@@ -1,0 +1,286 @@
+[Sun Jul 31 05:45:41 2011 GMT] ----------------------------------------
+[Sun Jul 31 05:45:41 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 05:45:41 2011 GMT] ----------------------------------------
+[Sun Jul 31 05:45:41 2011 GMT] Local Time: Sun, 31 Jul 2011 05:45:41 GMT+0
+[Sun Jul 31 05:45:41 2011 GMT] RAM : (572.54 MB free + 0 shared + 38.95 MB buffers) / 1001.65 MB total
+[Sun Jul 31 05:45:41 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 05:45:41 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 05:45:41 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 05:45:41 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 05:45:41 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 05:45:41 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 05:45:41 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 05:45:41 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 05:45:41 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 05:45:41 2011 GMT] 127.0.0.1
+[Sun Jul 31 05:45:41 2011 GMT] 108.84.177.122
+[Sun Jul 31 05:45:41 2011 GMT] Host /opt/gwan/0.0.0.0_8080/#0.0.0.0:
+[Sun Jul 31 05:45:41 2011 GMT] loaded chart.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded cache1.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded cache0.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded hello.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded loan.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded cache3.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded crash.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded attack.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded argv.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded hellox.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded trace.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded contact.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded post.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded httpdate.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded request.c
+[Sun Jul 31 05:45:41 2011 GMT] server started
+[Sun Jul 31 05:45:41 2011 GMT] loaded sqlite.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded json.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded setheaders.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded exit.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded sleep.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded cache4.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded v8.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded served_from.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded base64.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded while.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded redirect.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded fractal.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded noheaders.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded cache2.c
+[Sun Jul 31 05:45:41 2011 GMT] loaded getheaders.c
+[Sun Jul 31 05:46:36 2011 GMT] server stopped
+[Sun Jul 31 05:46:47 2011 GMT] ----------------------------------------
+[Sun Jul 31 05:46:47 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 05:46:47 2011 GMT] ----------------------------------------
+[Sun Jul 31 05:46:47 2011 GMT] Local Time: Sun, 31 Jul 2011 05:46:47 GMT+0
+[Sun Jul 31 05:46:47 2011 GMT] RAM : (571.94 MB free + 0 shared + 38.10 MB buffers) / 1001.65 MB total
+[Sun Jul 31 05:46:47 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 05:46:47 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 05:46:47 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 05:46:47 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 05:46:47 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 05:46:47 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 05:46:47 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 05:46:47 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 05:46:47 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 05:46:47 2011 GMT] 127.0.0.1
+[Sun Jul 31 05:46:47 2011 GMT] 108.84.177.122
+[Sun Jul 31 05:46:47 2011 GMT] Host /opt/gwan/0.0.0.0_80/#0.0.0.0:
+[Sun Jul 31 05:46:47 2011 GMT] loaded chart.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded cache1.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded cache0.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded hello.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded loan.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded cache3.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded crash.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded attack.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded argv.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded hellox.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded trace.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded contact.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded post.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded httpdate.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded request.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded sqlite.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded json.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded setheaders.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded exit.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded sleep.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded cache4.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded v8.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded served_from.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded base64.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded while.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded redirect.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded fractal.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded noheaders.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded cache2.c
+[Sun Jul 31 05:46:47 2011 GMT] loaded getheaders.c
+[Sun Jul 31 05:46:47 2011 GMT] server started
+[Sun Jul 31 06:00:42 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:00:42 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 06:00:42 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:00:42 2011 GMT] Local Time: Sun, 31 Jul 2011 06:00:42 GMT+0
+[Sun Jul 31 06:00:42 2011 GMT] RAM : (565.29 MB free + 0 shared + 39.36 MB buffers) / 1001.65 MB total
+[Sun Jul 31 06:00:42 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 06:00:42 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 06:00:42 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 06:00:42 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 06:00:42 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 06:00:42 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 06:00:42 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 06:00:42 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 06:00:42 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 06:00:42 2011 GMT] 127.0.0.1
+[Sun Jul 31 06:00:42 2011 GMT] 108.84.177.122
+[Sun Jul 31 06:00:42 2011 GMT] Host /opt/gwan/0.0.0.0_80/#0.0.0.0:
+[Sun Jul 31 06:00:42 2011 GMT] loaded chart.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded cache1.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded cache0.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded hello.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded loan.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded cache3.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded crash.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded attack.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded argv.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded hellox.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded trace.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded contact.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded post.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded httpdate.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded request.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded sqlite.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded json.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded setheaders.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded exit.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded sleep.c
+[Sun Jul 31 06:00:42 2011 GMT] loaded cache4.c
+[Sun Jul 31 06:00:42 2011 GMT] Error(s) in /opt/gwan/0.0.0.0_80/#0.0.0.0/csp/v8.c
+[Sun Jul 31 06:03:29 2011 GMT] server stopped
+[Sun Jul 31 06:03:30 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:03:30 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 06:03:30 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:03:30 2011 GMT] Local Time: Sun, 31 Jul 2011 06:03:30 GMT+0
+[Sun Jul 31 06:03:30 2011 GMT] RAM : (573.66 MB free + 0 shared + 39.12 MB buffers) / 1001.65 MB total
+[Sun Jul 31 06:03:30 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 06:03:30 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 06:03:30 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 06:03:30 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 06:03:30 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 06:03:30 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 06:03:30 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 06:03:30 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 06:03:30 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 06:03:30 2011 GMT] 127.0.0.1
+[Sun Jul 31 06:03:30 2011 GMT] 108.84.177.122
+[Sun Jul 31 06:03:30 2011 GMT] Host /opt/gwan/0.0.0.0_80/#0.0.0.0:
+[Sun Jul 31 06:03:30 2011 GMT] loaded chart.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded cache1.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded cache0.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded hello.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded loan.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded cache3.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded crash.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded attack.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded argv.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded hellox.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded trace.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded contact.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded post.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded httpdate.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded request.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded sqlite.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded json.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded setheaders.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded exit.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded sleep.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded cache4.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded v8.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded served_from.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded base64.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded while.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded redirect.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded fractal.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded noheaders.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded cache2.c
+[Sun Jul 31 06:03:30 2011 GMT] loaded getheaders.c
+[Sun Jul 31 06:03:30 2011 GMT] server started
+[Sun Jul 31 06:03:46 2011 GMT] server stopped
+[Sun Jul 31 06:03:46 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:03:46 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 06:03:46 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:03:46 2011 GMT] Local Time: Sun, 31 Jul 2011 06:03:46 GMT+0
+[Sun Jul 31 06:03:46 2011 GMT] RAM : (573.24 MB free + 0 shared + 39.14 MB buffers) / 1001.65 MB total
+[Sun Jul 31 06:03:46 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 06:03:46 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 06:03:46 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 06:03:46 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 06:03:46 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 06:03:46 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 06:03:46 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 06:03:46 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 06:03:46 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 06:03:46 2011 GMT] 127.0.0.1
+[Sun Jul 31 06:03:46 2011 GMT] 108.84.177.122
+[Sun Jul 31 06:03:46 2011 GMT] Host /opt/gwan/0.0.0.0_80/#0.0.0.0:
+[Sun Jul 31 06:03:46 2011 GMT] loaded chart.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded cache1.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded cache0.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded hello.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded loan.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded cache3.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded crash.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded attack.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded argv.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded hellox.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded trace.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded contact.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded post.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded httpdate.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded request.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded sqlite.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded json.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded setheaders.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded exit.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded sleep.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded cache4.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded v8.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded served_from.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded base64.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded while.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded redirect.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded fractal.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded noheaders.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded cache2.c
+[Sun Jul 31 06:03:46 2011 GMT] loaded getheaders.c
+[Sun Jul 31 06:03:46 2011 GMT] server started
+[Sun Jul 31 06:07:17 2011 GMT] server stopped
+[Sun Jul 31 06:07:18 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:07:18 2011 GMT] G-WAN 2.1.20 (Jan 20 2011 17:46:00)
+[Sun Jul 31 06:07:18 2011 GMT] ----------------------------------------
+[Sun Jul 31 06:07:18 2011 GMT] Local Time: Sun, 31 Jul 2011 06:07:18 GMT+0
+[Sun Jul 31 06:07:18 2011 GMT] RAM : (573.40 MB free + 0 shared + 39.20 MB buffers) / 1001.65 MB total
+[Sun Jul 31 06:07:18 2011 GMT] DISK: 0 free / 0 total
+[Sun Jul 31 06:07:18 2011 GMT] 1               Intel(R) Pentium(R) 4 CPU 2.66GHz (1 logical CPUs)
+[Sun Jul 31 06:07:18 2011 GMT] 32-bit little-endian (least significant byte first)
+[Sun Jul 31 06:07:18 2011 GMT] Linux v#1 SMP Mon Jun 13 04:13:06 UTC 2011 built 2.6.32-5-686
+[Sun Jul 31 06:07:18 2011 GMT] user: root (uid:0), group: root (uid:0)
+[Sun Jul 31 06:07:18 2011 GMT] system  fd_max: 1,024
+[Sun Jul 31 06:07:18 2011 GMT] program fd_max: 1,024
+[Sun Jul 31 06:07:18 2011 GMT] updated fd_max: 64,000
+[Sun Jul 31 06:07:18 2011 GMT] Available network interfaces (2):
+[Sun Jul 31 06:07:18 2011 GMT] 127.0.0.1
+[Sun Jul 31 06:07:18 2011 GMT] 108.84.177.122
+[Sun Jul 31 06:07:18 2011 GMT] Host /opt/gwan/0.0.0.0_80/#0.0.0.0:
+[Sun Jul 31 06:07:18 2011 GMT] loaded chart.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded cache1.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded cache0.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded hello.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded loan.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded crash_gwcall.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded cache3.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded crash.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded attack.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded argv.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded hellox.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded trace.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded contact.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded crash_libc.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded post.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded httpdate.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded request.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded sqlite.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded json.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded setheaders.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded exit.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded sleep.c
+[Sun Jul 31 06:07:18 2011 GMT] loaded cache4.c
+[Sun Jul 31 06:07:18 2011 GMT] Error(s) in /opt/gwan/0.0.0.0_80/#0.0.0.0/csp/v8.c

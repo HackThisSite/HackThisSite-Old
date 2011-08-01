@@ -1,0 +1,41 @@
+<html><head><title>Loan Calculator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link href="imgs/style.css" rel="stylesheet" type="text/css">
+<script src="imgs/ajax.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+// remove leading and ending spaces
+String.prototype.trim = function(){return this.replace(/^\s+|\s+$/g,"");}
+
+// replace all remaining spaces by '+' characters
+//String.prototype.tran = function(){return this.replace(/\s/gi,"+");}
+
+// Post the form (method is either "GET" or "POST")
+function calc(method){
+  var yname = document.getElementById("YName").value.trim();
+  var amount = document.getElementById("Amount").value.trim();
+  var rate = document.getElementById("Rate").value.trim();
+  var term = document.getElementById("Term").value.trim();
+  var url = "csp?loan&name="+escape(yname)+"&amount="+escape(amount)+"&rate="+escape(rate)+"&term="+escape(term);
+  ajaxGet(url, method,
+  function(request){
+  var e=document.getElementById("Result"); 
+  e.innerHTML=request.responseText;
+  e.style.display="block";});
+}
+</script>
+</head>
+<body bgcolor="White"><p><h1>Loan Calculator</h1></p><br>
+<form id="calculator">
+<fieldset style="width:600px;">
+<legend> Please fill the fields and press the 'Calculate' button ('*' fields are mandatory):</legend>
+<label for="YName">Your Full Name</label><input type="text" value="-" id="YName" maxLength="79" style="width: 400px;"><br><br>
+<label for="Amount">* Amount</label><input type="text" value="1000000" id="Amount" maxLength="12" style="width: 100px;"><br><br>
+<label for="Rate">* Rate </label><input type="text" value="3.5" id="Rate" maxLength="5" style="width: 100px;">%<br><br>
+<label for="Term">* Years</label><input type="text" value="10" id="Term" maxLength="3" style="width: 100px;"><br><br>
+<label for="Go"> &nbsp;</label><input type="button" class="button" value="Calculate" id="Go" onClick="calc('GET')" style="width: 100px;"><br><br>
+<label for="Result"> &nbsp;</label><div id="Result" style="display:none"><br>
+</fieldset>
+</form>
+<br>
+</body></html>

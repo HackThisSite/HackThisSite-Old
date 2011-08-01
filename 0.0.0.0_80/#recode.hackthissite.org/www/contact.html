@@ -1,0 +1,24 @@
+<html><head><title>Contact Form</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link href="imgs/style.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="White"><p><h1>Contact Form</h1></p>
+<p><!--time--><br><!--ip--><br></p>
+<form id="form" enctype="application/x-www-form-urlencoded" method="POST" action="csp?contact">
+<fieldset style="width:600px;">
+<legend> Please fill this form to send us your suggestions </legend> 
+	<input type="hidden" value="en" name="url">
+	<label for="address">Email Address</label>
+	<input name="address" maxlength="64" style="BORDER-RIGHT:#e0e0e0 1px solid; BORDER-TOP:#e0e0e0 1px solid; BORDER-LEFT:#e0e0e0 1px solid; WIDTH:400px; BORDER-BOTTOM:#e0e0e0 1px solid">
+	<br><br>
+	<label for="subject">Subject</label>
+	<input name="subject" maxlength="64" style="BORDER-RIGHT:#e0e0e0 1px solid; BORDER-TOP:#e0e0e0 1px solid; BORDER-LEFT:#e0e0e0 1px solid; WIDTH:400px; BORDER-BOTTOM:#e0e0e0 1px solid">
+	<br><br>
+	<label for="text">Question</label>
+	<textarea name="text" style="BORDER-RIGHT:#e0e0e0 1px solid; BORDER-TOP:#e0e0e0 1px solid; BORDER-LEFT:#e0e0e0 1px solid; WIDTH:400px; BORDER-BOTTOM:#e0e0e0 1px solid" rows="8"></textarea>
+</fieldset>
+	<br>
+	<input name="name" type="submit" class="button" value="Send">
+</form>
+</body>
+</html>

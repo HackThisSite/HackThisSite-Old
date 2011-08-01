@@ -1,2 +1,2 @@
 --- HackThisSite Acheron Readme ---
-This file will be used soon. No worries.
+Refer to /docs/ for some extra documentation.

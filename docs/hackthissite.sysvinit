@@ -1,0 +1,51 @@
+#! /bin/sh
+
+# HackThisSite Instance Init Script for Debian/Ubuntu
+#
+# How to Use:
+# Copy this file to /etc/init.d/hackthissite.
+# Set the correct permission on hackthissite. Run 'chmod 775 /etc/init.d/hackthissite'. 
+# Run 'update-rc.d hackthissite defaults' if you want it to start on boot.
+
+### BEGIN INIT INFO
+# Provides: HackThisSite Instance
+# Required-Start: $all
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: HackThisSite Instance initscript
+# Description: This initiscript starts and stops the HackThisSite instance.
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local
+LD_LIBRARY_PATH=$ACHERON_PATH/libraries/v8
+
+NAME=hackthissite
+GWANBIN=gwan
+USER=hts-www
+GROUP=hts-www
+HTS_PATH=/htsdev
+START="-d"
+STOP="-k"
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if G-Wan is not installed
+[ -x "$HTS_PATH/$GWANBIN" ] || exit 0
+
+case "$1" in
+start)
+echo "Starting GWAN HackThisSite Acheron Instance."
+cd $HTS_PATH
+./$GWANBIN $START
+;;
+stop)
+cd $GWANBIN_PATH
+./$NAME $STOP
+;;
+*)
+echo "Usage: $SCRIPTNAME {start|stop}" >&2
+exit 3
+;;
+esac
+
+:

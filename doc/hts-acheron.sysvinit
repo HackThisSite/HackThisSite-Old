@@ -2,6 +2,7 @@
 
 # HackThisSite Acheron Instance Init Script for Debian/Ubuntu
 # Change HTSACHERON_PATH
+# Run 'update-rc.d hts-acheron default' if you want it to start on boot.
 
 ### BEGIN INIT INFO
 # Provides: TrustLeap G-Wan Webserver

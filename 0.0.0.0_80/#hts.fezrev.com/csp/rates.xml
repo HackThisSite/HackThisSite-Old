@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd"><html lang="en"><head><title>Currency convertor</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><link href="images/style.css" rel="stylesheet" type="text/css"></head><body><h1>Currency convertor</h1><br>The latest exchange rates (from the European bank):<br><br>HTTP/1.1 200 OKDate: Wed, 18 Mar 2009 18:39:18 GMTServer: Apache/2.2.3 (Linux/SUSE)Last-Modified: Wed, 18 Mar 2009 13:26:39 GMTETag: "c9c39e-6ab-46564a22f81c0"Accept-Ranges: bytesContent-Length: 1707Connection: closeContent-Type: text/xmlX-Pad: avoid browser bug<?xml version="1.0" encoding="UTF-8"?>
+<gesmes:Envelope xmlns:gesmes="http://www.gesmes.org/xml/2002-08-01" xmlns="http://www.ecb.int/vocabulary/2002-08-01/eurofxref">
+	<gesmes:subject>Reference rates</gesmes:subject>
+	<gesmes:Sender>
+		<gesmes:name>European Central Bank</gesmes:name>
+	</gesmes:Sender>
+	<Cube>
+		<Cube time='2009-03-18'>
+			<Cube currency='USD' rate='1.3130'/>
+			<Cube currency='JPY' rate='128.94'/>
+			<Cube currency='BGN' rate='1.9558'/>
+			<Cube currency='CZK' rate='26.988'/>
+			<Cube currency='DKK' rate='7.4508'/>
+			<Cube currency='EEK' rate='15.6466'/>
+			<Cube currency='GBP' rate='0.93910'/>
+			<Cube currency='HUF' rate='301.70'/>
+			<Cube currency='LTL' rate='3.4528'/>
+			<Cube currency='LVL' rate='0.7075'/>
+			<Cube currency='PLN' rate='4.5427'/>
+			<Cube currency='RON' rate='4.2965'/>
+			<Cube currency='SEK' rate='10.9630'/>
+			<Cube currency='CHF' rate='1.5332'/>
+			<Cube currency='NOK' rate='8.8090'/>
+			<Cube currency='HRK' rate='7.4395'/>
+			<Cube currency='RUB' rate='45.1795'/>
+			<Cube currency='TRY' rate='2.2459'/>
+			<Cube currency='AUD' rate='1.9840'/>
+			<Cube currency='BRL' rate='2.9982'/>
+			<Cube currency='CAD' rate='1.6563'/>
+			<Cube currency='CNY' rate='8.9740'/>
+			<Cube currency='HKD' rate='10.1787'/>
+			<Cube currency='IDR' rate='15677.22'/>
+			<Cube currency='INR' rate='67.3440'/>
+			<Cube currency='KRW' rate='1859.60'/>
+			<Cube currency='MXN' rate='18.5133'/>
+			<Cube currency='MYR' rate='4.8351'/>
+			<Cube currency='NZD' rate='2.4753'/>
+			<Cube currency='PHP' rate='63.480'/>
+			<Cube currency='SGD' rate='2.0004'/>
+			<Cube currency='THB' rate='47.025'/>
+			<Cube currency='ZAR' rate='12.9205'/>
+		</Cube>
+	</Cube>
+</gesmes:Envelope></body></html>

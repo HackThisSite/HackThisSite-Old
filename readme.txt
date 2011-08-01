@@ -1,1 +1,0 @@
-# -- HackThisSite Project Acheros Readme --

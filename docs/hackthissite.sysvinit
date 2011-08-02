@@ -22,9 +22,9 @@ LD_LIBRARY_PATH=$ACHERON_PATH/libraries/v8
 
 NAME=hackthissite
 GWANBIN=gwan
-USER=hts-www
-GROUP=hts-www
-HTS_PATH=/htsdev
+USER=root
+GROUP=root
+HTS_PATH=/hts/htsdev.git
 START="-d"
 STOP="-k"
 SCRIPTNAME=/etc/init.d/$NAME

@@ -18,7 +18,7 @@
 ### END INIT INFO
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local
-LD_LIBRARY_PATH=$ACHERON_PATH/libraries/v8
+LD_LIBRARY_PATH=$HTS_PATH/libraries/v8
 
 NAME=hackthissite
 GWANBIN=gwan
@@ -29,12 +29,11 @@ START="-d"
 STOP="-k"
 SCRIPTNAME=/etc/init.d/$NAME
 
-# Exit if G-Wan is not installed
 [ -x "$HTS_PATH/$GWANBIN" ] || exit 0
 
 case "$1" in
 start)
-echo "Starting GWAN HackThisSite Acheron Instance."
+echo "Starting GWAN HackThisSite Instance."
 cd $HTS_PATH
 ./$GWANBIN $START
 ;;

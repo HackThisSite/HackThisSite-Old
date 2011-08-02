@@ -4,7 +4,7 @@
 #
 # How to Use:
 # Copy this file to /etc/init.d/hackthissite.
-# Set the correct permission on hackthissite. Run 'chmod 775 /etc/init.d/hackthissite'. 
+# Set the correct permissions on hackthissite. Run 'chmod 775 /etc/init.d/hackthissite'. 
 # Run 'update-rc.d hackthissite defaults' if you want it to start on boot.
 
 ### BEGIN INIT INFO
@@ -18,7 +18,7 @@
 ### END INIT INFO
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local
-LD_LIBRARY_PATH=$HTS_PATH/libraries/v8
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8
 
 NAME=hackthissite
 GWANBIN=gwan
@@ -34,12 +34,10 @@ SCRIPTNAME=/etc/init.d/$NAME
 case "$1" in
 start)
 echo "Starting GWAN HackThisSite Instance."
-cd $HTS_PATH
-./$GWANBIN $START
+$HTS_PATH/$GWANBIN $START
 ;;
 stop)
-cd $HTS_PATH
-./$GWANBIN $STOP
+$HTS_PATH/$GWANBIN $STOP
 ;;
 *)
 echo "Usage: $SCRIPTNAME {start|stop}" >&2

@@ -1,1 +1,0 @@
-../hts/$static.my.hts.org

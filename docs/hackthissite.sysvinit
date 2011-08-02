@@ -39,8 +39,8 @@ cd $HTS_PATH
 ./$GWANBIN $START
 ;;
 stop)
-cd $GWANBIN_PATH
-./$NAME $STOP
+cd $HTS_PATH
+./$GWANBIN $STOP
 ;;
 *)
 echo "Usage: $SCRIPTNAME {start|stop}" >&2

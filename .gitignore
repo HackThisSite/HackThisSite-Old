@@ -1,0 +1,4 @@
+# .gitignore faile - htsdev.git
+*.pid
+trace
+logs/*

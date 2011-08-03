@@ -34,10 +34,12 @@ SCRIPTNAME=/etc/init.d/$NAME
 case "$1" in
 start)
 echo "Starting GWAN HackThisSite Instance."
-$HTS_PATH/$GWANBIN $START
+cd $HTS_PATH
+./$GWANBIN $START
 ;;
 stop)
-$HTS_PATH/$GWANBIN $STOP
+cd $HTS_PATH
+./$GWANBIN $STOP
 ;;
 *)
 echo "Usage: $SCRIPTNAME {start|stop}" >&2

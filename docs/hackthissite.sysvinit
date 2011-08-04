@@ -18,7 +18,7 @@
 ### END INIT INFO
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8:$HTS_PATH/libraries/mongodb
 
 NAME=hackthissite
 GWANBIN=gwan

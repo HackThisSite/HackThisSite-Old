@@ -22,8 +22,8 @@ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8
 
 NAME=hackthissite
 GWANBIN=gwan
-USER=root
-GROUP=root
+USER=hts-www
+GROUP=hts-www
 HTS_PATH=/hts/htsdev.git
 START="-d"
 STOP="-k"
@@ -35,7 +35,7 @@ case "$1" in
 start)
 echo "Starting GWAN HackThisSite Instance."
 cd $HTS_PATH
-./$GWANBIN $START
+./$GWANBIN $START:$GROUP:$USER
 ;;
 stop)
 cd $HTS_PATH

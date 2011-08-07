@@ -110,7 +110,7 @@ static inline long double powd(long double x, u32 p)
 
       x *= x, p >>= 1; // get next 'p' bit
    } 
-   while(p); // if(p==1024) 10 iterations, instead of: while(p--) x *= x;
+   while(p); // if(p==1024) 10 iterations, instead of 1024: while(p--) x *= x;
    return res;
 }
 // ----------------------------------------------------------------------------
@@ -129,7 +129,6 @@ int main(int argc, char *argv[])
       static char redir[] = "HTTP/1.1 302 Found\r\n"
          "Content-type:text/html\r\n"
          "Location: loan.html\r\n\r\n"
-         "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
          "<html><head><title>Redirect</title></head><body>"
          "Click <a href=\"loan.html\">HERE</A> for redirect.</body></html>";
 
@@ -162,6 +161,23 @@ int main(int argc, char *argv[])
    // all litteral strings provided by a client must be escaped this way
    // if you inject them into an HTML page
    escape_html(szName, Name, sizeof(szName) - 1);
+   
+   // but we don't want to display "%20" for each space character
+   {
+      char *s = szName, *d = s;
+      while(*s)
+      {
+         if(s[0] == '%' && s[1] == '2' && s[2] == '0') // escaped space?
+         {
+            s += 3;     // pass escaped space
+            *d++ = ' '; // translate it into the real thing
+            continue;   // loop
+         }
+         
+         *d++ = *s++; // copy other characters
+      }
+      *d = 0; // close zero-terminated string
+   }
 
    // filter input data to avoid all the useless/nasty cases
    amount = atod(Amount);
@@ -202,15 +218,15 @@ int main(int argc, char *argv[])
    cost = (term * 12 * payment) - amount;
 
    // build the top of our HTML page
-   xbuf_xcat(reply, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+   xbuf_xcat(reply, "<!DOCTYPE HTML>"
       "<html lang=\"en\"><head><title>Loan Calculator</title><meta http-equiv"
       "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-      "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
-      "</head><body style=\"background:#fff;\"><h2>"
-      "Dear %s, your loan goes as follows:</h2>", 
-      (*szName && *szName != '-')?szName:"client");  
+      "<link href=\"/imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
+      "</head><body style=\"margin:0 16px;\">"
+      "<h2>Dear %s, your loan goes as follows:</h2><br>", 
+      (*szName && *szName != '-') ? szName : "client");  
 
-   xbuf_xcat(reply, "<br><table class=\"clean\" width=240px>"
+   xbuf_xcat(reply, "<table class=\"clean\" width=240px>"
       "<tr><th>loan</th><th>details</th></tr>"
       "<tr class=\"d1\"><td>Amount</td><td>%.2F</td></tr>"
       "<tr class=\"d0\"><td>Rate</td><td>%.2F%%</td></tr>"
@@ -288,7 +304,7 @@ int main(int argc, char *argv[])
    xbuf_xcat(reply,
             "</table><br>This page was generated in %.2F ms."
             "<br>(on a 3GHz CPU 1 ms = 3,000,000 cycles)"
-            "<br></body></html>", (double)(getus() - start)/1000.);
+            "<br></body></html>", (getus() - start)/1000.0);
 
    return 200; // return an HTTP code (200:'OK')
 }

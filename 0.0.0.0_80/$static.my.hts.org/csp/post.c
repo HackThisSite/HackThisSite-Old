@@ -12,8 +12,10 @@
 //    xbuf_cat(): like strcat(), but it works in the specified dynamic buffer 
 // ----------------------------------------------------------------------------
 #include "gwan.h" // G-WAN exported functions
-#include <sys/socket.h>#include <netdb.h>
-
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #define IP         "192.168.200.88" // change as needed
 #define PORT       "8080"
 
@@ -57,10 +59,13 @@ int main(int argc, char *argv[])
                       "Content-Length: " ENTITY_LEN "\r\n"
                       "Content-Type: application/octet-stream\r\n"
                       "Connection: close\r\n"
-                      "\r\n"
-                      ENTITY;
+                      "\r\n";
          int len = sizeof(req) - 1;
          if(write(s, req, len) != len)
+            break;
+
+         len = sizeof(ENTITY) - 1;
+         if(write(s, ENTITY, len) != len)
             break;
 
          char buf[4070] = {0};
@@ -110,16 +115,34 @@ int main(int argc, char *argv[])
 
    xbuf_t *reply = get_reply(argv);
    xbuf_xcat(reply, 
-             "<h1>Client POSTed:</h1><br><br>"
-             "Length: %U bytes<br>"
-             " Type : %s<br>"
-             "Coding: %s<br>"
-             "Entity: %s<br>",
+             "<h1>The client has posted:</h1><br>"
+             "<b>Length:</b> %U bytes<br>"
+             "<b>Type :</b> %s<br>"
+             "<b>Encoding:</b> %s<br>"
+             "<b>Entity:</b> ",
              length,
-             http_type[type],
-             enc_type[coding],
-             entity);
+             http_type[type & 7],
+             enc_type[coding & 7]);
              
+   if(entity[1] >= ' ') // crude test: ASCII entity?
+   {
+      xbuf_ncat(reply, entity, length);
+      return 200; // return an HTTP code (200:'OK')
+   }
+   
+   // convert binary data into ASCII characters
+   static const u8 to_ascii[] = "0123456789abcdef";
+   u8 tmp[80], *d = tmp, *s = entity;
+   int len = length;
+   while(len--)
+   {
+      *d++ = 'x';
+      *d++ = to_ascii[(*s >> 4) & 15];
+      *d++ = to_ascii[(*s++   ) & 15];
+   }
+   *d = 0; // close the string (useless here)
+        
+   xbuf_ncat(reply, tmp, length * 3);
    return 200; // return an HTTP code (200:'OK')
 }
 // ============================================================================

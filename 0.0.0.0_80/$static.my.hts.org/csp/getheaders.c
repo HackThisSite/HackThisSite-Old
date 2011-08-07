@@ -34,7 +34,7 @@
 static char title[] = "Getting HTTP Headers";
 
 // Top of our HTML page
-static char top[] = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+static char top[] = "<!DOCTYPE HTML>"
      "<html lang=\"en\"><head><title>%s</title><meta http-equiv"
      "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
 //   "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
@@ -43,7 +43,7 @@ static char top[] = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
 // ----------------------------------------------------------------------------
 // imported functions:
 //   get_reply(): get a pointer on the 'reply' dynamic buffer from the server
-//  xbuf_reset(): (re)initiatize a dynamic buffer object
+//   xbuf_init(): called after xbuf_t has been declared, to initialize struct
 //  xbuf_frurl(): make an Http request, and store results in a dynamic buffer
 //   xbuf_ncat(): like strncat(), but in the specified dynamic buffer 
 //   xbuf_xcat(): formatted strcat() (a la printf) in a given dynamic buffer 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
    // send the Http request (1,000 ms timeout)
    // -------------------------------------------------------------------------
    xbuf_t buf;
-   xbuf_reset(&buf);
+   xbuf_init(&buf);
    int code = xbuf_frurl(&buf, pHost, port, HTTP_HEAD, pURL, 1000, 0);
 
    // -------------------------------------------------------------------------

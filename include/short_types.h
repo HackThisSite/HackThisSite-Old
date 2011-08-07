@@ -17,23 +17,15 @@ typedef unsigned int       u32;
 # ifdef _WIN32
 typedef          __int64   s64;
 typedef unsigned __int64   u64;
-# elif def _LP64
-typedef          long      s64;
-typedef unsigned long      u64;
 # else
-typedef          long long s64;
-typedef unsigned long long u64;
+#  if __WORDSIZE == 64
+typedef          long int s64;
+typedef long unsigned int u64;
+#  else
+typedef          long long int s64;
+typedef long long unsigned int u64;
+#  endif
 # endif
-
-/*
-# if __WORDSIZE == 64
-typedef s64 size_t;
-# else
-typedef s32 size_t;
-# endif
-*/
-typedef __SIZE_TYPE__ size_t;
-typedef long int      time_t;
 
 #endif // _SHORT_TYPES_H
 

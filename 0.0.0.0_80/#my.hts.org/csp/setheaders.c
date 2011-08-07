@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 // imported functions:
 //   get_reply(): get a pointer on the 'reply' dynamic buffer from the server
-//  xbuf_reset(): (re)initiatize a dynamic buffer object
+//   xbuf_init(): called after xbuf_t has been declared, to initialize struct
 //   xbuf_xcat(): formatted strcat() (a la printf) in a given dynamic buffer 
 //     get_env(): get connection's 'environment' variables from the server:
 // ----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ static char title[]="Setting response headers";
 
 // Top of our HTML page
 static char top[]=
-     "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+     "<!DOCTYPE HTML>"
      "<html lang=\"en\"><head><title>%s</title><meta http-equiv"
      "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
      "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"

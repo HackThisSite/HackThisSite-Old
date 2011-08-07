@@ -9,43 +9,56 @@
 #include "xbuffer.h"     // xbuf_xcat(), etc.
 #include "float.h"       // limits, conversions
 #include "stdarg.h"      // va_start()/va_end()
+#include "stddef.h"      // basic types
 #include "stdbool.h"     // true/false
 
-// ----------------------------------------------------------------------------
+typedef long int off_t;  // used by typedef struct http_t
+
+// ============================================================================
 // Sections covered below:
 // ----------------------------------------------------------------------------
-// G-WAN server reply' xbuffer
-// G-WAN server 'error.log' file
-// G-WAN server 'environment' variables
-// G-WAN server URL parameters
-// G-WAN server handlers
-// G-WAN server cache
+// The 'reply' xbuffer
+// The error.log file
+// Environment variables
+// HTTP response Headers
+// HTTP code messages
+// URL parameters
+// Key-value store
+// Garbage collector
+// Handlers
+// Cache
+// Server report
 // JSON (de-)serialization
-// escaping
-// formatting
-// in-memory GIF
-// frame buffer
-// charts & sparklines
-// email
-// time
-// random numbers
-// checksums
-// hashing
-// encryption
-// compression
-// shared libraries (see also "#pragma link" in sqlite.c)
+// HTML escaping
+// Formatting
+// In-memory GIF I/O
+// Frame buffer
+// Charts & sparklines
+// Email
+// Time
+// Random numbers
+// Checksums
+// Hashing
+// Encryption
+// Compression
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// G-WAN server 'reply' xbuffer
+// ============================================================================
+// The 'reply' xbuffer
 // ----------------------------------------------------------------------------
 // get the memory pointer for the server reply dynamic buffer
 // xbuf_t *reply = get_reply(argv);
 
 xbuf_t *get_reply(char *argv[]);
 
-// ----------------------------------------------------------------------------
-// G-WAN server 'error.log' file
+// use a user-defined allocated (not static) buffer for the server reply
+// (usually used to serve entries cached in a G-WAN KV store)
+// set_reply(argv, my_reply, my_reply_length, 200); // 200:OK (HTTP status)
+
+void set_reply(char *argv[], char *buf, u32 len, u32 status);
+
+// ============================================================================
+// The error.log file
 // ----------------------------------------------------------------------------
 // output text in the current virtual host 'error.log' file:
 // char str[256];
@@ -55,19 +68,99 @@ xbuf_t *get_reply(char *argv[]);
 
 void log_err(char *argv[], const char *msg);
 
-// ----------------------------------------------------------------------------
-// G-WAN server 'environment' variables
+// ============================================================================
+// Environment variables
 // ----------------------------------------------------------------------------
 // get an environment variable (a performance counter, or a persistence ptr)
 // (see the 'contact.c' sample and 'enum HTTP_Env' below for all values)
+//
+// 'inval' is only used to get a *pointer* on a value (so we can change the 
+// value, like for HTTP_CODE, DOWNLOAD_SPEED, US_HANDLER_DATA, US_VHOST_DATA, 
+// or US_HANDLER_STATES):
 
-// 'inval' is only used to SET a value (HTTP_CODE or DOWNLOAD_SPEED)
+// int session = get_env(argv, SESSION_ID, 0); // easy cases
+// char *www   = get_env(argv, WWW_ROOT, 0);
+
+// int *pHttp_code = 0;
+// get_env(argv, HTTP_CODE, (char**)&pHttp_code);
+// if(pHttp_code)       // if we got a pointer on the value,
+//   *pHttp_code = 200; // then change the value (to 200:OK)
+
+// int *pDownload_speed = 0;
+// get_env(argv, DOWNLOAD_SPEED, (char**)&pDownload_speed);
+// if(pDownload_speed)     // if we got a pointer on the value,
+//   *pDownload_speed = 2; // then change the value (to 2,048 bytes per sec)
+
+// void **pVhost_persistent_ptr = 0;
+// get_env(argv, US_VHOST_DATA, &pVhost_persistent_ptr);
+// if(pVhost_persistent_ptr) // if we got a pointer on the value, change it
+//   *pVhost_persistent_ptr = strdup("persistent data");
+//
 u64 get_env(char *argv[], int name, char **inval);
 
 enum HTTP_Method
 {
-   HTTP_BAD=0, HTTP_GET, // RFC 2616
-   HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OPTIONS
+    HTTP_ANY=0, HTTP_GET, // RFC 2616
+    HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OPTIONS,
+    // G-WAN currently supports this list until 'OPTIONS'
+    HTTP_CONNECT,
+    HTTP_TRACE,
+    HTTP_PATCH,     // no RFC (remove?)
+    HTTP_PROPFIND,  // RFC 2518: WebDAV
+    HTTP_PROPPATCH,
+    HTTP_MKCOL,
+    HTTP_COPY,
+    HTTP_MOVE,
+    HTTP_LOCK,
+    HTTP_UNLOCK,
+    HTTP_VERSION_CONTROL,
+    HTTP_CHECKOUT,
+    HTTP_UNCHECKOUT,
+    HTTP_CHECKIN,
+    HTTP_UPDATE,
+    HTTP_LABEL,
+    HTTP_REPORT,
+    HTTP_MKWORKSPACE,
+    HTTP_MKACTIVITY,
+    HTTP_BASELINE_CONTROL,
+    HTTP_MERGE,
+    HTTP_INVALID    // RFC 3253: WebDAV versioning
+};
+
+// letting you translate HTTP method codes into character strings (tracing)
+static char *szHTTP_Method[] =
+{
+   [HTTP_ANY]        = "?",
+   [HTTP_GET]        = "GET",
+   [HTTP_HEAD]       = "HEAD",
+   [HTTP_POST]       = "POST",
+   [HTTP_PUT]        = "PUT",
+   [HTTP_DELETE]     = "DELETE",
+   [HTTP_OPTIONS]    = "OPTIONS",
+   // G-WAN currently supports this list until 'OPTIONS'
+   [HTTP_CONNECT]    = "CONNECT",
+   [HTTP_TRACE]      = "TRACE",
+   [HTTP_PATCH]      = "PATCH",     // no RFC (remove?)
+   [HTTP_PROPFIND]   = "PROPFIND",  // RFC 2518: WebDAV
+   [HTTP_PROPPATCH]  = "PROPPATCH",
+   [HTTP_MKCOL]      = "MKCOL",
+   [HTTP_COPY]       = "COPY",
+   [HTTP_MOVE]       = "MOVE",
+   [HTTP_LOCK]       = "LOCK",
+   [HTTP_UNLOCK]     = "UNLOCK",
+   [HTTP_VERSION_CONTROL]="VERSION_CONTROL",
+   [HTTP_CHECKOUT]   = "CHECKOUT",
+   [HTTP_UNCHECKOUT] = "UNCHECKOUT",
+   [HTTP_CHECKIN]    = "CHECKIN",
+   [HTTP_UPDATE]     = "UPDATE",
+   [HTTP_LABEL]      = "LABEL",
+   [HTTP_REPORT]     = "REPORT",
+   [HTTP_MKWORKSPACE]= "MKWORKSPACE",
+   [HTTP_MKACTIVITY] = "MKACTIVITY",
+   [HTTP_BASELINE_CONTROL]="BASELINE_CONTROL",
+   [HTTP_MERGE]      = "MERGE",
+   [HTTP_INVALID]    = "INVALID"    // RFC 3253: WebDAV versioning
+   ""
 };
 
 enum HTTP_Type
@@ -88,6 +181,38 @@ enum AUTH_Type
    AUTH_x509=5 // can be used on the top of AUTH_BASIC/AUTH_DIGEST/AUTH_SRP
 };
 
+// the HTTP state of a connection
+// (see the served_from.c sample for how to use it)
+typedef struct
+{
+   char    *h_entity,   // all "h_" prefixed variables are HTTP Headers
+           *h_host,
+           *h_useragent,
+           *h_referer,
+           *h_auth_user,
+           *h_auth_pwd,
+           *h_cookies,
+           *h_if_nonematch; // If-None-Match: "68689-7696a7c-876b7e" (ETag)
+   off_t    h_range_from,
+            h_range_to;
+   u32      session_id; // csp: only used by get_env() at the moment...
+   int      file_fd;    // needs 32 bits as it is tested for -1 equality...
+   u32      h_if_modified, h_if_unmodified, // EPOCH time (seconds)
+            h_content_length;
+   unsigned h_auth_type         : 3, // 0-7
+            h_keepalive         : 1, // 0-1
+            h_accept_encoding   : 4, // 0-15
+            h_content_encoding  : 4, // 0-15
+            h_transfer_encoding : 4, // 0-15
+            h_port              :16, // 0-65,535 (server port)
+            h_content_type      : 2, // 0-3
+            h_expect            : 1, // 0-1
+            h_maj_ver           : 1, // 0-1
+            h_min_ver           : 4, // 0-15
+            h_ver               :10, // 0-1023
+            h_method            : 5; // 0-32 (0-27 to cover the HTTP standard)
+} http_t;
+
 enum HTTP_Env
 {
    // -------------------------------------------------------------------------
@@ -102,11 +227,13 @@ enum HTTP_Env
    CONTENT_ENCODING,// int    CONTENT_ENCODING// entity, gzip, deflate
    SESSION_ID,      // int    SESSION_ID;     // 12345678 (range: 0-4294967295)
    HTTP_CODE,       // int   *HTTP_CODE;      // 100-600 range (200:'OK')
+   HTTP_HEADERS,    // struct *http_t;        // see struct http_t above
    AUTH_TYPE,       // int    AUTH_TYPE;      // see enum AUTH_Type {}
    REMOTE_ADDR,     // char  *REMOTE_ADDR;    // "192.168.54.128"
    REMOTE_PORT,     // int    REMOTE_PORT;    // 1460 (range: 1024-65535)
    REMOTE_PROTOCOL, // int    REMOTE_PROTOCOL // ((HTTP_major*1000)+HTTP_minor)
    REMOTE_USER,     // char  *REMOTE_USER     // "Pierre"
+   CLIENT_SOCKET,   // int    CLIENT_SOCKET   // 1032 (-1 if invalid/closed)   
    USER_AGENT,      // char  *USER_AGENT;     // "Mozilla ... Firefox"
    SERVER_SOFTWARE, // char  *SERVER_SOFTWARE // "G-WAN/1.0.2"
    SERVER_NAME,     // char  *SERVER_NAME;    // "domain.com"
@@ -120,6 +247,9 @@ enum HTTP_Env
    HLD_ROOT,        // char  *HLD_ROOT;       // the handlers folder
    FNT_ROOT,        // char  *FNT_ROOT;       // the fonts folder
    DOWNLOAD_SPEED,  // int   *DOWNLOAD_SPEED; // minimum allowed transfer rate
+   READ_XBUF,       // xbuf_t*READ_XBUF;      // HTTP request is stored there
+   SCRIPT_TMO,      // u32   *SCRIPT_TMO;     // time-out in milliseconds
+   KALIVE_TMO,      // u32   *KALIVE_TMO;     // HTTP Keep-Alive time-out (ms)
    // -------------------------------------------------------------------------
    // Server performance counters
    // -------------------------------------------------------------------------
@@ -130,15 +260,68 @@ enum HTTP_Env
    // -------------------------------------------------------------------------
    // Handler and VirtualHost Persistence pointers
    // -------------------------------------------------------------------------
-   US_HANDLER_DATA=200, US_VHOST_DATA
+   US_HANDLER_DATA=200, // Listener-wide pointer
+   US_VHOST_DATA,       // Virtual-Host-wide pointer
+   US_SERVER_DATA,      // global pointer
+   US_HANDLER_STATES    // states registered to get server-state notifications
 };
 
+// ============================================================================
+// HTTP response Headers
 // ----------------------------------------------------------------------------
-// G-WAN server URL parameters
+// modify HTTP response headers generated by G-WAN
+// example: char header[] = "Powered-by: ANSI C scripts\r\n";
+//          http_header(HEAD_ADD, header, sizeof(header) - 1);
+
+enum HEADERS_flags
+{
+   HEAD_ADD   = 1, // add this HTTP header to response headers
+   HEAD_MOD   = 2, // not implemented yet
+   HEAD_DEL   = 4, // not implemented yet
+   HEAD_AFTER = 8  // add this data chunck just after [HTTP headers CRLFCRLF]
+};
+// *only* for STATIC requests used by "content-type" handlers
+void http_header(u32 flags, char *buf, u32 buflen, char *argv[]);
+
+// build HTTP response headers (usually used with set_reply(), see the
+// main_404.cxx handler sample)
+//
+// char *date = get_env(argv, SERVER_DATE, 0);
+// char szmodified[32];
+// static const char buf[] = 
+//    "HTTP/1.1 %s\r\n"
+//    "Date: %s\r\n"
+//    "Last-Modified: %s\r\n"
+//    "Content-type: text/html\r\n"
+//    "Content-Length: %u\r\n" // HTML body length
+//    "Connection: keep-alive\r\n\r\n";
+//
+// build_headers(argv, buf,
+//           http_status(*pHTTP_status), // "200 OK" here
+//           date,                       // current HTTP time
+//           time2rfc(mod, szmodified),  // file HTTP time
+//           len);                       // file length
+//           
+// set_reply(argv, c, len, *pHTTP_status); // re-use cached buffer
+
+void build_headers(char *argv[], char *format, ...);
+
+// ============================================================================
+// HTTP code messages
+// ----------------------------------------------------------------------------
+// example: 
+// char *hdr, *msg;
+// hdr = http_status(404); // "404 Not Found"
+// msg = http_error(404); // "The requested URL was not found on this server."
+char *http_status(int code);
+char *http_error (int code);
+
+// ============================================================================
+// URL parameters
 // ----------------------------------------------------------------------------
 // get an URL parameter: "http://127.0.0.1/csp?hellox&name=Eva"
-// example: char name=0; get_arg("name=", &name, argc, argv);
-//          (now, 'name' points to "Eva")
+// example: char *name = 0; get_arg("name=", &name, argc, argv);
+//          (now, 'name' points to "Eva" - you MUST check if 'name' is NULL)
 
 void get_arg(char *name, char **value, int argc, char *argv[]);
 
@@ -146,29 +329,146 @@ void get_arg(char *name, char **value, int argc, char *argv[]);
 // int i = 0;
 // while(i < argc)
 // {
-//    xbuf_xcat(&reply, "argv[%u] '%s'<br>", i, argv[i]);
+//    xbuf_xcat(reply, "argv[%u] '%s'<br>", i, argv[i]);
 //    i++;
 // }
 
+// ============================================================================
+// Server report
 // ----------------------------------------------------------------------------
-// G-WAN server handlers
-// ----------------------------------------------------------------------------
+// append a server report (in html or text format) to an xbuffer)
+// most of this data can be extracted from the performance counters above but
+// this is a convenient way to get a 'snapshot' of the server state
+void server_report(xbuf_t *reply, int html); // see the report.c sample
 
-enum HANDLER_ACT
+// ============================================================================
+// Key-Value store 
+// ----------------------------------------------------------------------------
+// example: (for more details, see the kv.c sample)
+//
+// kv_item item;
+// item.key = strdup("Paula");
+// item.val = strdup("Accounting");
+// item.klen = sizeof("Paula");
+//
+// kv_t store;
+// kv_new(&store, 4 * 1024, argv); // using 4 KB "maximum" 
+// kv_add(&store, &item, argv);
+//
+// char *ptr = kv_get(&store, "Paula");
+// if(ptr)
+//    printf("value: %s\n", ptr);
+//
+// kv_del(&store, "Paula");
+// kv_free(&store); // makes the above kv_del() redundant in this example
+// ----------------------------------------------------------------------------
+// the kv_init() flag options
+enum KV_OPTIONS
 {
-   HDL_INIT=0, HDL_AFTER_ACCEPT, HDL_AFTER_READ, HDL_BEFORE_PARSE, 
-   HDL_AFTER_PARSE, HDL_BEFORE_WRITE, HDL_CLEANUP
+   KV_GC_ALLOC = 1,    // garbage collection, default behavior
+   KV_PERSISTANCE = 2, // periodic file I/O (using kv_recfn() call-back)
+   KV_INCR_KEY = 4,    // 1st field:primary key (automatically incremented)
+   KV_CUR_TIME = 8     // 2nd field:time stamp  (automatically setup/updated)
 };
 
+// a key-value store
+typedef struct
+{
+   long  root;
+   long  nbr_items;
+   char *name;
+   long  ctx[13];
+} kv_t;
+
+// a tuple (key-value, and key-value lengths)
+// if(!klen) then kv_add()/kv_get()/kv_del()/kv_do() do klen = strlen(klen);
+typedef struct
+{
+   char *key,
+        *val;
+   long  ctx;
+   u32   klen; // key length limit: 4 GB
+} kv_item;
+
+// delfn is an user-defined function to free memory allocated for KV records
+typedef void(*kv_delfn_t)(void *value);
+
+// recfn is an user-defined function to format KV records when saved to disk
+typedef void(*kv_recfn_t)(void *value);
+
+// create a KV store (all arguments can be NULL but 'store')
+void kv_init(kv_t *store, char *name, int max_nbr_items, u32 flags,
+             kv_delfn_t delfn, kv_recfn_t recfn);
+
+// add/update a value associated to a key
+// return: 0:out of memory, else:pointer on existing/inserted kv_item struct
+kv_item *kv_add(kv_t *store, kv_item *item);
+
+// search a 'value' using a 'key'
+// return: 0:not found, else:pointer on the value we found
+char *kv_get(kv_t *store, const char *key, int klen);
+
+// delete a 'value' using a 'key'
+// return: 0:failure (value not found), 1:success
+int kv_del(kv_t *store, const char *key, int klen);
+
+// free all the keys and values
+void kv_free(kv_t *store);
+
+// run 'proc(kval_node, ctx)' on the specified subset of entries
+//
+// if 'key' is NULL then we visit all the entries,
+// else we only visit the entries that start with the 'key' string
+// (entries are visited in ASCII/binary order)
+// if(!klen) then kv_do() does klen = strlen(klen);
+// 
+// return:
+//  1: success: visited all matching entries
+//  2: no entry starts with the 'key' string
+//
+// It must return 1 to continue searching (any other value stops the search)
+// You can use the 'user_defined_ctx' context to store a structure for 
+// counters, data collection, etc.
+typedef int(*kv_proc_t)(const kv_item *item, const void *user_defined_ctx);
+
+int kv_do(kv_t *store, const char *key, int klen, kv_proc_t kv_proc, 
+          void *user_defined_ctx);
+
+// ============================================================================
+// Garbage collector
 // ----------------------------------------------------------------------------
-// G-WAN server cache
+// If you need to make sure that all the memory allocated by your C script
+// is automatically freed when the script (either a handler or a servlet)
+// returns, then these calls are for you:
+void *gc_malloc(int size);
+void  gc_free  (void *ptr); // only there for completeness...
+
+// ============================================================================
+// G-WAN server handlers
+// ----------------------------------------------------------------------------
+// define which handler states we want to be notified in the handler's main():
+enum HANDLER_ACT
+{
+   HDL_INIT = 0, 
+   HDL_AFTER_ACCEPT, // just after accept (only client IP address setup)
+   HDL_AFTER_READ,   // each time a read was done until HTTP request OK
+   HDL_BEFORE_PARSE, // HTTP verb/URI validated but HTTP headers are not 
+   HDL_AFTER_PARSE,  // HTTP headers validated, ready to build reply
+   HDL_BEFORE_WRITE, // after a reply was built, but before it is sent
+   HDL_AFTER_WRITE,  // after a reply was sent
+   HDL_HTTP_ERRORS,  // when G-WAN is going to reply with an HTTP error
+   HDL_CLEANUP
+};
+
+// ============================================================================
+// Cache
 // ----------------------------------------------------------------------------
 // create/update a cache entry ('file' MUST be imaginary if 'buf' is not NULL)
 // example: cacheadd(argv, "/tool/counter", buf, 1024, 200, 60); // expire:60sec
 // example: cacheadd(argv, "/archives/doc_1.pdf", 0, 0, 200, 0); // never expire
 //                             ('file' MUST exist if 'buf' is NULL)
-// if(expire ==       0) never expires
-// if(expire >        0) expires in 'expires' seconds
+// if(expire == 0) never expires
+// if(expire >  0) expires in 'expires' seconds
 //
 // 'code' is the HTTP status code that the server will send to clients
 //
@@ -176,15 +476,31 @@ enum HANDLER_ACT
 //
 // see the cache0.c, cache1.c, cache2.c, etc. samples.
 
-int cacheadd(char *argv[], char *file, char *buf, u32 buflen, u32 code, 
-             u32 expire);
+long cacheadd(char *argv[], char *file, char *buf, u32 buflen, u32 code, 
+              u32 expire);
 
 // delete a cached entry
 // example: cachedel(argv, "/tool/counter");
 
 void cachedel(char *argv[], char *file);
 
-// ----------------------------------------------------------------------------
+// search a cached entry (and, if found, return the requested details)
+// examples: 
+//    u32 len = 0, code = 0, date = 0, exp = 0;
+//    char *entry = cacheget(argv, "tool/counter", &len, &code, &date, &exp);
+//    char *entry = cacheget(argv, "tool/counter", &len, 0, 0, 0);
+//    char *entry = cacheget(argv, "tool/counter", 0, 0, 0, 0);
+// return 0:not found, else pointer on cached entry
+//
+// NOTES: a cached entry can disappear at any moment IF IT EXPIRES. In that 
+//        case, you MUST MAKE A COPY of the returned buffer to use it.
+//        DON'T work 'inplace' in the provided buffer, rather make a copy
+//        and call cacheadd() to update a previously cached entry.
+
+char *cacheget(char *argv[], char *uri, u32 *buflen, u32 *code,
+               u32 *modified, u32 *expire);
+
+// ============================================================================
 // JSON (de-)serialization
 // ----------------------------------------------------------------------------
 // NOTE: numbers are stored as 'double', don't forget to *cast* in xbuf_xcat()
@@ -252,16 +568,16 @@ void jsn_free(jsn_t *node);
 #define jsn_add_node(node, name)      jsn_add(node, name, jsn_NODE,        0)
 #define jsn_add_array(node, name, n)  jsn_add(node, name, jsn_ARRAY,  (u64)n)
 
-// ----------------------------------------------------------------------------
-// escaping
+// ============================================================================
+// HTML escaping
 // ----------------------------------------------------------------------------
 u32  url_encode   (u8 *dst, u8 *src, u32 maxdstlen);  // return len
 u32  escape_html  (u8 *dst, u8 *src, u32 maxdstlen);  // return len
 u32  unescape_html(u8 *str);                          // inplace, return len
 int  html2txt     (u8 *html, u8 *text, int maxtxlen); // return len
 
-// ----------------------------------------------------------------------------
-// formatting
+// ============================================================================
+// Formatting
 // ----------------------------------------------------------------------------
 // extended sprintf(): (these extensions are also used by xbuf_xcat())
 // "%F","%D","%I","%U" - pretty thousands (the ' formatter is also supported)
@@ -269,11 +585,13 @@ int  html2txt     (u8 *html, u8 *text, int maxtxlen); // return len
 // "%B","%-B"          - base 64 encode/decode ("%12B" encode a binary buffer)
 // "%3C"               - generate a string of length n ("%3C", 'A' => "AAA")
 // "%k"                - KB, MB, GB, etc. (1024 => "1 KB")
+// "%m"                - strerror_r() system error messages (errno)
 
-int s_snprintf(char *str, u32 str_m, const char *fmt, ...);
+int s_snprintf (char *str, size_t len, const char *fmt, ...);
+int s_vsnprintf(char *str, size_t len, const char *fmt, va_list a);
 
-// ----------------------------------------------------------------------------
-// in-memory GIF
+// ============================================================================
+// In-memory GIF I/O
 // ----------------------------------------------------------------------------
 // to save a GIF image on disk, just save the buffer made by gif_build()
 
@@ -307,8 +625,8 @@ int gif_build(u8 *gif, u8 *bitmap, u32 width, u32 height, u8 *palette,
 u8 *gif_parse(u8 *buf, u32 buflen, u32 *width, u32 *height, u8 *palette,
               u32 *nbcolors, int *transparent, u8 **comment);
 
-// ----------------------------------------------------------------------------
-// frame buffer
+// ============================================================================
+// Frame buffer
 // ----------------------------------------------------------------------------
 typedef struct { u8  r,g,b; } rgb_t;
 typedef struct { u32 x,y,X,Y; } rect_t;
@@ -366,8 +684,8 @@ void dr_line  (bmp_t *img, int x1, int y1, int x2, int y2);
 
 void dr_circle(bmp_t *img, int x, int y, int radius);
 
-// ----------------------------------------------------------------------------
-// charts & sparklines
+// ============================================================================
+// Charts & sparklines
 // ----------------------------------------------------------------------------
 // to make a sparkline, use C_LINE without (C_TITLES | C_LABELS | C_AVERAGE)
 // float tab[] = {10042, 10098, 10182, 10154, 10160, 10132, 10160, 10146};
@@ -408,8 +726,8 @@ void dr_chart(bmp_t *img, u8 *title, u8 *subtitle,
               u8  **tags, u32 ntag, 
               float *val, u32 nval);
 
-// ----------------------------------------------------------------------------
-// email
+// ============================================================================
+// Email
 // ----------------------------------------------------------------------------
 // the 'error' parameter must point to an allocated buffer sized to the total
 // size of headers + email body + attachments (encoded in base64: worst case). 
@@ -449,8 +767,8 @@ int sendemail(char *mail_server,
 
 int isvalidemailaddr(char *szEmail);
 
-// ----------------------------------------------------------------------------
-// time
+// ============================================================================
+// Time
 // ----------------------------------------------------------------------------
 typedef struct _tm_s // just to make our life easier under MS-Windows
 {
@@ -467,8 +785,10 @@ typedef struct _tm_s // just to make our life easier under MS-Windows
 
 u32      cycles     (void); // return CPU clock cycles (in-minutes overflow)
 u64      cycles64   (void); // return CPU clock cycles (will never overflow)
-u64      getus      (void); // elapsed microseconds    (1 millisecond/1000)
-u64      getms      (void); // elapsed miliseconds     (1 second/1000)
+u64      getns      (void); // EPOCH time in nanoseconds  (1 second/1bn)
+u64      getus      (void); // EPOCH time in microseconds (1 second/1m)
+
+u64      getms      (void); // EPOCH time in miliseconds  (1 second/1000)
 
 time_t   s_time     (void); // on Windows, much much faster than time(0);
 tm_t    *s_gmtime   (time_t t, tm_t *ts); // those are thread-safe
@@ -478,8 +798,8 @@ char    *s_asctime  (time_t t, char *buf);
 size_t   rfc2time   (char *s); // "Tue, 06 Jan 2009 06:12:20 GMT" => u32
 char    *time2rfc   (time_t t, char *buf); // inverse of above operation
 
-// ----------------------------------------------------------------------------
-// random numbers
+// ============================================================================
+// Random numbers
 // ----------------------------------------------------------------------------
 typedef struct { u32 x[5]; } prnd_t;
 void sw_init(prnd_t *rnd, u32 seed); // pseudo-random numbers generator
@@ -489,19 +809,17 @@ typedef struct { u32 x[270340]; } rnd_t;
 void hw_init(rnd_t *rnd); // hardware random numbers generator
 u32  hw_rand(rnd_t *rnd); // (cache the context: hw_init() takes time)
 
+// ============================================================================
+// Checksums
 // ----------------------------------------------------------------------------
-// checksums
-// ----------------------------------------------------------------------------
-// u32 crc = 0;
-// int i = 10;
-// while(i--)
-//    crc = crc32(data[i].ptr, data[i].len, crc);
+// u32 crc = 0; // starting value
+// crc = crc_32(data, length, crc);
 
-u32 crc32  (char *data, u32 len, u32 crc);
-u32 adler32(char *data, u32 len, u32 crc); // adler32 is slower than crc32
+u32 crc_32  (char *data, u32 len, u32 crc);
+u32 adler_32(char *data, u32 len, u32 crc); // adler_32 is slower than crc_32
 
-// ----------------------------------------------------------------------------
-// hashing
+// ============================================================================
+// Hashing
 // ----------------------------------------------------------------------------
 // u8 dst[16]; // the resulting 128-bit hash
 // md5_t ctx;
@@ -548,8 +866,8 @@ void sha2_end (sha2_t *ctx, u8 *dst);
 // a wrapper on all the above SHA-256 calls
 void sha2(u8 *input, int ilen, u8 *dst);
 
-// ----------------------------------------------------------------------------
-// encryption
+// ============================================================================
+// Encryption
 // ----------------------------------------------------------------------------
 // AES is the U.S. NIST FIPS PUB 197 standard (2001) developed by Belgians
 // Joan Daemen & Vincent Rijmen and approved by the NSA. Useful to comply.
@@ -585,37 +903,15 @@ void aes_init(aes_t *ctx, u32 mode, u8 *key, u32 keylen);
 
 void aes_enc(aes_t *ctx, u32 mode, u32 len, u8 *iv, u8 *src, u8 *dst);
 
+// ============================================================================
+// Compression
 // ----------------------------------------------------------------------------
-// compression
-// ----------------------------------------------------------------------------
-// LZJB is fast, safe (no overrun during decompression), and uses little CPU
-// (this algorithm created by Oracle is used by Solaris in the ZFS file system)
-// return dstlen
-
-size_t lzjb_cmp(void *src, void *dst, size_t srclen, size_t dstlen);
-
-// return the dstlen, 0 on error
-
-size_t lzjb_exp(void *src, void *dst, size_t srclen, size_t dstlen);
-
-// GZip is slow, unsafe and uses tons of CPU (but, hey, that's the standard)
-// if(gzip != 0) then use the 'gzip' format, else use the 'zlib' format 
+// if(gzip != 0) then we use the 'gzip' format, else we use the 'zlib' format 
 // (the new 'zlib' format is both slower and larger than the old 'gzip' format)
+// if you already have the crc32, pass it into 'crc', else 'crc' MUST be NULL
 // return the dstlen, 0 on error
 
-u32 zlib_cmp(char *src, u32 srclen, char *dst, u32 dstlen, char gzip);
-
-// ----------------------------------------------------------------------------
-// shared libraries (see also "#pragma link" in sqlite.c)
-// ----------------------------------------------------------------------------
-#define RTLD_LAZY   0x001
-#define RTLD_NOW    0x002
-#define RTLD_GLOBAL 0x100
-
-void       *dlopen (const char *filename, int flag);
-const char *dlerror(void);
-void       *dlsym  (void *handle, char *symbol);
-int         dlclose(void *handle);
+u32 zlib_cmp(char *src, u32 *crc, u32 srclen, char *dst, u32 dstlen, int gzip);
 
 // ============================================================================
 // End of Header file

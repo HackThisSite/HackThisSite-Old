@@ -30,7 +30,11 @@ int main(int argc, char *argv[])
    foo();
 
    // this is displayed in the Internet Browser
-   xbuf_xcat(reply, "function:%s (line:%d)", __func__, __LINE__);
+   xbuf_xcat(reply, 
+             "function: %s (line: %d)<br><br>"
+             "C script loaded on: %s %s", 
+             __func__, __LINE__, 
+             __DATE__, __TIME__);
 
    return 200; // return an HTTP code (200:'OK')
 }

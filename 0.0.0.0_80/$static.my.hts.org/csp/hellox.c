@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
    char *name = 0;
    get_arg("name=", &name, argc, argv);
 
-   xbuf_xcat(reply, "<h1>Hello %s</h1>", 
+   xbuf_xcat(reply, "Hello %s",
              escape_html(name, name, 20)?name:"you");
                 
    return 200;

@@ -200,8 +200,8 @@ int main(int argc, char *argv[])
    {
       if(!xbuf_growto(reply, wXh / 10)) // resize reply
       {
-         xbuf_reset(reply);
-         xbuf_ncat (reply, " ", 1);
+         xbuf_init(reply);
+         xbuf_ncat(reply, " ", 1);
          reply->len = 0; // discart pointless data, keep allocated memory
          return 503; // error: we could not allocate enough memory
       }
@@ -226,15 +226,6 @@ int main(int argc, char *argv[])
    // store the GIF size in the empty space of the 'Content-Length' header
    // -------------------------------------------------------------------------
    u32toa(p, len);
-
-   // -------------------------------------------------------------------------
-   // print timing information on the Terminal (if any)
-   // -------------------------------------------------------------------------
-   // yes, you can easily trace your code with printf()
-   // (see the 'trace.c' servlet sample for a more elaborate strategy)
-   start = getus() - start - time1;
-   printf("Time to generate the Mandelbrot set: %.2f ms\n", time1 / 1000.);
-   printf("Time to generate the GIF & palette : %.2f ms\n\n", start / 1000.);
 
    return 200; // return an HTTP code (200:'OK')
 }

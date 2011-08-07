@@ -1,7 +1,11 @@
 // ============================================================================
 // C servlet sample for the G-WAN Web Application Server (http://trustleap.ch/)
 // ----------------------------------------------------------------------------
-// while.c: just to test the angel process
+// exit.c: test the angel process (it restarts the child gwan process if G-WAN
+//         is running in 'daemon' mode, with the -d command-line switch)
+//
+// Note: this also can be used to force a reload of G-WAN's listeners/hosts 
+//       from a C script (after you modified them, for example).
 // ============================================================================
 #include "gwan.h"    // G-WAN exported functions
 

@@ -37,22 +37,7 @@
 //    xbuf_cat(): like strcat(), but it works in the specified dynamic buffer 
 //     log_err(): lets you dumpt text in the current virtual host's error.log
 // ----------------------------------------------------------------------------
-
-// this directive allows you to link libraries, wherever they are installed
-// (use either an absolute path or a path relative to the gwan program)
-// adjust the path as needed for your system:
-
-#ifdef LP64
-# pragma link "/usr/lib32/libsqlite3.so.0" // for Linux 64-bit
-#else
-# pragma link "/usr/lib/libsqlite3.so.0"   // for Linux 32-bit
-#endif
-
-// this directive allows you to indicate where to find additional #includes
-// (use either an absolute path or a path relative to the gwan program)
-// sqlite3.h not found in Ubuntu 8.1 so I copied it here, with sqlite3ext.h; 
-// we could also use "./include/sqlite3" but I prefer to keep the libraries'
-// includes where the library itself is copied (when not already elsewhere):
+#pragma link "sqlite3"
 
 #pragma include "./libraries/sqlite3"
 
@@ -457,12 +442,12 @@ int main(int argc, char **argv)
    xbuf_t *reply = get_reply(argv);
    
    // build the top of our HTML page
-   xbuf_cat(reply, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+   xbuf_cat(reply, "<!DOCTYPE HTML>"
       "<html lang=\"en\"><head><title>SQLite</title><meta http-equiv"
       "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
       "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
-      "</head><body style=\"background:#fff;\"><h4>C servlet linked "
-      "with the SQLite library</h4><br>");
+      "</head><body style=\"margin:20px 16px; padding:8px;\">"
+      "<h1>C servlet linked with the SQLite library</h1>");
 
    // -------------------------------------------------------------------------
    // no file harmed in this experiment (we create an in-memory table)
@@ -523,7 +508,7 @@ int main(int argc, char **argv)
       sqlite3_exec(db, "COMMIT", 0, 0, 0);
 
       // not really useful, just to illustrate how to use it
-      xbuf_cat(reply, "<h1>SELECT COUNT(*) FROM toons (HTML Format):</h1>");
+      xbuf_cat(reply, "<br><h2>SELECT COUNT(*) FROM toons (HTML Format):</h2>");
       sql_Query(argv, db, reply, &fmt_html, "SELECT COUNT(*) FROM toons;", 0);
    } 
    
@@ -531,7 +516,7 @@ int main(int argc, char **argv)
    // run a query and append the (formatted) result to our server reply
    // -------------------------------------------------------------------------
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons (Custom Format):</h1>");
+            "<br><h2>SELECT rate, name FROM toons (Custom Format):</h2>");
    static char szcr[] = "<br>", szseparator[] = ", ";
    sqlite3_stmt *stmt;
    ret = sql_QuerySteps(argv, db, &stmt, "SELECT rate, name FROM toons;", 0);
@@ -551,21 +536,21 @@ int main(int argc, char **argv)
    // run the same query again, using pre-defined formats this time
    // -------------------------------------------------------------------------
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons (TEXT format):</h1><pre>");
+            "<br><h2>SELECT rate, name FROM toons (TEXT format):</h2><pre>");
    sql_Query(argv, db, reply, &fmt_text, "SELECT rate, name FROM toons;", 0);
    xbuf_cat(reply, "</pre>");
 
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons (HTML format):</h1>");
+            "<br><h2>SELECT rate, name FROM toons (HTML format):</h2>");
    sql_Query(argv, db, reply, &fmt_html, "SELECT rate, name FROM toons;", 0);
 
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons (JSON format):</h1><pre>");
+            "<br><h2>SELECT rate, name FROM toons (JSON format):</h2><pre>");
    sql_Query(argv, db, reply, &fmt_json, "SELECT rate, name FROM toons;", 0);
    xbuf_cat(reply, "</pre>");
 
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons (XML format):</h1><pre>");
+            "<br><h2>SELECT rate, name FROM toons (XML format):</h2><pre>");
    sql_Query(argv, db, reply, &fmt_xml, "SELECT rate, name FROM toons;", 0);
    xbuf_cat(reply, "</pre>");
 
@@ -579,15 +564,15 @@ int main(int argc, char **argv)
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ '-_]"
    
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons WHERE name LIKE 'T%'"
-            " (PARSING RECORD):</h1>");
+            "<br><h2>SELECT rate, name FROM toons WHERE name LIKE 'T%'"
+            " (PARSING RECORD):</h2>");
    u32 rate = 0;
    char name[40] = "T%";
    xbuf_t buf;
-   xbuf_reset(&buf);
-   sql_Query (argv, db, &buf, &fmt_csv,
-//            "SELECT rate, name FROM toons WHERE name = 'Tom';", 0);
-              "SELECT rate, name FROM toons WHERE name LIKE ?;", "%s", name);
+   xbuf_init(&buf);
+   sql_Query(argv, db, &buf, &fmt_csv,
+//           "SELECT rate, name FROM toons WHERE name = 'Tom';", 0);
+             "SELECT rate, name FROM toons WHERE name LIKE ?;", "%s", name);
 
    rate = 0;  // clear rate
    *name = 0; // clear name
@@ -607,7 +592,7 @@ int main(int argc, char **argv)
             // reformat extracted fields in another (HTML) string
             xbuf_xcat(reply, 
                       "buffer: '%s'<br>"
-                      "Fields(rate: %u, name: %s)<br><br>", 
+                      "Fields(rate: %u, name: %s)<br>", 
                       buf.ptr, rate, name);
          }
       }
@@ -618,8 +603,8 @@ int main(int argc, char **argv)
    // same thing, extracting fields from several records in a loop this time
    // -------------------------------------------------------------------------
    xbuf_cat(reply, 
-            "<h1>SELECT rate, name FROM toons WHERE rate > 4"
-            " (PARSING TABLE):</h1>");
+            "<br><h2>SELECT rate, name FROM toons WHERE rate > 4"
+            " (PARSING TABLE):</h2>");
    rate = 4;
    ret = sql_QuerySteps(argv, db, &stmt, //"SELECT rate, name FROM toons;", 0);
          "SELECT rate, name FROM toons WHERE rate > ?;", "%u", rate);
@@ -647,6 +632,7 @@ int main(int argc, char **argv)
    }
 
    xbuf_free(&buf); // we are done with it now, free memory
+   xbuf_cat(reply, "</body><html>");
 
    // -------------------------------------------------------------------------
    // done with database   

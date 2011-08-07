@@ -31,12 +31,11 @@ static u8 title[] = "Benchmarking function calls (with CPU clock cycles)";
 
 // Top of our HTML page
 static u8 top[]=
-     "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+     "<!DOCTYPE HTML>"
      "<html lang=\"en\"><head><title>%s</title><meta http-equiv"
      "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-//   "<style=\"margin: 10; padding: 10;\" type=\"text/css\">"
-     "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
-     "</head><body><h1>%s</h1>";
+     "<link href=\"/imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
+     "</head><body style=\"margin:0 16px;\"><br><h2>%s</h2>";
      
 int main(int argc, char *argv[])
 {
@@ -62,9 +61,9 @@ int main(int argc, char *argv[])
    // check that all function calls provide similar results
    memset(date, 0, sizeof(date));
    httptime(t, date);
-   xbuf_xcat(reply, "<br>Linux clib calls: %s<br>", date); 
+   xbuf_xcat(reply, "Linux clib calls: %s<br>", date); 
 
-   xbuf_cat(reply, "<br><table class=\"clean\" width=160px>"
+   xbuf_cat(reply, "<br><table class=\"clean\" width=180px>"
                     "<tr><th>function</th><th>time</th></tr>");
 
    // warm the cpu cache to get consistent values
@@ -91,7 +90,7 @@ int main(int argc, char *argv[])
    memset(date, 0, sizeof(date));
    xbuf_xcat(reply, "<br>G-WAN time2rfc(): %s<br>", time2rfc(t, date)); 
 
-   xbuf_cat(reply, "<br><table class=\"clean\" width=160px>"
+   xbuf_cat(reply, "<br><table class=\"clean\" width=180px>"
                     "<tr><th>function</th><th>time</th></tr>");
 
    // warm the cpu cache to get consistent values

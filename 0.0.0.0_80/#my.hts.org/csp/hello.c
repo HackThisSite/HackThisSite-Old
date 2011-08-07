@@ -11,9 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-   xbuf_t *reply = get_reply(argv);
-
-   xbuf_cat(reply, "<h1>HELLO WORLD</h1>");
+   xbuf_cat(get_reply(argv), "Hello World");
 
    return 200; // return an HTTP code (200:'OK')
 }

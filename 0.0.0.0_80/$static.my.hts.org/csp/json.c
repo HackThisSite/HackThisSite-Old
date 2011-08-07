@@ -147,8 +147,16 @@ jsn_t *find_parent(jsn_t *node)
 // ============================================================================
 int main(int argc, char *argv[])
 {
-   xbuf_t *reply = get_reply(argv);
    int now = time(0);
+   static u8 top[]=
+     "<!DOCTYPE HTML>"
+     "<html lang=\"en\"><head><title>JSON</title><meta http-equiv"
+     "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+     "<link href=\"/imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
+     "</head><body style=\"margin:16px;\"><h2>EXERCISING JSON</h2>\r\n";
+
+   xbuf_t *reply = get_reply(argv);
+   xbuf_ncat(reply, top, sizeof(top) - 1);
 
    // -------------------------------------------------------------------------
    // create a first 'node' (container)
@@ -178,14 +186,14 @@ int main(int argc, char *argv[])
    // -------------------------------------------------------------------------
    xbuf_cat(reply, "<b>JSON compact output:</b><br>");
    xbuf_t xbuf;
-   xbuf_reset(&xbuf);
+   xbuf_init(&xbuf);
    char *text = jsn_totext(&xbuf, users, 0); // 0:compact form
-   xbuf_xcat(reply, "%s<br><br>", text);
+   xbuf_xcat(reply, "<pre>%s</pre>", text);
 
    xbuf_cat(reply, "<b>JSON formated output (with tabs, spaces, CRs):</b><br>");
    xbuf_empty(&xbuf);
    text = jsn_totext(&xbuf, users, 1); // 1:formated form
-   xbuf_xcat(reply, "%s<br><br>", text);
+   xbuf_xcat(reply, "<pre>%s</pre>", text);
 
    // -------------------------------------------------------------------------
    // search the whole 'users' node for a named 'item' (data)
@@ -267,7 +275,7 @@ int main(int argc, char *argv[])
       // list 'users' again
       xbuf_empty(&xbuf);
       text = jsn_totext(&xbuf, users, 1); // 1:formated form
-      xbuf_xcat(reply, "%s<br><br>", text);
+      xbuf_xcat(reply, "<pre>%s</pre>", text);
 
       // ----------------------------------------------------------------------
       // get an item[i] by its array index value
@@ -347,7 +355,7 @@ int main(int argc, char *argv[])
    // list 'users' again
    xbuf_empty(&xbuf);
    text = jsn_totext(&xbuf, users, 1); // 1:formated form
-   xbuf_xcat(reply, "%s<br><br>", text);
+   xbuf_xcat(reply, "<pre>%s</pre>", text);
 
    // -------------------------------------------------------------------------
    // search an item by its value
@@ -408,12 +416,12 @@ int main(int argc, char *argv[])
    // redisplay all in compact and formatted form
    xbuf_cat(reply, "<b>JSON compact output:</b><br>");
    text = jsn_totext(&xbuf, import, 0); // 0:compact form
-   xbuf_xcat(reply, "%s<br><br>", text);
+   xbuf_xcat(reply, "<pre>%s</pre>", text);
 
    xbuf_cat(reply, "<b>JSON formated output (with tabs, spaces, CRs):</b><br>");
    xbuf_empty(&xbuf);
    text = jsn_totext(&xbuf, import, 1); // 1:formatted form
-   xbuf_xcat(reply, "%s<br><br>", text);
+   xbuf_xcat(reply, "<pre>%s</pre>", text);
 
    // -------------------------------------------------------------------------
    // free the 'users' node and its contents
@@ -427,7 +435,8 @@ int main(int argc, char *argv[])
    // as the JSON standard does not make room for named array items, names
    // have not been exported (so they are not in the imported tree)
    xbuf_cat(reply, "<b>Traversing our JSON tree:</b><br>");
-   traverse(import, 1, reply);
+   if(import)
+      traverse(import, 1, reply);
    
    // -------------------------------------------------------------------------
    // free the 'users' node and its contents

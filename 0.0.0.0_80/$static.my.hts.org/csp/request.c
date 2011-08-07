@@ -26,7 +26,7 @@
 static char title[] = "Currency conversions";
 
 // Top of our HTML page
-static char top[] = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+static char top[] = "<!DOCTYPE HTML>"
      "<html lang=\"en\"><head><title>%s</title><meta http-equiv"
      "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
      "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
@@ -35,7 +35,7 @@ static char top[] = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
 // ----------------------------------------------------------------------------
 // imported functions:
 //   get_reply(): get a pointer on the 'reply' dynamic buffer from the server
-//  xbuf_reset(): (re)initiatize a dynamic buffer object
+//   xbuf_init(): called after xbuf_t has been declared, to initialize struct
 // xbuf_frfile(): load a file, and store its contents in a dynamic buffer
 //  xbuf_frurl(): make an Http request, and store results in a dynamic buffer
 //   xbuf_ncat(): like strncat(), but in the specified dynamic buffer 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
    char szfile[1024];
    s_snprintf (szfile, sizeof(szfile)-1, "%s/rates.xml", csp_root);
    xbuf_xcat  (reply, "Trying to load %s<br>", szfile);
-   xbuf_reset (&buf); 
+   xbuf_init (&buf); 
    xbuf_frfile(&buf, szfile);
 
    // -------------------------------------------------------------------------
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
    if(!code || code == 20) // cached file not found (or not up-to-date)
    {
       xbuf_ctx buf2;
-      xbuf_reset(&buf2);
+      xbuf_init(&buf2);
       code = xbuf_frurl(&buf2, "www.ecb.int", 80, HTTP_GET, 
                                "/stats/eurofxref/eurofxref-daily.xml", 500, 0);
       
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
       {
          xbuf_cat   (reply, "The ECB server replied to our query<br>");
          xbuf_tofile(&buf2, szfile);
-         xbuf_reset (&buf);
+         xbuf_init (&buf);
          xbuf_ncat  (buf.ptr, buf2.ptr, buf2.len);
       }
       else

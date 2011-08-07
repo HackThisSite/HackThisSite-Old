@@ -24,16 +24,16 @@
 static char title[]="Attacking your own web server";
 
 // Top of our HTML page
-static char top[]="<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">"
+static char top[]="<!DOCTYPE HTML>"
      "<html lang=\"en\"><head><title>%s</title><meta http-equiv"
      "=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-//   "<link href=\"imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
+//   "<link href=\"/imgs/style.css\" rel=\"stylesheet\" type=\"text/css\">"
      "</head><body><h1>%s</h1>The web server replied:<br><br>";
 
 // ----------------------------------------------------------------------------
 // imported functions:
 //   get_reply(): get a pointer on the 'reply' dynamic buffer from the server
-//  xbuf_reset(): (re)initiatize a dynamic buffer object
+//   xbuf_init(): called after xbuf_t has been declared, to initialize struct
 // xbuf_frfile(): load a file, and store it in a dynamic buffer
 //  xbuf_frurl(): make an Http request, and store results in a dynamic buffer
 //   xbuf_ncat(): like strncat(), but in the specified dynamic buffer 
@@ -95,19 +95,19 @@ int main(int argc, char *argv[])
    // -------------------------------------------------------------------------
    // load our bad URIs list
    // -------------------------------------------------------------------------
-   char *csp_root = get_env(argv, CSP_ROOT, 0); // get the ".../csp/" path
+   char *csp_root = (char*)get_env(argv, CSP_ROOT, 0); // the ".../csp/" path
    char szfile[512];
    s_snprintf(szfile, sizeof(szfile)-1, "%s/attack.txt", csp_root);
    xbuf_ctx list;
-   xbuf_reset (&list);
+   xbuf_init(&list);
    xbuf_frfile(&list, szfile);
    if(list.len)
    {
       int code = 0, codcut = 0, cod2xx = 0, cod3xx = 0, cod4xx = 0, cod5xx = 0;
       u32 i = 1;
-      xbuf_ctx buf; xbuf_reset(&buf);
+      xbuf_ctx buf; xbuf_init(&buf);
       char uri[512]; // loop to send all URIs
-      while(xbuf_getln(&list, uri, sizeof(uri) - 1) > 0 /*&& i < 3*/)
+      while(xbuf_getln(&list, uri, sizeof(uri) - 1) > 0 && i < 100)
       {
          // send the Http request (with a timeout in milliseconds)
          xbuf_empty(&buf);
@@ -138,8 +138,9 @@ int main(int argc, char *argv[])
                          uri);
          }
          else // could not connect, or connection hard-closed by server
-            xbuf_xcat(reply, "%03u] Reply: %03d to &quot;%s&quot;<br>", 
-                      i, code, uri);
+            xbuf_xcat(reply, "%03u] Reply: <b style=\"color:#2020f0\">000</b>"
+                      " to &quot;%s&quot;<br>", 
+                      i, uri);
          i++;
          
       }

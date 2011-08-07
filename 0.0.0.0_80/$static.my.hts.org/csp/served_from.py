@@ -11,7 +11,7 @@
 import sys,BaseHTTPServer as B
 class Handler(B.BaseHTTPRequestHandler):
   def do_GET(self):
-    self.wfile.write("Served from port %s" % port)
+    self.wfile.write("Python HTTP server listening on port %s" % port)
   def log_message(self, *args):
     pass
 if __name__ == '__main__':

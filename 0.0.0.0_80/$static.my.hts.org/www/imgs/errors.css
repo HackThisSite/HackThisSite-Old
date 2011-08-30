@@ -1,8 +1,0 @@
-p{margin:4px 0 8px 0;}
-body, td, p, ul, option, input, select, textarea, form, div {font-family:verdana,arial,helvetica,sans-serif; color:#404040; font-size:12px; line-height:16px;}
-body {background:#fff;}
-h1 {color:#909090; font-weight:bold; font-size:14px; height:25px; padding:0; padding-left:12px; margin:0; margin-bottom:16px; border-bottom:solid 1px #D0D0D0; background:url(../imgs/bullet.gif) no-repeat 0 0;}
-img {border:0; margin:0; padding:0}
-a:link {text-decoration:none; color:#909090}
-a:visited {text-decoration:none; color:#000000}
-a:hover {text-decoration:underline; color:#cccccc}

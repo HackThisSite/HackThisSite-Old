@@ -1,0 +1,28 @@
+html, body{
+   margin: 0 16px;
+   padding: 0;
+   height: 100%;
+   font-family:Arial, Helvetica, Helvetica Neue, Verdana, sans-serif;
+   font-size: 16px;
+   line-height: 26px;
+}
+
+body {
+   background:#fff;
+   color:#222;
+}
+
+h1{
+    color: #205080;
+    font-size: 20px;
+    font-weight: 100;
+    letter-spacing:0.2ex;
+    text-shadow: #d0e0ea 0 1px;
+    line-height: 40px;
+    border-bottom: 2px solid #c0d0e0;
+}
+h1:before{
+    content: "";
+    content: '\203a\2002'; 
+}
+

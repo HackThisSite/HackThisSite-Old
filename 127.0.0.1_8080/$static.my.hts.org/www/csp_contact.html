@@ -1,0 +1,23 @@
+<!DOCTYPE HTML><html><head><title>Contact Form</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="imgs/style.css" rel="stylesheet" type="text/css">
+</head>
+<body style="margin:16px;"><h2>Contact Form</h2>
+<p><!--time--><br><!--ip--><br></p>
+<form id="form" enctype="application/x-www-form-urlencoded" method="POST" action="csp?contact">
+<fieldset style="width:540px;">
+<legend> Please fill this form to send us your suggestions </legend> 
+	<input type="hidden" value="en" name="url">
+	<label for="email">Email</label>
+	<input name="email" maxlength="64" style="width: 400px;">
+	<br>
+	<label for="subject">Subject</label>
+	<input name="subject" maxlength="64" style="width: 400px;">
+	<br>
+	<label for="text">Text</label>
+	<textarea name="text" style="width: 400px;" rows="8" maxlength="4000"></textarea>
+	<input name="name" type="submit" class="button" value="Send Email">
+</fieldset>
+</form>
+</body>
+</html>

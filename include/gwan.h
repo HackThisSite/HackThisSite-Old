@@ -189,6 +189,7 @@ typedef struct
            *h_host,
            *h_useragent,
            *h_referer,
+           *h_accept_language,
            *h_auth_user,
            *h_auth_pwd,
            *h_cookies,
@@ -474,7 +475,7 @@ enum HANDLER_ACT
 //
 // return 0:failure, !=0:success
 //
-// see the cache0.c, cache1.c, cache2.c, etc. samples.
+// see the cache1.c, cache2.c, etc. samples.
 
 long cacheadd(char *argv[], char *file, char *buf, u32 buflen, u32 code, 
               u32 expire);

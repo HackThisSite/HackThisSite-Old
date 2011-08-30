@@ -1,13 +1,60 @@
---- HackThisSite Readme ---
+---------------------------------------------------------------
+G-WAN/Linux readme.txt
+G-WAN/Windows is here: http://trustleap.ch/
+---------------------------------------------------------------
+Program  :  G-WAN
+Author   :  http://trustleap.ch/
+Platforms:  Windows (XP+), Linux (Ubuntu 8.10+)
+---------------------------------------------------------------
 
-HackThisSite uses the robust G-WAN web server to run its C servlets and Node/V8
-scripts. In order to run the HackThisSite G-WAN instance, $LD_LIBRARY_PATH must
-have the $HTS_PATH/libraries/v8 in it. Under bash, run ( $ export
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8 ). $HTS_PATH is the path
-to the HackThisSite directory that contains the `gwan` binary. Rename
-$HTS_PATH/127.0.0.01_8080 to 192.168.0.2_80 if you want to listen on address
-192.18.0.2 port 80. In your hosts file, set (my.hts.org) & (static.my.hts.org)
-to point to 127.0.0.1. Once that's done, you are all set to run the HackThisSite
-instance. Install the SysV init script in $HTS_PATH/docs/hackthissite.sysvinit,
-just run the `gwan` binary after your current working directory is the
-$HTS_PATH, run ( $ ./gwan ) as root.
+G-WAN is a FREE Web and application server with ANSI C servlets
+and the whole takes 200 KB of code in addition to be far faster
+than *all* other available Web application servers.
+
+C servlets are 'edit & play' scripts that let you use the power
+of C with the convenience of scripts.
+
+G-WAN is free for all. Feel free to distribute it around you!!!
+
+---------------------------------------------------------------
+Archive Contents
+---------------------------------------------------------------
+- gwan ........ G-WAN web application server executable
+- main.cxx .... G-WAN maintenance script sample
+- /logs ....... G-WAN web server's log files
+- /.../csp .... G-WAN C servlet samples
+- /.../www .... G-WAN web server's 'root' directory
+- /.../handlers G-WAN web server's handler sample
+- readme.txt .. the document you are reading
+- license.txt . the license agreement (for humans)
+
+---------------------------------------------------------------
+Installation
+---------------------------------------------------------------
+1) decompress the gwan_xxx.tar.bz2 archive in /home/gwan
+2) 'cd /home/gwan' and run G-WAN with './gwan'
+3) start your Internet browser and enter: http://127.0.0.1:8080
+4) have fun!
+5) read the G-WAN manual to use all G-WAN's features
+
+---------------------------------------------------------------
+Removal
+---------------------------------------------------------------
+G-WAN does not alter the system, add shared libraries, create 
+dependencies or configuration files that could interfere with 
+other programs so you can 'uninstall' it by just stopping it 
+and deleting its directory.
+
+---------------------------------------------------------------
+Use is subject to license terms, read the attached license.txt.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND TRUSTLEAP DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING, BUT NOT 
+LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+FITNESS FOR A PARTICULAR PURPOSE IN NO EVENT SHALL TRUSTLEAP
+BE LIABLE FOR ANY SPECIAL DIRECT INDIRECT, OR CONSEQUENTIAL 
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH
+THE USE OR PERFORMANCE OF THIS SOFTWARE.
+---------------------------------------------------------------

@@ -1,0 +1,56 @@
+HTTP/1.1 200 OK
+Date: Sat, 06 Aug 2011 12:38:02 GMT
+Server: Apache/2.2.3 (Linux/SUSE)
+Last-Modified: Fri, 05 Aug 2011 12:30:33 GMT
+ETag: "1035d0-6a8-4a9c1437eac40"
+Accept-Ranges: bytes
+Content-Length: 1704
+Connection: close
+Content-Type: text/xml
+X-Pad: avoid browser bug
+Set-Cookie: BIGipServerPOOL.www.ecb.europa.eu_HTTP=1376260780.16415.0000; path=/
+
+<?xml version="1.0" encoding="UTF-8"?>
+<gesmes:Envelope xmlns:gesmes="http://www.gesmes.org/xml/2002-08-01" xmlns="http://www.ecb.int/vocabulary/2002-08-01/eurofxref">
+	<gesmes:subject>Reference rates</gesmes:subject>
+	<gesmes:Sender>
+		<gesmes:name>European Central Bank</gesmes:name>
+	</gesmes:Sender>
+	<Cube>
+		<Cube time='2011-08-05'>
+			<Cube currency='USD' rate='1.4155'/>
+			<Cube currency='JPY' rate='111.25'/>
+			<Cube currency='BGN' rate='1.9558'/>
+			<Cube currency='CZK' rate='24.248'/>
+			<Cube currency='DKK' rate='7.4489'/>
+			<Cube currency='GBP' rate='0.86905'/>
+			<Cube currency='HUF' rate='274.10'/>
+			<Cube currency='LTL' rate='3.4528'/>
+			<Cube currency='LVL' rate='0.7095'/>
+			<Cube currency='PLN' rate='4.0455'/>
+			<Cube currency='RON' rate='4.2418'/>
+			<Cube currency='SEK' rate='9.2070'/>
+			<Cube currency='CHF' rate='1.0847'/>
+			<Cube currency='NOK' rate='7.7840'/>
+			<Cube currency='HRK' rate='7.4470'/>
+			<Cube currency='RUB' rate='40.0645'/>
+			<Cube currency='TRY' rate='2.4556'/>
+			<Cube currency='AUD' rate='1.3538'/>
+			<Cube currency='BRL' rate='2.2469'/>
+			<Cube currency='CAD' rate='1.3899'/>
+			<Cube currency='CNY' rate='9.1164'/>
+			<Cube currency='HKD' rate='11.0505'/>
+			<Cube currency='IDR' rate='12141.66'/>
+			<Cube currency='ILS' rate='5.0027'/>
+			<Cube currency='INR' rate='63.3370'/>
+			<Cube currency='KRW' rate='1517.34'/>
+			<Cube currency='MXN' rate='17.0327'/>
+			<Cube currency='MYR' rate='4.2699'/>
+			<Cube currency='NZD' rate='1.6900'/>
+			<Cube currency='PHP' rate='60.398'/>
+			<Cube currency='SGD' rate='1.7271'/>
+			<Cube currency='THB' rate='42.295'/>
+			<Cube currency='ZAR' rate='9.8154'/>
+		</Cube>
+	</Cube>
+</gesmes:Envelope

@@ -1,50 +1,55 @@
 #! /bin/sh
-
-# HackThisSite Instance Init Script for Debian/Ubuntu
-#
-# How to Use:
-# Copy this file to /etc/init.d/hackthissite.
-# Set the correct permissions on hackthissite. Run 'chmod 775 /etc/init.d/hackthissite'. 
-# Run 'update-rc.d hackthissite defaults' if you want it to start on boot.
-
 ### BEGIN INIT INFO
-# Provides: HackThisSite Instance
-# Required-Start: $all
-# Required-Stop: $remote_fs $syslog
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
-# Short-Description: HackThisSite Instance initscript
-# Description: This initiscript starts and stops the HackThisSite instance.
+# Provides:          HackThisSite Instance
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: HackThisSite initscript
+# Description:       This initiscript starts and stops HackThisSite
 ### END INIT INFO
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HTS_PATH/libraries/v8:$HTS_PATH/libraries/mongodb
-
-NAME=hackthissite
-GWANBIN=gwan
-USER=root
-GROUP=root
-HTS_PATH=/hts/htsdev.git
+NAME=hts
+HTS_PATH=/htsdev
 START="-d"
 STOP="-k"
 SCRIPTNAME=/etc/init.d/$NAME
+STARTMESG="Starting HackThisSite v5."
+UPMESG="$NAME is alive."
+DOWNMESG="$NAME is not running."
+STATUS=`pidof $NAME`
 
-[ -x "$HTS_PATH/$GWANBIN" ] || exit 0
+# Exit if G-WAN is not installed
+[ -x "$HTS_PATH/$NAME" ] || exit 0
 
 case "$1" in
-start)
-echo "Starting GWAN HackThisSite Instance."
-cd $HTS_PATH
-./$GWANBIN $START:$GROUP:$USER
-;;
-stop)
-cd $HTS_PATH
-./$GWANBIN $STOP
-;;
-*)
-echo "Usage: $SCRIPTNAME {start|stop}" >&2
-exit 3
-;;
+  start)
+    echo $STARTMESG
+    cd $HTS_PATH 
+    ./$NAME $START
+    ;;
+  stop)
+        cd $HTS_PATH
+    ./$NAME $STOP 
+    ;;
+  status)
+        if [ "$STATUS" > 0 ] ; then
+          echo $UPMESG
+        else
+          echo $DOWNMESG
+        fi 
+        ;;
+  restart)
+        cd $HTS_PATH
+        ./$NAME $STOP
+    echo $STARTMESG
+        ./$NAME $START
+        ;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|status|restart|stop}" >&2
+    exit 3
+    ;;
 esac
 
 :

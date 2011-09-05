@@ -14,15 +14,15 @@ HackThisSite utilizes the robust G-WAN web server (gwan.com) to run its C
 servlets.
 
 -----------------------------------------------
---- Running the HackThisSite G-WAN instance ---
+--- Running the HackThisSite instance ---
 ----------------------------------------------- 
 * Add the following lines to the /etc/hosts file: 
 	127.0.0.1 my.hts.org
 	127.0.0.1 static.my.hts.org 
 * Install the SysV init script in $HTS_PATH/docs/hackthissite.sysvinit if you
   are running a Debian-based Linux distribution.
-* You're all set to run the `gwan` binary after your current working directory
-  is the $HTS_PATH, run ( $ ./gwan ) as root.
+* You're all set to run the `hts` binary after your current working directory
+  is the $HTS_PATH, run ( $ ./hts ) as root.
 
 ---------------------------
 --- Meet The Developers ---

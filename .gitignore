@@ -1,4 +1,4 @@
-# .gitignore faile - htsdev.git
+# .gitignore fail - htsdev.git
 *.pid
 trace
 logs/*

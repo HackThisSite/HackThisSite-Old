@@ -1,4 +1,0 @@
-# .gitignore fail - htsdev.git
-*.pid
-trace
-logs/*

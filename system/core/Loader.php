@@ -252,7 +252,7 @@ class CI_Loader {
 		{
 			return FALSE;
 		}
-
+		
 		require_once(BASEPATH.'database/DB.php');
 
 		if ($return === TRUE)

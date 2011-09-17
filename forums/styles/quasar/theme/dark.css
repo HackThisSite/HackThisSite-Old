@@ -1,0 +1,270 @@
+/*  phpBB 3.0 Style Sheet
+    --------------------------------------------------------------
+	Style name: dominion (dark variations) 
+	Original Author: RocketTheme, LLC (C) Copyright. All rights reserved.     		
+    --------------------------------------------------------------
+*/
+
+li.header dt, li.header dd,#page-body li.header dt a,#page-body li.header dt a:visited {
+    color: #999999;
+}
+
+li.row {
+    color: #999999;
+}
+
+ul.topics li,ul.forums li {
+    border-bottom-color: #333333;
+}
+
+li.row:hover {
+    color: #9F9F9F;
+    background-color: #1C1C1C;
+}
+
+li.header { background: transparent url(images/system/dark/header-r.png) no-repeat scroll 100% 0; }
+li.header dl { background: transparent url(images/system/dark/header-l.png) no-repeat scroll 0 0; }
+
+.bg1 {background-color: #343434;}
+.bg2 {background-color: #282828;}
+
+.post span.corners-top {
+	background-image: url(images/system/dark/corners_left.png);
+}
+
+.post span.corners-top span {
+	background-image: url(images/system/dark/corners_right.png);
+}
+
+.post span.corners-bottom {
+	background-image: url(images/system/dark/corners_left.png);
+}
+
+.post span.corners-bottom span {
+	background-image: url(images/system/dark/corners_right.png);
+}
+
+#cp-main span.corners-top, #cp-menu span.corners-top {
+	background-image: url(images/system/dark/corners_left2.gif);
+}
+
+#cp-main span.corners-top span, #cp-menu span.corners-top span {
+	background-image: url(images/system/dark/corners_right2.gif);
+}
+
+#cp-main span.corners-bottom, #cp-menu span.corners-bottom {
+	background-image: url(images/system/dark/corners_left2.gif);
+}
+
+#cp-main span.corners-bottom span, #cp-menu span.corners-bottom span {
+	background-image: url(images/system/dark/corners_right2.gif);
+}
+
+/* Topicreview */
+#cp-main .panel #topicreview span.corners-top, #cp-menu .panel #topicreview span.corners-top {
+	background-image: url(images/system/dark/corners_left.gif);
+}
+
+#cp-main .panel #topicreview span.corners-top span, #cp-menu .panel #topicreview span.corners-top span {
+	background-image: url(images/system/dark/corners_right.gif);
+}
+
+#cp-main .panel #topicreview span.corners-bottom, #cp-menu .panel #topicreview span.corners-bottom {
+	background-image: url(images/system/dark/corners_left.gif);
+}
+
+#cp-main .panel #topicreview span.corners-bottom span, #cp-menu .panel #topicreview span.corners-bottom span {
+	background-image: url(images/system/dark/corners_right.gif);
+}
+
+a.button1, input.button1, input.button3, a.button2, input.button2 {
+	background: #444444  url(images/system/dark/bg_button.gif);
+	border: 1px solid #333333;
+	color: #DBDBDB;
+}
+
+.postprofile strong,#cp-main .panel li.header dt,#cp-main .panel li.header dd, #cp-main .panel li.header dt { 
+color: #FFFFFF;
+}
+
+.row .pagination span a:hover, li.pagination span a:hover , tr.bg1, table.table1 tbody tr.bg2:hover {
+	background-color: #2A2A2A;
+}
+
+tr.bg2, table.table1 tbody tr.bg1:hover {
+	background-color: #333333;
+}
+
+.postprofile {
+border-left-color:#585858;
+}
+
+.content h2, .panel h2,dl.codebox dt,#cp-main .panel li.row {
+    border-bottom-color: #2C2C2C;
+}
+hr.dashed,fieldset.polls dl {
+     border-top-color: #2C2C2C;
+}
+hr,.postprofile,#cp-main h3, #cp-main hr, #cp-menu hr,.pm .postprofile,table.table1 tbody td,.rtl .postprofile,.pm-panel-header, #cp-main .pm-message-nav {
+    border-color: #2C2C2C;
+}
+
+dl.codebox {
+background-color:#000000;
+border-color:#2C2C2C;
+}
+
+/* Ucp */
+div.panel.bg3    {
+    background-color: #393939;
+}
+
+
+#cp-main .panel{
+   background-color: #2E2E2E; 
+}
+
+.bg3 {
+background-color: #292929;
+}
+
+#navigation #active-subsection a {
+background-color: #2E2E2E;
+background-image:none;
+}
+
+#navigation a:hover {
+background-color: #2E2E2E;
+}
+
+#navigation a {
+    background:#353535 none repeat scroll 0 0;
+}
+
+#cp-main .pm,#topicreview .post,.cp-mini{
+    background-color: #2E2E2E;
+}
+
+#tabs a {
+background-image:url(images/system/dark/bg_tabs1.gif);
+}
+#tabs a span {
+background-image:url(images/system/dark/bg_tabs2.gif);
+}
+#minitabs li.activetab  {
+    background-color: #2E2E2E;
+}
+
+#minitabs li.activetab a {
+    color: #AAAAAA;
+}
+
+
+#minitabs li{
+    background-color: #323232;
+}
+
+.row .pagination span a, li.pagination span a,.pagination span a, .pagination span a:link, .pagination span a:visited,select { 
+background-color:#414141;
+border-color:#414141;
+color: #AAAAAA;
+}
+
+.pagination span a:active,.pagination span strong {
+    background-color:#767676;
+    border-color:#414141;
+}
+
+#simple-wrap .panel,.cp-mini {
+    background-color: #333333;
+}
+#simple-wrap  tr.bg1 {
+     background-color: #333333;
+}
+
+#simple-wrap  tr.bg2 {
+     background-color: #333333;
+}
+table.table1 tbody tr.bg2,table1 tbody tr.bg2:hover {
+     background-color: #282828;
+}
+table.table1 tbody tr.bg1,table1 tbody tr.bg1:hover {
+     background-color: #222222;
+}
+
+.panel {
+background-color:#212121;
+}
+
+/* BB Code styles
+----------------------------------------*/
+/* Quote block */
+blockquote {
+	background-color: #212121;
+	background-image: url("{T_THEME_PATH}/images/quote.gif");
+	border-color:#43474A;
+}
+.rtl blockquote {
+	background-image: url("{T_THEME_PATH}/images/quote_rtl.gif");
+}
+
+
+blockquote blockquote {
+	/* Nested quotes */
+	background-color:#404040;
+}
+
+blockquote blockquote blockquote {
+	/* Nested quotes */
+	background-color: #4B4B4B;
+}
+
+/* Code block */
+dl.codebox {
+	background-color: #404040;
+	border-color: #53575A;
+}
+
+dl.codebox dt {
+	border-bottom-color:  #CCCCCC;
+}
+
+dl.codebox code {
+	color: #2E8B57;
+}
+
+.syntaxbg		{ color: #FFFFFF; }
+.syntaxcomment	{ color: #FF8000; }
+.syntaxdefault	{ color: #0000BB; }
+.syntaxhtml		{ color: #000000; }
+.syntaxkeyword	{ color: #007700; }
+.syntaxstring	{ color: #DD0000; }
+
+ul.navlinks,table.table1 tbody td,.panel h3  {
+	border-color: #6B6B6B;
+}
+
+.post:target .content { 
+color: #FFFFFF;
+}
+
+
+span.corners-top {
+	background-image: url(images/system/dark/corners_left.png);
+}
+
+span.corners-top span {
+	background-image: url(images/system/dark/corners_right.png);
+}
+
+span.corners-bottom {
+	background-image: url(images/system/dark/corners_left.png);
+}
+
+span.corners-bottom span {
+	background-image: url(images/system/dark/corners_right.png);
+}
+
+#cp-main h2 {
+    color: #999999;
+}

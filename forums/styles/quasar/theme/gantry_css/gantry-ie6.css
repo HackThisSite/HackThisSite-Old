@@ -1,0 +1,17 @@
+/**
+ * @package		Gantry Template Framework - RocketTheme
+ * @version		2.5.0 March 1, 2010
+ * @author		RocketTheme http://www.rockettheme.com
+ * @copyright 	Copyright (C) 2007 - 2010 RocketTheme, LLC
+ * @license		http://www.rockettheme.com/legal/license.php RocketTheme Proprietary Use License
+ */
+
+#rt-top, #rt-header, #rt-menu, #rt-showcase, #rt-feature, #rt-main, #rt-sidebar-a, #rt-sidebar-b, #rt-content-top, #rt-mainbody, #rt-content-bottom, #rt-bottom, #rt-footer, .rt-container {zoom: 1;}
+
+/* IE6 Warning */
+#iewarn {background: #C6D3DA url(../images/error.png) 10px 20px no-repeat;position: absolute;z-index: 1000000;opacity: 0;top: -150px; margin: 0 auto;font-size: 110%;color: #001D29;z-index: 8000;}
+#iewarn div {position: relative;border-top: 5px solid #95B8C9;border-bottom: 5px solid #95B8C9;padding: 10px 80px 10px 220px;}
+#iewarn h4 {color: #900;font-weight: bold;line-height: 120%;}
+#iewarn a {color: #296AC6;font-weight: bold;}
+#iewarn_close {background: url(../images/close.png) 50% 50% no-repeat;display: block;cursor: pointer;position: absolute;width: 61px;height: 21px;top: 25px;right: 12px;}
+#iewarn_close.cHover {background: url(../images/close_hover.png) 50% 50% no-repeat;}

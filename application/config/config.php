@@ -1,5 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+// HTS Custom Configs
+$config['defaultTemplate'] = 'dark';
+$config['data_server'] = 'http://'.rand(0,3).'.static.htscdn.org';
+$config['redis'] = '127.0.0.1';
+
 /*
 |--------------------------------------------------------------------------
 | Base Site URL

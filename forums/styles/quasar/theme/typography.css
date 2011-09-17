@@ -1,0 +1,72 @@
+/**
+ * @package   Quasar Template - RocketTheme
+ * @version   1.5.2 March 9, 2010
+ * @author    RocketTheme http://www.rockettheme.com
+ * @copyright Copyright (C) 2007 - 2010 RocketTheme, LLC
+ * @license   http://www.rockettheme.com/legal/license.php RocketTheme Proprietary Use License
+ */
+/* Bullet Styles */
+ul.bullet-1, ul.bullet-2, ul.bullet-3, ul.bullet-4 {padding: 0 0 0 15px;}
+ul.bullet-1 li, ul.bullet-2 li, ul.bullet-3 li, ul.bullet-4 li {list-style: none;padding: 0 0 3px 15px;margin: 0 0 5px;background: no-repeat 0 4px;}
+ul.bullet-1 li a, ul.bullet-2 li a, ul.bullet-3 li a, ul.bullet-4 li a {font-size: 100%;line-height: 1.7;}
+ul.bullet-1 li {background-image: url(images/typography/bullet1.png);}
+ul.bullet-2 li {background-image: url(images/typography/bullet2.png);}
+ul.bullet-3 li {background-image: url(images/typography/bullet3.png);}
+ul.bullet-4 li {background-image: url(images/typography/bullet4.png);}
+.cssstyle-style1 ul.bullet-1 li, .cssstyle-style3 ul.bullet-1 li, .cssstyle-style5 ul.bullet-1 li {background-image: url(images/typography/bullet1-dark.png);}
+.cssstyle-style1 ul.bullet-2 li, .cssstyle-style3 ul.bullet-2 li, .cssstyle-style5 ul.bullet-2 li {background-image: url(images/typography/bullet2-dark.png);}
+.cssstyle-style1 ul.bullet-3 li, .cssstyle-style3 ul.bullet-3 li, .cssstyle-style5 ul.bullet-3 li {background-image: url(images/typography/bullet3-dark.png);}
+.cssstyle-style1 ul.bullet-4 li, .cssstyle-style3 ul.bullet-4 li, .cssstyle-style5 ul.bullet-4 li {background-image: url(images/typography/bullet4-dark.png);}
+
+/* Emphasis Styles*/
+em.color {font-style: italic;font-weight: bold;}
+em.bold {font-size: 120%;font-weight: bold;line-height: 150%;font-style: normal;}
+
+/* Drop Cap */
+p.dropcap {overflow: hidden;}
+span.dropcap {font-size: 400%;margin: 0 5px 0 0;line-height: 100%;color: #333;float: left;display: block;}
+.cssstyle-style1 span.dropcap, .cssstyle-style3 span.dropcap, .cssstyle-style5 span.dropcap {color: #999;}
+
+/* Notice Styles */
+pre  {background: #F9F1ED;border-bottom: 1px solid #DCD7D4;border-right: 1px solid #DCD7D4;color: #AC3400;font-style:italic;overflow: auto;padding: 10px;}
+.cssstyle-style1 pre, .cssstyle-style3 pre, .cssstyle-style5 pre {background: #333;border-bottom: 1px solid #3a3a3a;border-right: 1px solid #3a3a3a;color: #bbb;}
+.alert, .approved, .attention, .camera, .cart, .doc, .download, .media, .note, .notice {display: block;margin: 15px 0;background: repeat-x 0 100%;background-color: #FAFCFD;}
+.typo-icon {display: block;padding: 8px 10px 0px 36px;margin: 15px 0;background: no-repeat 10px 12px;}
+.alert {color: #D0583F;background-image: url(images/typography/alert.png);border-bottom: 1px solid #F8C9BB;border-right: 1px solid #F8C9BB;}
+.approved {color: #6CB656;background-image: url(images/typography/approved.png);border-bottom: 1px solid #C1CEC1;border-right: 1px solid #C1CEC1;}
+.attention {color: #E1B42F;background-image: url(images/typography/attention.png);border-bottom: 1px solid #E4E4D5;border-right: 1px solid #E4E4D5;}
+.camera {color: #55A0B4;background-image: url(images/typography/camera.png);border-bottom: 1px solid #C9D5D8;border-right: 1px solid #C9D5D8;}
+.cart {color: #559726;background-image: url(images/typography/cart.png);border-bottom: 1px solid #D3D3D3;border-right: 1px solid #D3D3D3;}
+.doc {color: #666666;background-image: url(images/typography/doc.png);border-bottom: 1px solid #E5E5E5;border-right: 1px solid #E5E5E5;}
+.download {color: #666666;background-image: url(images/typography/download.png);border-bottom: 1px solid #D3D3D3;border-right: 1px solid #D3D3D3;}
+.media {color: #8D79A9;background-image: url(images/typography/media.png);border-bottom: 1px solid #DBE1E6;border-right: 1px solid #DBE1E6;}
+.note {color: #B76F38;background-image: url(images/typography/note.png);border-bottom: 1px solid #E6DAD2;border-right: 1px solid #E6DAD2;}
+.notice {color: #6187B3;background-image: url(images/typography/notice.png);border-bottom: 1px solid #C7CDDA;border-right: 1px solid #C7CDDA;}
+.approved .typo-icon {background-image: url(images/typography/approved-icon.png);}
+.alert .typo-icon {background-image: url(images/typography/alert-icon.png);}
+.attention .typo-icon {background-image: url(images/typography/attention-icon.png);}
+.camera .typo-icon {background-image: url(images/typography/camera-icon.png);}
+.cart .typo-icon {background-image: url(images/typography/cart-icon.png);}
+.doc .typo-icon {background-image: url(images/typography/doc-icon.png);}
+.download .typo-icon {background-image: url(images/typography/download-icon.png);}
+.media .typo-icon {background-image: url(images/typography/media-icon.png);}
+.note .typo-icon {background-image: url(images/typography/note-icon.png);}
+.notice .typo-icon {background-image: url(images/typography/notice-icon.png);}
+
+/* Important Style*/
+.important {border: 1px solid #E5E5E5;background: url(images/typography/important.png) repeat-x 0 100%;padding: 15px;margin: 25px 0 10px 0;position: relative;}
+span.important-title {background: #fff;color: #000;position: absolute;display: block;top: -0.8em;left: 10px;padding: 3px 8px;font-size: 120%;font-weight: bold;}
+.cssstyle-style1 .important, .cssstyle-style3 .important, .cssstyle-style5 .important {background: none #333;border: none;color: #999;}
+.cssstyle-style1 span.important-title, .cssstyle-style1 span.important-title, .cssstyle-style3 span.important-title, .cssstyle-style3 span.important-title, .cssstyle-style5 span.important-title, .cssstyle-style5 span.important-title {color: #999;background: #333;}
+
+/* Inset Styles */
+span.inset-left {float: left;margin-right: 20px;margin-bottom:20px;}
+span.inset-right {float: right;margin-left: 20px;margin-bottom:20px;}
+span.inset-right-title, span.inset-left-title {background: #fff;color: #000;position: absolute;display: block;top: -12px;left: 10px;padding: 3px 8px;font-size: 100%;font-weight: bold;}
+span.inset-left, span.inset-right {display: block;padding: 12px 8px 8px 8px;width: 20%;font-size: 100%;font-style: italic;margin-top: 25px;position: relative;border: 1px solid #E5E5E5;background: url(images/typography/important.png) repeat-x 0 100%;color: #333;text-align: center;}
+.cssstyle-style1 span.inset-left, .cssstyle-style1 span.inset-right, .cssstyle-style3 span.inset-left, .cssstyle-style3 span.inset-right, .cssstyle-style5 span.inset-left, .cssstyle-style5 span.inset-right {background: none #333;border: none;color: #999;}
+.cssstyle-style1 span.inset-left-title, .cssstyle-style1 span.inset-right-title, .cssstyle-style3 span.inset-left-title, .cssstyle-style3 span.inset-right-title, .cssstyle-style5 span.inset-left-title, .cssstyle-style5 span.inset-right-title {color: #999;background: #333;}
+
+/* Image Style */
+.cssstyle-style1 .img-demo, .cssstyle-style3 .img-demo, .cssstyle-style5 .img-demo {border: 2px solid #333;padding: 2px;margin: 3px;}
+.cssstyle-style2 .img-demo, .cssstyle-style4 .img-demo, .cssstyle-style6 .img-demo {border: 2px solid #ddd;padding: 2px;margin: 3px;}

@@ -1,14 +1,14 @@
 <?php
-class Template extends CI_Controller {
+class Template {
 	
 	public function show($view, $data = array()) {
-		//$parent = parent::$this;
-		$this->load->config('config');
-		$template = $this->config->item('defaultTemplate');
+		$CI =& get_instance();
 		
-		$this->load->view($template . '_header');
-		$this->load->view('views/' . $view, $data);
-		$this->load->view($template . '_footer');
+		$template = $CI->config->item('defaultTemplate');
+		
+		$CI->load->view($template . '_header');
+		$CI->load->view('views/' . $view, $data);
+		$CI->load->view($template . '_footer');
 	}
 
 }

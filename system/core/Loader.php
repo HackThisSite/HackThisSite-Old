@@ -187,7 +187,7 @@ class CI_Loader {
 		{
 			return;
 		}
-
+		echo $name;
 		$CI =& get_instance();
 		if (isset($CI->$name))
 		{

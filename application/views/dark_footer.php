@@ -1,5 +1,4 @@
-<?php $this->load->config('config'); ?>
-</p>
+
 </td>
         </tr>
       </table></td>

@@ -4,6 +4,8 @@
 $config['defaultTemplate'] = 'dark';
 $config['data_server'] = 'http://'.rand(0,3).'.static.htscdn.org';
 $config['redis'] = '127.0.0.1';
+$config['mongo'] = '127.0.0.1';
+$config['mongoDb'] = 'hackthissite';
 
 /*
 |--------------------------------------------------------------------------

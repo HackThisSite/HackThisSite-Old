@@ -17,8 +17,8 @@ $config = array(
             'db' => 'hackthissite'
         ),
         'mongo' => array(
-			'ip' => '127.0.0.1',
-			'db' => 'hackthissite'
+            'ip' => '127.0.0.1',
+            'db' => 'hackthissite'
         ),
         'redis' => '127.0.0.1',
         'recaptcha' => array(
@@ -36,9 +36,9 @@ $config = array(
             'token' => 'site-wide-secret-salt'
         ),
         'forums' => array(
-			'prefix' => 'phpbb_',
-			'session_length' => 3600,
-		),
+            'prefix' => 'phpbb_',
+            'session_length' => 3600,
+        ),
         'baseUrl' => 'http://localhost/',
         'dataServer' => 'http://'.rand(0,3).'.static.htscdn.org',
     )

@@ -38,7 +38,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $maind.'library');
 class lazyLoader
 {
     private static $instance;
-	
+    
     private function __construct($hooks = false)
     {
         spl_autoload_register(null, false);
@@ -50,15 +50,15 @@ class lazyLoader
     }
     
     public function router($name) {
-		if (substr($name, -11) == '_controller') 
-			return $this->controller(substr($name, 0, -11));
-		if (substr($name, -5) == '_hook')
-			return $this->hook(substr($name, 0, -5));
+        if (substr($name, -11) == '_controller') 
+            return $this->controller(substr($name, 0, -11));
+        if (substr($name, -5) == '_hook')
+            return $this->hook(substr($name, 0, -5));
         if (substr($name, -7) == '_driver')
-			return $this->driver(strstr($name, '_', true));
-			
-		return false;
-	}
+            return $this->driver(strstr($name, '_', true));
+            
+        return false;
+    }
     
     public function model($name)
     {
@@ -135,73 +135,73 @@ class lazyLoader
 }
 
 function genKey($sensitivity) {
-	if ($sensitivity == 'all') {
-		$data = serialize($_GET) . serialize($_POST);
-	} else if ($sensitivity == 'unique') {
-		$data = serialize($_GET) . serialize($_POST) .serialize($_COOKIE) . serialize($_SERVER);
-	} else {
-		return false;
-	}
-	
-	$hash = hash('adler32', $data);
-	return $hash;
+    if ($sensitivity == 'all') {
+        $data = serialize($_GET) . serialize($_POST);
+    } else if ($sensitivity == 'unique') {
+        $data = serialize($_GET) . serialize($_POST) .serialize($_COOKIE) . serialize($_SERVER);
+    } else {
+        return false;
+    }
+    
+    $hash = hash('adler32', $data);
+    return $hash;
 }
 
 function dispatch($controller, $request = false, $viewData = false, $standAlone = false)
 {
-	$controller .= '_controller';
-	if (class_exists($controller))
-	{
-		$GLOBALS['errors'] = array();
-		
-		if (empty($request[0])) $request = array(0 => "index");
-		if (!method_exists($controller, $request[0])) $request = array_merge(array(0 => 'index'), $request);
-		
-		if (apc_exists(genKey('all')) || apc_exists(genKey('unique'))) {
-			$data = apc_fetch(genKey('all'));
-			if ($data == false) $data = apc_fetch(genKey('unique'));
-			
-			if ($data['what'] == 'c') {
-				$state = new Controller($request, $data['data'], true);
-				$state->callStatic(substr($controller, 0, -11), $request[0]);
-			} else if ($data['what'] == 'v') {
-				$extension = explode('.', end($request));
-				if (count($extension) == 2) {
-					$driver = $extension[1];
-				} else {
-					$driver = 'traditional';
-				}
-				
-				if ($driver != 'traditional') {
-					$state = new $controller($request);
-				} else {
-					require $GLOBALS['maind'].'application/layouts/'.$GLOBALS['config']['layout'] . '.php';
-					$template = new $GLOBALS['config']['layout']();
-					echo $template->template($data['data']);
-					return;
-				}
-			} else {
-				$state = new $controller($request);
-			}
-		} else {
-			$state = new $controller($request);
-		}
-		
-		// Cache
-		if (empty($data) && !empty($GLOBALS['cache']) && $GLOBALS['cacheData']['what'] == 'c')
-			$GLOBALS['cacheData']['data'] = $state->view;
-		
-		$GLOBALS['errors'] = $state->getErrors();
-		
-		if (!$standAlone)
-		   return $state->getResult();
-		
-		echo $state->getResult()->parse();
-	}
-	else
-	{
-		include_once("./../application/errors/404.php");
-	}
+    $controller .= '_controller';
+    if (class_exists($controller))
+    {
+        $GLOBALS['errors'] = array();
+        
+        if (empty($request[0])) $request = array(0 => "index");
+        if (!method_exists($controller, $request[0])) $request = array_merge(array(0 => 'index'), $request);
+        
+        if (apc_exists(genKey('all')) || apc_exists(genKey('unique'))) {
+            $data = apc_fetch(genKey('all'));
+            if ($data == false) $data = apc_fetch(genKey('unique'));
+            
+            if ($data['what'] == 'c') {
+                $state = new Controller($request, $data['data'], true);
+                $state->callStatic(substr($controller, 0, -11), $request[0]);
+            } else if ($data['what'] == 'v') {
+                $extension = explode('.', end($request));
+                if (count($extension) == 2) {
+                    $driver = $extension[1];
+                } else {
+                    $driver = 'traditional';
+                }
+                
+                if ($driver != 'traditional') {
+                    $state = new $controller($request);
+                } else {
+                    require $GLOBALS['maind'].'application/layouts/'.$GLOBALS['config']['layout'] . '.php';
+                    $template = new $GLOBALS['config']['layout']();
+                    echo $template->template($data['data']);
+                    return;
+                }
+            } else {
+                $state = new $controller($request);
+            }
+        } else {
+            $state = new $controller($request);
+        }
+        
+        // Cache
+        if (empty($data) && !empty($GLOBALS['cache']) && $GLOBALS['cacheData']['what'] == 'c')
+            $GLOBALS['cacheData']['data'] = $state->view;
+        
+        $GLOBALS['errors'] = $state->getErrors();
+        
+        if (!$standAlone)
+           return $state->getResult();
+        
+        echo $state->getResult()->parse();
+    }
+    else
+    {
+        include_once("./../application/errors/404.php");
+    }
 }
 
 lazyLoader::initialize();
@@ -218,8 +218,8 @@ $hooks = HookHandler::singleton(
 
 // proccess request string
 function cleanArray($var) {
-	if ($var !== null && $var !== '') return true;
-	return false;
+    if ($var !== null && $var !== '') return true;
+    return false;
 }
 
 if (empty($_GET['r'])) $_GET['r'] = 'index/index';
@@ -232,4 +232,4 @@ $hooks->runHooks('end');
 
 // Cache
 if (!empty($GLOBALS['cache'])) 
-	apc_store($GLOBALS['cacheKey'], $GLOBALS['cacheData'], $GLOBALS['cacheTtl']);
+    apc_store($GLOBALS['cacheKey'], $GLOBALS['cacheData'], $GLOBALS['cacheTtl']);

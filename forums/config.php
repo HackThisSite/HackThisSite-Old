@@ -2,14 +2,14 @@
 // phpBB 3.0.x auto-generated configuration file
 // Do not change anything in this file! <- <J.K. Rowling> FAAWK YOUU.
 $config = array();
-require('/var/www/application/config/forum_config.php');
+
 $dbms = 'mysqli';
-$dbhost = $config['host'];
-$dbport = $config['port'];
-$dbname = $config['name'];
-$dbuser = $config['user'];
-$dbpasswd = $config['pass'];
-$table_prefix = $config['prefix'];
+$dbhost = 'localhost';
+$dbport = '';
+$dbname = 'hackthissite';
+$dbuser = 'htsdb';
+$dbpasswd = 'htsdb';
+$table_prefix = 'phpbb_';
 $acm_type = 'file';
 $load_extensions = '';
 

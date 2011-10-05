@@ -1,0 +1,49 @@
+@CHARSET "UTF-8";
+body {
+  background-color: #3D3D3D;
+  font-size: 12px;
+  font-family: Verdana, Arial, Helvetica, SunSans-Regular, Sans-Serif;
+  color:#564b47;  
+  padding:20px;
+  margin:0px;
+  text-align: center;
+}
+ 
+ 
+#content { 	
+text-align: left;
+vertical-align: middle;	
+margin: 0px auto;
+padding: 0px;
+width: 550px;
+background-color: #ffffff;
+border: 1px dashed #564b47;
+}
+ 
+			
+p, h1, pre {
+margin: 0px; 
+padding: 5px 10px; 
+}
+h1 {
+font-size: 11px;
+text-transform:uppercase;
+text-align: right;
+color: #564b47;
+background-color: #878787;
+}
+ 
+ 
+a { 
+color: #ff66cc;
+font-size: 11px;
+background-color:transparent;
+text-decoration: none; 
+}
+ 
+pre { 
+color: #564b47;
+font-size: 11px;
+background-color:transparent;
+font-family: Courier, Monaco, Monospace;
+}		

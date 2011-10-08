@@ -8,92 +8,66 @@ class Main {
 		$this->data = Data::singleton();
 	}
 	
+	private function parse($data, $file) {
+		$file = file_get_contents($GLOBALS['maind'] . 'application/layouts/main/' . $file . '.html');
+		
+		foreach ($data as $key => $value) {
+			$file = str_replace('{' . $key . '}', $value, $file);
+		}
+		
+		return $file;
+	}
 	public function intro($main, $notice) {
-		return '<table border="0" width="100%" cellspacing="5" cellpadding="0">
-	<tr>
-	  <td width="66%" rowspan="3" valign="top" class="normal-td">
-
-<center>		 <div class="training"></div></center><br />
-		 <div class="mainintro">' . $main . '<br /> <br />
-		</div><div id="notice">' . $notice . '
-</div>
-<br />
-</td>
-  </tr>
-</table>';
+		return $this->parse(array('main' => $main, 'notice' => $notice), 'intro');
+	}
+	
+	public function textForm($data, $location) {
+		$info = array_merge($data, array('base_url' => $GLOBALS['config']['baseUrl'], 'location' => addslashes($location)));
+		$info['title'] = htmlentities($info['title']);
+		$info['text'] = htmlentities($info['text']);
+		
+		return $this->parse($info, 'textForm');
 	}
 	
 	public function newsStart() {
-		return '<div style="border-bottom: 1px dashed #000000;">Latest site news: <a href="/pages/hts.rss.php" title="HTS RSS feed"><img src="http://1.static.htscdn.org/images/feed-icon.png" alt="RSS!" border="0" /></a></div><br />
-<div>
-
-<table border="0" width="100%" cellspacing="0" cellpadding="0">
-
-			<tr>
-				<td class="normal-td" style="font-size: 16px;"></td>
-			</tr>
-			<tr>
-				<td></td>
-			</tr>';
+		return $this->parse(array(), 'newsStart');
 	}
 	
 	public function newsEntry($entry) {
 		if (empty($this->Date)) $this->Date = new Date;
 		$idLib = new Id;
 		$id = $idLib->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news');
+		$bbcode = new BBCode;
+		$comment = ($entry['commentable'] ? '<a href="/news/view/{id}/#comments">comments (N/a)</a>' : 'comments disabled');
 		
-		return '	<tr>
-		<td class="normal-td" style="font-size: 16px;">
-      		<b><span style="font-size: 12px"><img src="' . $GLOBALS['config']['dataServer'] . '/images/tick.gif" alt="#" />' . $this->Date->dayFormat($entry['date']) . ':</span>&nbsp;&nbsp;' . $entry['title'] . '</b><span style="display:none;font-size: 9px;"><br /></span>
-
-    		</td>
-	</tr>
-       
-	<tr>
-		<td class="normal-td" style="font-size: 10px;">
-      	<br /><div class="news"><div align="left">' . $entry['body'] . '</div></div>
-  		<br />
-       	<br />
-  		<span style="font-size: 10px;"><a href="/news/view/' . $id . '">read more...</a> | <a href="/news/view/' . $id . '/#comments">comments (N/a)</a><br /><br /></span>
-    </td>
-	</tr>';
+		return $this->parse(array('dataServer' => $GLOBALS['config']['dataServer'], 
+			'date' => $this->Date->dayFormat($entry['date']), 'title' => $entry['title'], 
+			'body' => $bbcode->parse($entry['body'], '#'), 'id' => $id,
+			'comment' => $comment), 'newsEntry');
 	}
 	
 	public function newsEnd() {
-		return '	<tr>
-
-		<td>&nbsp;</td>
-	</tr>
-       </table>
-</div>';
+		return $this->parse(array(), 'newsEnd');
 	}
 	
 	public function showNews($entry) {
 		if (empty($this->Date)) $this->Date = new Date;
-		return '		<table border="0" width="100%" cellspacing="2" cellpadding="3">
-			<tr>
-				<td colspan="2">
-					<span style="font-size: 18px"><b>' . $entry['title'] . '</b></span> <br />
-				</td>
-			</tr>
-
-			<tr>
-				<td colspan="2">
-					Published by: HackThisSite Staff, on ' . $this->Date->minuteFormat($entry['date']) . '
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3" class="article">
-
-					<br /><div align="left">' . $entry['body'] . '</div> <br /><br />
-				</td>
-			</tr>
-			<tr style="font-size: 10px">
-				<td width="30%">
-					&nbsp; N/a views / N/a comments
-				</td>
-			</tr>
-		</table>';
+		$bbcode = new BBCode;
+		$id = new Id;
+		
+		$admin = array();
+		if ($GLOBALS['permissions']->check('postNews'))
+			array_push($admin, '<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/post_news/edit/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Edit</a>');
+		if ($GLOBALS['permissions']->check('deleteNews')) 
+			array_push($admin, '<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/post_news/delete/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Delete</a>');
+		
+		$realAdmin = '';
+		if (!empty($admin))
+			$realAdmin = '&nbsp;&nbsp;' . implode(' | ', $admin);
+		
+		$comments = ($entry['commentable'] ? 'N/a comments' : 'comments disabled');
+		return $this->parse(array('title' => $entry['title'], 'date' => $this->Date->minuteFormat($entry['date']),
+			'body' => $bbcode->parse($entry['body'], '#'), 'bottom' => $comments . $realAdmin), 'showNews');
 	}
 	
 	public function simpleTableStart() {
@@ -209,7 +183,7 @@ class Main {
 
 <body>
 <div id="topbar" align="center">
-<a href="' . $GLOBALS['config']['baseUrl'] . '" id="active">HackThisSite</a> - <a href="irc://irc.hackthissite.org:+7000/">IRC</a> - <a href="' . $GLOBALS['config']['baseUrl'] . '/forums">Forums</a> - <a href="https://twitter.com/#!/hackthissite">Twitter</a> - <a href="http://radio.hackthissite.org">Radio</a> - <a href="http://www.cafepress.com/htsstore">Store</a></div>
+<a href="' . $GLOBALS['config']['baseUrl'] . '" id="active">HackThisSite</a> - <a href="irc://irc.hackthissite.org:+7000/">IRC</a> - <a href="' . $GLOBALS['config']['baseUrl'] . 'forums">Forums</a> - <a href="https://twitter.com/#!/hackthissite">Twitter</a> - <a href="http://radio.hackthissite.org">Radio</a> - <a href="http://www.cafepress.com/htsstore">Store</a></div>
 
 	<div align="center">
 <a href="/"><img src="' . $GLOBALS['config']['dataServer'] . '/themes/Dark/images/header.jpg" alt="Header Logo" border="0" /></a>

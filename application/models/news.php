@@ -25,6 +25,41 @@ class News {
 		return $news;
 	}
 	
+	public function saveNews($title, $text, $commentable) {
+		$forums = new Forums;
+		$data = $forums->loginData();
+		$id = $data['id'];
+		
+		$entry = array('type' => 'news', 'title' => htmlentities($title), 'body' => $text, 'userId' => $id, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+		$this->db->insert($entry);
+	}
+	
+	public function editNews($id, $title, $text, $commentable) {
+		$this->db->update(array('_id' => $id), array('$set' => array(
+			'title' => htmlentities($title), 'body' => $text, 'commentable' => (bool) $commentable)));
+	}
+	
+	public function deleteNews($id) {
+		$idLib = new Id;
+		
+		$query = array('type' => 'news', 'ghosted' => false);
+		$query = array_merge($idLib->dissectKeys($id, 'news'), $query);
+		$results = $this->db->find($query);
+		$actual = array();
+		
+		foreach ($results as $result) {
+			if (!$idLib->validateHash($id, array('id' => (string) $result['_id'], 'date' => $result['date']), 'news'))
+				continue;
+			
+			$actual = $result;
+		}
+		
+		if (empty($actual)) return false;
+		
+		$this->db->remove(array('_id' => $actual['_id']), array('justOne' => true));
+		return true;
+	}
+	
 	public function realGetNewPosts() {
 		$query = array('type' => 'news', 'ghosted' => false);
 		$results = $this->db->find($query)->sort(array('date' => -1))->limit(10);

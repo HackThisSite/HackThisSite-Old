@@ -128,14 +128,98 @@ class admin_controller extends Controller {
 		}
 	}
 	
-	public function post_news() {
+	public function post_news($arguments) {
 		if ($this->bad) return false;
-		if (!$GLOBALS['permissions']->check('postNews'))
-			return $this->setError('You are not allowed to post news.');
+		$canPost = $GLOBALS['permissions']->check('postNews');
+		$canDelete = $GLOBALS['permissions']->check('deleteNews');
 			
 		$this->view['good'] = true;
+		
+		if (empty($arguments[0])) { // ----- NEW NEWS POSTS -----
+			if (!$canPost) {
+				$this->view['good'] = false;
+				return $this->setError('You are not allowed to post news.');
+			}
+			$this->view['title'] = '';
+			$this->view['text'] = '';
+			$this->view['id'] = '';
+			return;
+		} else if ($arguments[0] == 'save') { // ----- SAVING CHANGED NEWS -----
+			if (!$canPost) {
+				$this->view['good'] = false;
+				return $this->setError('You are not allowed to post news.');
+			}
+			
+			$error = '';
+			if (empty($_POST['title'])) $error = 'Needs title.';
+			if (empty($_POST['text'])) $error = 'Needs body.';
+			
+			if (!empty($error)) {
+				$this->view['mode'] = 'edit';
+				$this->view['title'] = @$_POST['title'];
+				$this->view['text'] = @$_POST['text'];
+				return $this->setError($error);
+			}
+			
+			$this->view['good'] = false;
+			
+			$news = new News;
+			
+			if (!empty($arguments[1])) {
+				$entry = $news->getNews($arguments[1]);
+				if (empty($entry)) 
+					return $this->setError('Invalid id.');
+					
+				$news->editNews($entry['_id'], $_POST['title'], $_POST['text'], (!empty($_POST['commentable']) ? true : false));
+			} else {
+				$news->saveNews($_POST['title'], $_POST['text'], (!empty($_POST['commentable']) ? true : false));
+			}
+			
+			header('Location: ' . $GLOBALS['config']['baseUrl']);
+			
+			return $this->setError('News entry has been saved.  Please follow redirect.');
+		} else if ($arguments[0] == 'edit' && !empty($arguments[1])) {	// ----- EDITING NEWS -----
+			$this->view['good'] = false;
+			if (!$canPost) {
+				return $this->setError('You are not allowed to edit news.');
+			}
+			if (!$entry = $this->getNews($arguments[1]))
+				return;
+			
+			$this->view['title'] = $entry['title'];
+			$this->view['text'] = $entry['body'];
+			
+			$id = new Id;
+			$this->view['id'] = $id->create(array('id' => $entry['_id'], 'date' => $entry['date']), 'news');
+			$this->view['good'] = true;
+		} else if ($arguments[0] == 'delete' && !empty($arguments[1])) { // ----- DELETING NEWS -----
+			$this->view['good'] = false;
+			if (!$canDelete) {
+				return $this->setError('You are not allowed to delete news.');
+			}
+			if (!$this->getNews($arguments[1]))
+				return;
+			
+			$this->news->deleteNews($arguments[1]);
+			$this->setError('Deleted.  Please be aware of caches.');
+		} else {
+			$this->view['good'] = false;
+			$this->setError('Invalid operation.');
+		}
 	}
 	
+	
+	private function getNews($id) {
+		$this->news = new News;
+		$entry = $this->news->getNews($id);
+		
+		if (empty($entry)) {
+			$this->setError('Invalid id.');
+			return false;
+		}
+		
+		return $entry;
+	}
 	
 	private function findHashed($hash, $navigation, $full = false) {
 		foreach ($navigation as $serialized => $score) {

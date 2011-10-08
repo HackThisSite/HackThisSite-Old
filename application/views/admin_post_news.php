@@ -1,6 +1,4 @@
 <?php
 if (!empty($good) && $good) {
-?>
-Hello!
-<?php
+	echo $template->textForm(array('title' => $title, 'text' => $text), 'admin/post_news/save/' . $id);
 }

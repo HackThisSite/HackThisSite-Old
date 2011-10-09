@@ -1,0 +1,8 @@
+<form method="POST" action="{baseUrl}admin/navigation/save/new">
+	<b>Type: </b> <input type="radio" name="type" value=0 /> Header&nbsp;&nbsp;<input type="radio" name="type" value=1 /> Link<br />
+	<b>Name: </b> <input type="text" name="name" value="" /><br />
+	<b>Location: </b> <input type="text" name="location" value="" /> (do not fill out if header)<br />
+	<b>Access: </b><br />
+	<select name="access[]" multiple="multiple">{options}</select><br />
+	<b>Score: </b> <input type="text" name="score" value="" /><br />
+	<input type="submit" name="submit" value="Save" />&nbsp;&nbsp;<a href="{baseUrl}admin/navigation">Cancel</a>

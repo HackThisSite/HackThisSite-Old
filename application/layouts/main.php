@@ -3,6 +3,8 @@ class Main {
 	
 	var $data;
 	var $date;
+	var $comments;
+	var $forums;
 	
 	public function __construct() {
 		$this->data = Data::singleton();
@@ -17,6 +19,29 @@ class Main {
 		
 		return $file;
 	}
+	
+	public function commentHeader($count) {
+		return '<div align="center"><a name="comments"></a><br /><div class="cmHeader"><b>Comments:</b> <br />&nbsp;<span style="font-size: 10px">Published: ' . $count . ' comments.</span></div><table class="cmTable" border="0" width="80%" cellspacing="0" cellpadding="0"><form action="/pages/comments/com_delete.php" method="get" name="com_delete"><tr><td width="12%"></td><td width="2%"></td><td width="77%"></td><td width="9%"></td></tr>';
+	}
+	
+	public function noComments() {
+		return '<tr><td class="light-td" colspan="4"><p style="text-align: center"><br />&nbsp;No comments found on this id.<br />&nbsp;</p></td></tr>';
+
+	}
+	
+	public function comment($entry) {
+		if (empty($this->Date)) $this->Date = new Date;
+		if (empty($this->forums)) $this->forums = new Forums;
+		
+		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'userId' => $entry['userId'], 
+			'username' => $this->forums->getUsername($entry['userId']), 'date' => $this->Date->minuteFormat($entry['date']), 
+			'body' => $entry['body']), 'comment');
+	}
+	
+	public function commentFooter() {
+		return '</form></table></div>';
+	}
+	
 	public function intro($main, $notice) {
 		return $this->parse(array('main' => $main, 'notice' => $notice), 'intro');
 	}
@@ -35,10 +60,12 @@ class Main {
 	
 	public function newsEntry($entry) {
 		if (empty($this->Date)) $this->Date = new Date;
+		if (empty($this->comments)) $this->comments = new Comments;
+		
 		$idLib = new Id;
 		$id = $idLib->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news');
 		$bbcode = new BBCode;
-		$comment = ($entry['commentable'] ? '<a href="/news/view/{id}/#comments">comments (N/a)</a>' : 'comments disabled');
+		$comment = ($entry['commentable'] ? '<a href="/news/view/' . $id . '/#comments">comments (' . (int) $this->comments->totalComments($entry['_id']) . ')</a>' : 'comments disabled');
 		
 		return $this->parse(array('dataServer' => $GLOBALS['config']['dataServer'], 
 			'date' => $this->Date->dayFormat($entry['date']), 'title' => $entry['title'], 
@@ -117,50 +144,30 @@ class Main {
 	
 	public function navigationNew() {
 		$data = Data::singleton();
-
-		$return = '<form method="POST" action="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation/save/new">
-	<b>Type: </b> <input type="radio" name="type" value=0 /> Header&nbsp;&nbsp;<input type="radio" name="type" value=1 /> Link<br />
-	<b>Name: </b> <input type="text" name="name" value="" /><br />
-	<b>Location: </b> <input type="text" name="location" value="" /> (do not fill out if header)<br />
-	<b>Access: </b><br />
-	<select name="access[]" multiple="multiple">';
-	
+		$options = '';
 		$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
 		
 		foreach ($info['rows'] as $row) {
 			$name = strtolower($row['group_name']);
-			$return .= '		<option value="' . $name . '">' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
+			$options .= '		<option value="' . $name . '">' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
 		}
 		
-		$return .= '	</select><br />
-	<b>Score: </b> <input type="text" name="score" value="" /><br />
-	<input type="submit" name="submit" value="Save" />&nbsp;&nbsp;<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation">Cancel</a>';
-		
-		return $return;
+		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'options' => $options), 'navigationNew');
 	}
 	
 	public function navigationEdit($score, $entry) {
 		$data = Data::singleton();
 
-		$return = '<form method="POST" action="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation/save/' . hash('adler32', serialize($entry)) . '">
-	<b>Type: </b> <input type="radio" name="type" value=0' . ($entry['type'] == 0 ? ' checked=checked"' : '') . ' /> Header&nbsp;&nbsp;<input type="radio" name="type" value=1' . ($entry['type'] == 1 ? ' checked="checked"' : '') . ' /> Link<br />
-	<b>Name: </b> <input type="text" name="name" value="' . htmlentities($entry['name']) . '" /><br />
-	<b>Location: </b> <input type="text" name="location" value="' . htmlentities((!empty($entry['location']) ? $entry['location'] : '')) . '" /> (do not fill out if header)<br />
-	<b>Access: </b><br />
-	<select name="access[]" multiple="multiple">';
-	
 		$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
-		
+		$groups = '';
 		foreach ($info['rows'] as $row) {
 			$name = strtolower($row['group_name']);
-			$return .= '		<option value="' . $name . '"' . ($entry['access'] == 'all' || in_array($name, $entry['access']) ? '  selected="selected"' : '') . '>' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
+			$groups .= '		<option value="' . $name . '"' . ($entry['access'] == 'all' || in_array($name, $entry['access']) ? '  selected="selected"' : '') . '>' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
 		}
 		
-		$return .= '	</select><br />
-	<b>Score: </b> <input type="text" name="score" value="' . $score . '" /><br />
-	<input type="submit" name="submit" value="Save" />&nbsp;&nbsp;<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation">Cancel</a>';
-		
-		return $return;
+		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'hash' => hash('adler32', serialize($entry)), 'checked0' => ($entry['type'] == 0 ? ' checked=checked"' : ''), 
+			'checked1' => ($entry['type'] == 1 ? ' checked="checked"' : ''), 'name' => htmlentities($entry['name']), 'location' => htmlentities((!empty($entry['location']) ? $entry['location'] : '')),
+			'groups' => $groups, 'score' => $score), 'navigationEdit');
 	}
 	
 	public function template($page_content) {

@@ -17,6 +17,14 @@ class Forums {
 		return $loginData;
 	}
 	
+	public function getUsername($id) {
+		if (apc_exists('username_' . $id)) return apc_fetch('username_' . $id);
+		
+		$username = $this->realGetUsername($id);
+		apc_store('username_' . $id, $username, 3600);
+		return $username;
+	}
+	
 	private function getLoginData() {
 		if (empty($this->data)) $this->data = Data::singleton();
 		$cookieName = $GLOBALS['config']['forums']['cookie'];
@@ -34,6 +42,12 @@ class Forums {
 			return array('loggedIn' => false, 'group' => 'guests');
 		
 		return array('loggedIn' => true, 'id' => $query['rows'][0]['user_id'], 'username' => $query['rows'][0]['username'], 'group' => strtolower($query['rows'][0]['group_name']));
+	}
+	
+	private function realGetUsername($id) {
+		if (empty($this->data)) $this->data = Data::singleton();
+		$username = $this->data->query('SELECT username FROM ' . $GLOBALS['config']['forums']['prefix'] . 'users WHERE user_id = ' . intval($id) . ' LIMIT 1');
+		return (!empty($username['rows'][0]['username']) ? $username['rows'][0]['username'] : 'Anonymous');
 	}
 	
 }

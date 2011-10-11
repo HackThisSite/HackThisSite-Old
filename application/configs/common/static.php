@@ -1,4 +1,4 @@
 <?php
 return array(
-    "static:cdn" => "http://%d.static.htscdn.org" 
+    "static:cdn" => "http://1.static.htscdn.org" 
 );

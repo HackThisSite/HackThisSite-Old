@@ -34,13 +34,13 @@ class Config
 
     static private function _preloadConfigIfNotLoaded()
     {
-        $key = "_" . self::PREFIX . "is_loaded";
-        if (apc_fetch($key) !== false)
+        $isLoadedKey = "_" . self::PREFIX . "is_loaded";
+        if (apc_fetch($isLoadedKey) !== false)
         {
             // yay, we already loaded the config, return to what we were doing.
             return;
         }
-
+        
         // load the local configs for this server based on hostname
         $configBase = dirname(dirname(__FILE__)) . "/application/configs";
         $serverConf = self::_loadConfigsRecursively($configBase . "/servers/" . gethostname());
@@ -68,7 +68,7 @@ class Config
 
         // set the flag indicating that the shared memory cache has been
         // populated with the config state for this machine
-        apc_store($key, true);
+        apc_store($isLoadedKey, true);
     }
 
     /*

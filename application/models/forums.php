@@ -4,7 +4,7 @@ class Forums {
 	var $data;
 	
 	public function loginData() {
-		$cookieName = $GLOBALS['config']['forums']['cookie'];
+		$cookieName = Config::get("forums:cookie");
 		
 		if (empty($_COOKIE[$cookieName . '_sid'])) return array('loggedIn' => false, 'group' => 'guests');
 		
@@ -27,11 +27,11 @@ class Forums {
 	
 	private function getLoginData() {
 		if (empty($this->data)) $this->data = Data::singleton();
-		$cookieName = $GLOBALS['config']['forums']['cookie'];
+		$cookieName = Config::get("forums:cookie");
 
-		$sessionTable = $GLOBALS['config']['forums']['prefix'] . 'sessions';
-		$userTable = $GLOBALS['config']['forums']['prefix'] . 'users';
-		$groupTable = $GLOBALS['config']['forums']['prefix'] . 'groups';
+		$sessionTable = Config::get("forums:prefix") . 'sessions';
+		$userTable = Config::get("forums:prefix") . 'users';
+		$groupTable = Config::get("forums:prefix") . 'groups';
 		
 		$sess = $this->data->escape($_COOKIE[$cookieName . '_sid']);
 		$u = $this->data->escape($_COOKIE[$cookieName . '_u']);
@@ -46,7 +46,7 @@ class Forums {
 	
 	private function realGetUsername($id) {
 		if (empty($this->data)) $this->data = Data::singleton();
-		$username = $this->data->query('SELECT username FROM ' . $GLOBALS['config']['forums']['prefix'] . 'users WHERE user_id = ' . intval($id) . ' LIMIT 1');
+		$username = $this->data->query('SELECT username FROM ' . Config::get("forums:prefix") . 'users WHERE user_id = ' . intval($id) . ' LIMIT 1');
 		return (!empty($username['rows'][0]['username']) ? $username['rows'][0]['username'] : 'Anonymous');
 	}
 	

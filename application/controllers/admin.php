@@ -175,7 +175,7 @@ class admin_controller extends Controller {
 				$news->saveNews($_POST['title'], $_POST['text'], (!empty($_POST['commentable']) ? true : false));
 			}
 			
-			header('Location: ' . $GLOBALS['config']['baseUrl']);
+			header('Location: ' . Config::get("other:baseUrl"));
 			
 			return $this->setError('News entry has been saved.  Please follow redirect.');
 		} else if ($arguments[0] == 'edit' && !empty($arguments[1])) {	// ----- EDITING NEWS -----
@@ -246,7 +246,7 @@ class admin_controller extends Controller {
 		$this->view['saved'] = true;
 		
 		$data = Data::singleton();
-		$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
+		$info = $data->query('SELECT group_name FROM ' . Config::get("forums:prefix") . 'groups WHERE 1 = 1');
 		$count = $info['count'];
 		
 		if (!empty($_POST['access'])) {

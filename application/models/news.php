@@ -1,6 +1,5 @@
 <?php
 class News {
-    
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
     
@@ -14,10 +13,11 @@ class News {
     }
     
     public function getNewPosts($cache = true) {
-        if ($cache && apc_exists('top_news')) return apc_fetch('top_news');
+        // temporarilly disabling cache for development - Joseph Moniz
+        //if ($cache && apc_exists('top_news')) return apc_fetch('top_news');
         
         $news = $this->realGetNewPosts();
-        if ($cache && !empty($news)) apc_add('top_news', $news, 10);
+        //if ($cache && !empty($news)) apc_add('top_news', $news, 10);
         return $news;
     }
     
@@ -65,9 +65,15 @@ class News {
     }
     
     public function realGetNewPosts() {
-        $query = array('type' => 'news', 'ghosted' => false);
-        $results = $this->db->find($query)->sort(array('date' => -1))->limit(10);
-        return iterator_to_array($results);
+        return iterator_to_array(
+            $this->db->find(
+                array(
+                    'type' => 'news', 
+                    'ghosted' => false
+                )
+            )->sort(array('date' => -1))
+              ->limit(10)
+        );
     }
     
     public function realGetNews($id) {
@@ -84,5 +90,4 @@ class News {
             return $result;
         }
     }
-    
 }

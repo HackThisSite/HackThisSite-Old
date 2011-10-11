@@ -24,7 +24,7 @@ if ($mode == 'list') {
 		}
 		
 		if ($can)
-			echo '&nbsp;&nbsp;<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/access/edit/' . $name . '">(edit)</a>';
+			echo '&nbsp;&nbsp;<a href="' . Config::get("other:baseUrl") . 'admin/access/edit/' . $name . '">(edit)</a>';
 			
 ?>
 </li>
@@ -39,12 +39,12 @@ if ($mode == 'list') {
 
 <b><u><?php echo $id; ?> Access:</u></b><br />
 
-<form action="<?php echo $GLOBALS['config']['baseUrl']; ?>admin/access/save/<?php echo $id; ?>" method="post">
+<form action="<?php echo Config::get("other:baseUrl"); ?>admin/access/save/<?php echo $id; ?>" method="post">
 	<select name="access[]" multiple="multiple">
 <?php
 	$data = Data::singleton();
 	$list = explode(',', $permissions[$id]);
-	$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
+	$info = $data->query('SELECT group_name FROM ' . Config::get("forums:prefix") . 'groups WHERE 1 = 1');
 	
 	foreach ($info['rows'] as $row) {
 		$name = strtolower($row['group_name']);
@@ -55,7 +55,7 @@ if ($mode == 'list') {
 ?>
 	</select><br />
 
-	<input type="submit" name="submit" value="Save" />&nbsp;&nbsp;<a href="<?php echo $GLOBALS['config']['baseUrl']; ?>admin/access">Cancel</a>
+	<input type="submit" name="submit" value="Save" />&nbsp;&nbsp;<a href="<?php echo Config::get("other:baseUrl"); ?>admin/access">Cancel</a>
 </form>
 <?php
 }

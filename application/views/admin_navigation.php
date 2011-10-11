@@ -15,7 +15,7 @@ if (!isset($bad) || (isset($bad) && !$bad)):
 		echo $template->navigationEdit($info['score'], unserialize($info['serialized']));
 	} else {
 ?>
-<a href="<?php echo $GLOBALS['config']['baseUrl']; ?>admin/navigation/new">New Entry</a><br />
+<a href="<?php echo Config::get("other:baseUrl"); ?>admin/navigation/new">New Entry</a><br />
 <?php
 		echo $template->simpleTableStart();
 		

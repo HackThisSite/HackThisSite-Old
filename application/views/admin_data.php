@@ -12,7 +12,7 @@ if (!isset($bad) || (isset($bad) && !$bad)):
 if ($GLOBALS['permissions']->check('apcClear')) {
 ?>
 <br />
-<a href="<?php echo $GLOBALS['config']['baseUrl']; ?>admin/data/clear">Clear APC</a><br />
+<a href="<?php echo Config::get("other:baseUrl"); ?>admin/data/clear">Clear APC</a><br />
 <?php
 }
 ?>
@@ -34,7 +34,7 @@ if ($GLOBALS['permissions']->check('apcClear')) {
 if ($GLOBALS['permissions']->check('redisBgSave')) {
 ?>
 <br />
-<a href="<?php echo $GLOBALS['config']['baseUrl']; ?>admin/data/bgsave">Start Background Save</a><br />
+<a href="<?php echo Config::get("other:baseUrl"); ?>admin/data/bgsave">Start Background Save</a><br />
 <?php
 }
 endif;

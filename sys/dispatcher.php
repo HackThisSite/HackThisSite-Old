@@ -237,58 +237,41 @@ function genKey($sensitivity) {
 function dispatch($controller, $request = false, $viewData = false, $standAlone = false)
 {
     $controller .= '_controller';
-    if (class_exists($controller))
+    
+    // if the controller doesn't exist, route to the 404 handler immediately
+    if (!class_exists($controller))
     {
-        $GLOBALS['errors'] = array();
-        
-        if (empty($request[0])) $request = array(0 => "index");
-        if (!method_exists($controller, $request[0])) $request = array_merge(array(0 => 'index'), $request);
-        
-        if (apc_exists(genKey('all')) || apc_exists(genKey('unique'))) {
-            $data = apc_fetch(genKey('all'));
-            if ($data == false) $data = apc_fetch(genKey('unique'));
-            
-            if ($data['what'] == 'c') {
-                $state = new Controller($request, $data['data'], true);
-                $state->callStatic(substr($controller, 0, -11), $request[0]);
-            } else if ($data['what'] == 'v') {
-                $extension = explode('.', end($request));
-                if (count($extension) == 2) {
-                    $driver = $extension[1];
-                } else {
-                    $driver = 'traditional';
-                }
-                
-                if ($driver != 'traditional') {
-                    $state = new $controller($request);
-                } else {
-                    require $GLOBALS['maind'].'application/layouts/'.$GLOBALS['config']['layout'] . '.php';
-                    $template = new $GLOBALS['config']['layout']();
-                    echo $template->template($data['data']);
-                    return;
-                }
-            } else {
-                $state = new $controller($request);
-            }
-        } else {
-            $state = new $controller($request);
-        }
-        
-        // Cache
-        if (empty($data) && !empty($GLOBALS['cache']) && $GLOBALS['cacheData']['what'] == 'c')
-            $GLOBALS['cacheData']['data'] = $state->view;
-        
-        $GLOBALS['errors'] = $state->getErrors();
-        
-        if (!$standAlone)
-           return $state->getResult();
-        
-        echo $state->getResult()->parse();
+        include_once(
+            dirname(dirname(__FILE__)) .
+            "/application/errors/404.php"
+        );
+        return false;
     }
-    else
+    $GLOBALS['errors'] = array();
+    
+    // if no route is set then default to index
+    if (empty($request[0]))
     {
-        include_once("./../application/errors/404.php");
+        $request = array(0 => "index");
     }
+
+    // if the supplied method doesn't exist then default it to the index
+    // handler method
+    if (!method_exists($controller, $request[0]))
+    {
+        $request = array_merge(array(0 => 'index'), $request);
+    }
+
+    $state = new $controller($request);
+
+    $GLOBALS['errors'] = $state->getErrors();
+
+    if (!$standAlone)
+    {
+       return $state->getResult();
+    }
+
+    echo $state->getResult()->parse();
 }
 
 lazyLoader::initialize();
@@ -316,7 +299,3 @@ $controller = array_shift($request);
 dispatch($controller, $request, false, true);
 
 $hooks->runHooks('end');
-
-// Cache
-if (!empty($GLOBALS['cache'])) 
-    apc_store($GLOBALS['cacheKey'], $GLOBALS['cacheData'], $GLOBALS['cacheTtl']);

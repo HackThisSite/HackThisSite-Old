@@ -3,8 +3,7 @@ class traditional_view_driver
 {
 	public function parse($view, $data, $widget)
 	{
-		
-		require $GLOBALS['maind'].'application/layouts/'.$GLOBALS['config']['layout'] . '.php';
+		if (!$widget) require $GLOBALS['maind'].'application/layouts/'.$GLOBALS['config']['layout'] . '.php';
 		$template = new $GLOBALS['config']['layout']();
 		
 		if (apc_exists(genKey('all')) || apc_exists(genKey('unique'))) {

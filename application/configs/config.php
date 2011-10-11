@@ -36,6 +36,7 @@ $config = array(
             'token' => 'site-wide-secret-salt'
         ),
         'forums' => array(
+			'cookie' => 'phpbb3_nrese',
             'prefix' => 'phpbb_',
             'session_length' => 3600,
         ),

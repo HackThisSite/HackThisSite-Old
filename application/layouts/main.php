@@ -33,7 +33,7 @@ class Main {
 		if (empty($this->Date)) $this->Date = new Date;
 		if (empty($this->forums)) $this->forums = new Forums;
 		
-		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'userId' => $entry['userId'], 
+		return $this->parse(array('baseUrl' => Config::get("other:baseUrl"), 'userId' => $entry['userId'], 
 			'username' => $this->forums->getUsername($entry['userId']), 'date' => $this->Date->minuteFormat($entry['date']), 
 			'body' => $entry['body']), 'comment');
 	}
@@ -47,7 +47,7 @@ class Main {
 	}
 	
 	public function textForm($data, $location) {
-		$info = array_merge($data, array('base_url' => $GLOBALS['config']['baseUrl'], 'location' => addslashes($location)));
+		$info = array_merge($data, array('base_url' => Config::get("other:baseUrl"), 'location' => addslashes($location)));
 		$info['title'] = htmlentities($info['title']);
 		$info['text'] = htmlentities($info['text']);
 		
@@ -67,7 +67,7 @@ class Main {
 		$bbcode = new BBCode;
 		$comment = ($entry['commentable'] ? '<a href="/news/view/' . $id . '/#comments">comments (' . (int) $this->comments->totalComments($entry['_id']) . ')</a>' : 'comments disabled');
 		
-		return $this->parse(array('dataServer' => $GLOBALS['config']['dataServer'], 
+		return $this->parse(array('dataServer' => Config::get("static:cdn"), 
 			'date' => $this->Date->dayFormat($entry['date']), 'title' => $entry['title'], 
 			'body' => $bbcode->parse($entry['body'], '#'), 'id' => $id,
 			'comment' => $comment), 'newsEntry');
@@ -84,9 +84,9 @@ class Main {
 		
 		$admin = array();
 		if ($GLOBALS['permissions']->check('postNews'))
-			array_push($admin, '<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/post_news/edit/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Edit</a>');
+			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/edit/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Edit</a>');
 		if ($GLOBALS['permissions']->check('deleteNews')) 
-			array_push($admin, '<a href="' . $GLOBALS['config']['baseUrl'] . 'admin/post_news/delete/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Delete</a>');
+			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/delete/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Delete</a>');
 		
 		$realAdmin = '';
 		if (!empty($admin))
@@ -113,7 +113,7 @@ class Main {
 		$return = '<b>Type: </b><i>' . ($nav['type'] == 0 ? 'Header' : 'Link') . '</i><br /><b>Name: </b><code>' . htmlentities($nav['name']) . '</code>';
 		
 		if (!empty($nav['location'])) {
-			$return .= '<br /><b>Location: </b><a href="' . $GLOBALS['config']['baseUrl'] . $nav['location'] . '">' . htmlentities($nav['location']) . '</a>';
+			$return .= '<br /><b>Location: </b><a href="' . Config::get("other:baseUrl") . $nav['location'] . '">' . htmlentities($nav['location']) . '</a>';
 		}
 		
 		$return .= '<br /><b>Access: </b>';
@@ -136,7 +136,7 @@ class Main {
 		
 		if ($GLOBALS['permissions']->check('navigationEdit')) {
 			$hash = hash('adler32', serialize($nav));
-			$return .= '<span style="float: right;"><a class="nav" href="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation/edit/' . $hash . '"><b>Edit</b></a>&nbsp;&nbsp;-&nbsp;&nbsp;<a class="nav" href="' . $GLOBALS['config']['baseUrl'] . 'admin/navigation/delete/' . $hash . '"><b>Delete</b></a></span>';
+			$return .= '<span style="float: right;"><a class="nav" href="' . Config::get("other:baseUrl") . 'admin/navigation/edit/' . $hash . '"><b>Edit</b></a>&nbsp;&nbsp;-&nbsp;&nbsp;<a class="nav" href="' . Config::get("other:baseUrl") . 'admin/navigation/delete/' . $hash . '"><b>Delete</b></a></span>';
 		}
 		
 		return $return;
@@ -145,33 +145,33 @@ class Main {
 	public function navigationNew() {
 		$data = Data::singleton();
 		$options = '';
-		$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
+		$info = $data->query('SELECT group_name FROM ' . Config::get("forums:prefix") . 'groups WHERE 1 = 1');
 		
 		foreach ($info['rows'] as $row) {
 			$name = strtolower($row['group_name']);
 			$options .= '		<option value="' . $name . '">' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
 		}
 		
-		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'options' => $options), 'navigationNew');
+		return $this->parse(array('baseUrl' => Config::get("other:baseUrl"), 'options' => $options), 'navigationNew');
 	}
 	
 	public function navigationEdit($score, $entry) {
 		$data = Data::singleton();
 
-		$info = $data->query('SELECT group_name FROM ' . $GLOBALS['config']['forums']['prefix'] . 'groups WHERE 1 = 1');
+		$info = $data->query('SELECT group_name FROM ' . Config::get("forums:prefix") . 'groups WHERE 1 = 1');
 		$groups = '';
 		foreach ($info['rows'] as $row) {
 			$name = strtolower($row['group_name']);
 			$groups .= '		<option value="' . $name . '"' . ($entry['access'] == 'all' || in_array($name, $entry['access']) ? '  selected="selected"' : '') . '>' . ucwords(str_replace('_', ' ', $name)) . '</option>' . "\n";
 		}
 		
-		return $this->parse(array('baseUrl' => $GLOBALS['config']['baseUrl'], 'hash' => hash('adler32', serialize($entry)), 'checked0' => ($entry['type'] == 0 ? ' checked=checked"' : ''), 
+		return $this->parse(array('baseUrl' => Config::get("other:baseUrl"), 'hash' => hash('adler32', serialize($entry)), 'checked0' => ($entry['type'] == 0 ? ' checked=checked"' : ''), 
 			'checked1' => ($entry['type'] == 1 ? ' checked="checked"' : ''), 'name' => htmlentities($entry['name']), 'location' => htmlentities((!empty($entry['location']) ? $entry['location'] : '')),
 			'groups' => $groups, 'score' => $score), 'navigationEdit');
 	}
 	
 	public function template($page_content) {
-		$tick = '<img src="'. $GLOBALS['config']['dataServer'] .'/images/tick.gif" alt="#" />';
+		$tick = '<img src="'. Config::get("static:cdn") .'/images/tick.gif" alt="#" />';
 		$return = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
@@ -184,16 +184,16 @@ class Main {
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-  <link href="' . $GLOBALS['config']['dataServer'] . '/themes/Dark/Dark.css" rel="stylesheet" type="text/css" />
-  <base href="' . $GLOBALS['config']['baseUrl'] . '" />
+  <link href="' . Config::get("static:cdn") . '/themes/Dark/Dark.css" rel="stylesheet" type="text/css" />
+  <base href="' . Config::get("other:baseUrl") . '" />
 </head>
 
 <body>
 <div id="topbar" align="center">
-<a href="' . $GLOBALS['config']['baseUrl'] . '" id="active">HackThisSite</a> - <a href="irc://irc.hackthissite.org:+7000/">IRC</a> - <a href="' . $GLOBALS['config']['baseUrl'] . 'forums">Forums</a> - <a href="https://twitter.com/#!/hackthissite">Twitter</a> - <a href="http://radio.hackthissite.org">Radio</a> - <a href="http://www.cafepress.com/htsstore">Store</a></div>
+<a href="' . Config::get("other:baseUrl") . '" id="active">HackThisSite</a> - <a href="irc://irc.hackthissite.org:+7000/">IRC</a> - <a href="' . Config::get("other:baseUrl") . 'forums">Forums</a> - <a href="https://twitter.com/#!/hackthissite">Twitter</a> - <a href="http://radio.hackthissite.org">Radio</a> - <a href="http://www.cafepress.com/htsstore">Store</a></div>
 
 	<div align="center">
-<a href="/"><img src="' . $GLOBALS['config']['dataServer'] . '/themes/Dark/images/header.jpg" alt="Header Logo" border="0" /></a>
+<a href="/"><img src="' . Config::get("static:cdn") . '/themes/Dark/images/header.jpg" alt="Header Logo" border="0" /></a>
   	<div align="center" class="radical">
 	</div>
   <table width="780" border="0" cellpadding="0" cellspacing="0" class="siteheader">
@@ -211,9 +211,9 @@ class Main {
 		extract($forums->loginData());
 
 		if ($loggedIn) {
-			$return .= 'Hello, <a href="' . $GLOBALS['config']['baseUrl'] . 'forums/ucp.php">' . $username . '</a>!<br />';
+			$return .= 'Hello, <a href="' . Config::get("other:baseUrl") . 'forums/ucp.php">' . $username . '</a>!<br />';
 		} else {
-			$return .= '<a class="nav" href="' . $GLOBALS['config']['baseUrl'] . 'forums/">Login</a><br />';
+			$return .= '<a class="nav" href="' . Config::get("other:baseUrl") . 'forums/">Login</a><br />';
 		}
 
 		$navigation = $this->data->zRangeGet('navigation', 0, -1);
@@ -228,7 +228,7 @@ class Main {
 				$return .= ($first ? '' : '</ul>') . '<h4 class="header">' . $link['name'] . '</h4><ul class="navigation">';
 				$first = false;
 			} else if ($link['type'] == 1) {
-				$return .= '<li><a class="nav" href="' . $GLOBALS['config']['baseUrl'] . $link['location'] . '">' . $link['name'] . '</a></li>';
+				$return .= '<li><a class="nav" href="' . Config::get("other:baseUrl") . $link['location'] . '">' . $link['name'] . '</a></li>';
 			}
 		}
 		
@@ -250,7 +250,7 @@ class Main {
       </table></td>
     </tr>
  <tr>
-      <td class="sitebottomheader"><img src="' . $GLOBALS['config']['dataServer'] . '/themes/Dark/images/hts_bottomheadern.jpg" alt="End Footer" width="780" height="60" /></td>
+      <td class="sitebottomheader"><img src="' . Config::get("static:cdn") . '/themes/Dark/images/hts_bottomheadern.jpg" alt="End Footer" width="780" height="60" /></td>
     </tr>
   </table>
   <br />
@@ -260,10 +260,10 @@ HackThisSite staff. Please don\'t reproduce in part or whole without permission.
 </div>
 <div align="center">
   <p>
-   <a href="http://validator.w3.org/check?uri=referer"><img src="' . $GLOBALS['config']['dataServer'] . '/images/xhtml10.png" width="80" height="15" border="0" alt="" /></a>&nbsp;
-   <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="' . $GLOBALS['config']['dataServer'] . '/images/css.png" width="80" height="15" border="0" alt="" /></a> 
-   <a href="http://www.php.net/"> <img src="' . $GLOBALS['config']['dataServer'] . '/images/phppow.gif" width="80" height="15" border="0" alt="" /></a>
-   <a href="http://www.freebsd.org/"> <img src="' . $GLOBALS['config']['dataServer'] . '/images/freebsd.png" width="80" height="15" border="0" alt="" /></a>
+   <a href="http://validator.w3.org/check?uri=referer"><img src="' . Config::get("static:cdn") . '/images/xhtml10.png" width="80" height="15" border="0" alt="" /></a>&nbsp;
+   <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="' . Config::get("static:cdn") . '/images/css.png" width="80" height="15" border="0" alt="" /></a> 
+   <a href="http://www.php.net/"> <img src="' . Config::get("static:cdn") . '/images/phppow.gif" width="80" height="15" border="0" alt="" /></a>
+   <a href="http://www.freebsd.org/"> <img src="' . Config::get("static:cdn") . '/images/freebsd.png" width="80" height="15" border="0" alt="" /></a>
   </p>
   
   <div align="center" style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:10px; color:#CCCCCC">

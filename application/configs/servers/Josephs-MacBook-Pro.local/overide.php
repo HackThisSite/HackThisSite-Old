@@ -5,4 +5,8 @@
 
 return array(
     "system:environment" => "dev",
+    
+    // i have mutliple dev environments on this system so i need to run
+    // this dev env on an odd port
+	'other:baseUrl' => 'http://127.0.0.1:7777/',
 );

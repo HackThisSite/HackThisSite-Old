@@ -43,4 +43,3 @@ $config = array(
         'dataServer' => 'http://'.rand(0,3).'.static.htscdn.org',
     )
 );
-?>

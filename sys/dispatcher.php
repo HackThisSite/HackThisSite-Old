@@ -37,6 +37,13 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $maind.'library');
 
 class lazyLoader
 {
+    const PREFIX            = "lazyLoaderStat:";
+    const PREFIX_MODEL      = "model:";
+    const PREFIX_CONTROLLER = "controller:";
+    const PREFIX_LIBRARY    = "library:";
+    const PREFIX_HOOK       = "hook:";
+    const PREFIX_DRIVER     = "drivers:";
+
     private static $instance;
     
     private function __construct($hooks = false)
@@ -59,65 +66,145 @@ class lazyLoader
             
         return false;
     }
-    
+
     public function model($name)
     {
+        $key    = self::PREFIX . self::PREFIX_MODEL . $name;
+        $cached = apc_fetch($key);
+
+        if ($cached === null) { return false; }
+        if ($cached !== false)
+        {
+            include $cached;
+            return true;
+        }
+
         if ($name[0] != strtoupper($name[0]))
+        {
+            apc_store($key, null);
             return false;
-        
+        }
+
         $name = strtolower($name);
         $main = $GLOBALS['maind'];
         $file = "{$main}application/models/{$name}.php";
         if (!file_exists($file))
+        {
+            apc_store($key, null);
             return false;
-            
+        }
+
+        apc_store($key, $file);
         include $file;
     }
-    
+
     public function controller($name)
     {
+        $key    = self::PREFIX . self::PREFIX_CONTROLLER . $name;
+        $cached = apc_fetch($key);
+
+        if ($cached === null) { return false; }
+        if ($cached !== false)
+        {
+            include $cached;
+            return true;
+        }
+
         $main = $GLOBALS['maind'];
         $file = "{$main}application/controllers/{$name}.php";
         if (!file_exists($file))
+        {
+            apc_store($key, null);
             return false;
-        
+        }
+
+        apc_store($key, $file);
         include $file;
     }
-    
+
     public function library($name)
     {
+        $key    = self::PREFIX . self::PREFIX_LIBRARY . $name;
+        $cached = apc_fetch($key);
+
+        if ($cached === null) { return false; }
+        if ($cached !== false)
+        {
+            include $cached;
+            return true;
+        }
+
         if ($name[0] != strtoupper($name[0]))
+        {
+            apc_store($key, null);
             return false;
+        }
         
         $name = strtolower($name);
         $main = $GLOBALS['maind'];
         $file = "{$main}library/{$name}.php";
         if (!file_exists($file))
+        {
+            apc_store($key, null);
             return false;
-            
+        }
+
+        apc_store($key, $file);
         include $file;
     }
     
     public function hook($name)
     {
+        $key    = self::PREFIX . self::PREFIX_HOOK . $name;
+        $cached = apc_fetch($key);
+
+        if ($cached === null) {
+            return false;
+        }
+        if ($cached !== false)
+        {
+            include $cached;
+            return true;
+        }
+
         $main = $GLOBALS['maind'];
         $file = "{$main}application/hooks/{$name}.php";
         if (!file_exists($file))
+        {
+            apc_store($key, null);
             return false;
-        
+        }
+
+        apc_store($key, $file);
         include $file;
     }
-    
+
     public function driver($name)
     {
+        $key    = self::PREFIX . self::PREFIX_DRIVER . $name;
+        $cached = apc_fetch($key);
+
+        if ($cached === null) {
+            return false;
+        }
+        if ($cached !== false)
+        {
+            include $cached;
+            return true;
+        }
+
         $main = $GLOBALS['maind'];
         $file = "{$main}drivers/{$name}.php";
         if (!file_exists($file))
+        {
+            apc_store($key, null);
             return false;
-        
+        }
+
+        apc_store($key, $file);
         include $file;
     }
-    
+
     public static function initialize($hooks = false) 
     {
         if (!isset(self::$instance))

@@ -35,16 +35,7 @@ class startup_hook
 {
     public function __construct()
     {
-        $file = $GLOBALS['maind'].'application/configs/config.php';
-        include $file;
-	
-        if ($env = getenv('BE_CONFIG') && $config[$env]) {
-            $GLOBALS['config'] = $config[$env];
-        } else {
-			$GLOBALS['config'] = $config['dev'];
-		}
-		
-		$GLOBALS['startTime'] = microtime(true);
-		$GLOBALS['permissions'] = new Permissions;
+        $GLOBALS['startTime'] = microtime(true);
+        $GLOBALS['permissions'] = new Permissions;
     }
 }

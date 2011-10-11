@@ -38,9 +38,10 @@ class View
     private $parsed;
     private $widget;
     
-    const VIEW_PATH = 'application/views/';
-    const VIEW_EXT = '.php';
-    const DRIVER_SUFFIX = '_view_driver';
+    const VIEW_PATH     = 'application/views/';
+    const VIEW_EXT      = '.php';
+    const VIEW_SUFFIX   = '_view';
+    const DRIVER_PREFIX = 'driver_';
     
     public function __construct($viewPath, $data = false, $driver = 'traditional', $widget = false)
     {
@@ -50,7 +51,7 @@ class View
         $this->viewPath .= $viewPath;
         $this->viewPath .= self::VIEW_EXT;
         
-        $this->driver = $driver . self::DRIVER_SUFFIX;
+        $this->driver = self::DRIVER_PREFIX . $driver . self::VIEW_SUFFIX;
         $this->widget = $widget;
         
         // If view data is supplied as an array, merge it with the view data.

@@ -10,6 +10,8 @@ class Config
     const PREFIX          = "_config:";
     const ENVIRONMENT_KEY = "system:environment";
 
+    static private $_localized = array();
+
     /*
      * Fetches a config parmeter from shared memory (cache) or if the
      * applications config hasn't been loaded into cache yet, it will 
@@ -18,7 +20,8 @@ class Config
     static public function get($key)
     {
         self::_preloadConfigIfNotLoaded();
-        return apc_fetch(self::PREFIX . $key);
+        if (isset(self::$_localized[$key])) { return self::$_localized[$key]; }
+        return self::$_localized[$key] = apc_fetch(self::PREFIX . $key);
     }
 
     /*
@@ -29,6 +32,7 @@ class Config
     static public function set($key, $value)
     {
         self::_preloadConfigIfNotLoaded();
+        $this->_localized[$key] = $value;
         apc_store(self::PREFIX . $key, $value);
     }
 

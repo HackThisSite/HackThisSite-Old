@@ -1,5 +1,5 @@
 <?php
-class news_controller extends Controller {
+class controller_news extends Controller {
 	
 	public function index() {
 		// Nil

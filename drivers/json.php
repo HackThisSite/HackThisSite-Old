@@ -20,7 +20,7 @@ function objectToArray($data)
     return $result;
 }
 
-class json_view_driver
+class driver_json_view
 {
 	public function parse($view, $data)
 	{

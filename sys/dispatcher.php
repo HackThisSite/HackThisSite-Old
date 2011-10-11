@@ -50,21 +50,25 @@ class lazyLoader
     {
         spl_autoload_register(null, false);
         spl_autoload_extensions('.php');
-        spl_autoload_register(array($this, 'router'));
-        spl_autoload_register(array($this, 'model'));
-        // view loading is handled automatically by the view class
+        spl_autoload_register(array($this, 'cached'));
         spl_autoload_register(array($this, 'library'));
+        spl_autoload_register(array($this, 'model'));
+        spl_autoload_register(array($this, 'hook'));
+        spl_autoload_register(array($this, 'controller'));
+        spl_autoload_register(array($this, 'driver'));
     }
     
-    public function router($name) {
-        if (substr($name, -11) == '_controller') 
-            return $this->controller(substr($name, 0, -11));
-        if (substr($name, -5) == '_hook')
-            return $this->hook(substr($name, 0, -5));
-        if (substr($name, -7) == '_driver')
-            return $this->driver(strstr($name, '_', true));
-            
-        return false;
+    public function cached($name)
+    {
+        $cached = apc_fetch(self::PREFIX . $name);
+
+        if ($cached === null || $cached === false)
+        {
+            return false;
+        }
+
+        include $cached;
+        return true;
     }
 
     public function model($name)
@@ -75,12 +79,14 @@ class lazyLoader
         if ($cached === null) { return false; }
         if ($cached !== false)
         {
+            apc_store(self::PREFIX . $name, $cached);
             include $cached;
             return true;
         }
 
         if ($name[0] != strtoupper($name[0]))
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
@@ -90,10 +96,12 @@ class lazyLoader
         $file = "{$main}application/models/{$name}.php";
         if (!file_exists($file))
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
+        apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
     }
@@ -106,18 +114,29 @@ class lazyLoader
         if ($cached === null) { return false; }
         if ($cached !== false)
         {
+            apc_store(self::PREFIX . $name, $cached);
             include $cached;
             return true;
         }
 
-        $main = $GLOBALS['maind'];
-        $file = "{$main}application/controllers/{$name}.php";
-        if (!file_exists($file))
+        if (strncmp($name, "controller_", 11) !== 0)
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
+        $name = substr($name, 11);
+        $main = $GLOBALS['maind'];
+        $file = "{$main}application/controllers/{$name}.php";
+        if (!file_exists($file))
+        {
+            apc_store(self::PREFIX . $name, null);
+            apc_store($key, null);
+            return false;
+        }
+
+        apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
     }
@@ -130,12 +149,14 @@ class lazyLoader
         if ($cached === null) { return false; }
         if ($cached !== false)
         {
+            apc_store(self::PREFIX . $name, $cached);
             include $cached;
             return true;
         }
 
         if ($name[0] != strtoupper($name[0]))
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
@@ -145,10 +166,12 @@ class lazyLoader
         $file = "{$main}library/{$name}.php";
         if (!file_exists($file))
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
+        apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
     }
@@ -163,18 +186,29 @@ class lazyLoader
         }
         if ($cached !== false)
         {
+            apc_store(self::PREFIX . $name, $cached);
             include $cached;
             return true;
         }
 
-        $main = $GLOBALS['maind'];
-        $file = "{$main}application/hooks/{$name}.php";
-        if (!file_exists($file))
+        if (strncmp($name, 'hook_', 5) !== 0)
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
+        $name = substr($name, 5);
+        $main = $GLOBALS['maind'];
+        $file = "{$main}application/hooks/{$name}.php";
+        if (!file_exists($file))
+        {
+            apc_store(self::PREFIX . $name, null);
+            apc_store($key, null);
+            return false;
+        }
+
+        apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
     }
@@ -189,18 +223,29 @@ class lazyLoader
         }
         if ($cached !== false)
         {
+            apc_store(self::PREFIX . $name, $cached);
             include $cached;
             return true;
         }
 
-        $main = $GLOBALS['maind'];
-        $file = "{$main}drivers/{$name}.php";
-        if (!file_exists($file))
+        if (strncmp($name, "driver_", 7) !== 0)
         {
+            apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
+        $name = substr($name, 7, -5);
+        $main = $GLOBALS['maind'];
+        $file = "{$main}drivers/{$name}.php";
+        if (!file_exists($file))
+        {
+            apc_store(self::PREFIX . $name, null);
+            apc_store($key, null);
+            return false;
+        }
+
+        apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
     }
@@ -236,8 +281,8 @@ function genKey($sensitivity) {
 
 function dispatch($controller, $request = false, $viewData = false, $standAlone = false)
 {
-    $controller .= '_controller';
-    
+    $controller = 'controller_' . $controller;
+
     // if the controller doesn't exist, route to the 404 handler immediately
     if (!class_exists($controller))
     {
@@ -292,8 +337,12 @@ function cleanArray($var) {
     return false;
 }
 
-if (empty($_GET['r'])) $_GET['r'] = 'index/index';
-$request = array_filter(explode('/', $_GET['r']), 'cleanArray');
+list($uri) = explode("?", $_SERVER['REQUEST_URI']);
+$request = array_filter(explode('/', $uri), 'cleanArray');
+if (!count($request))
+{
+    $request = array("index", "index");
+}
 $controller = array_shift($request);
 
 dispatch($controller, $request, false, true);

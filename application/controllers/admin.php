@@ -1,5 +1,5 @@
 <?php
-class admin_controller extends Controller {
+class controller_admin extends Controller {
 	
 	var $bad = false;
 	

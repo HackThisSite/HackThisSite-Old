@@ -69,7 +69,7 @@ class HookHandler
         {
             foreach ($hookSet as $hook)
             {
-                $this->hooks[$x][] = $hook . '_hook';
+                $this->hooks[$x][] = "hook_{$hook}";
             }
         }
     }

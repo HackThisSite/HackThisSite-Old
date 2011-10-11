@@ -87,7 +87,7 @@ class Controller
         if (!method_exists($this, $name))
             return $this->setError('No such method:'.$name);
 
-        $controller = substr(get_class($this), 0, -11);
+        $controller = substr(get_class($this), 11);
         // Set the implicit view
         $this->setView($controller.'_'.$name);
         

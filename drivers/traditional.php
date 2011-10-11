@@ -1,5 +1,5 @@
 <?php
-class traditional_view_driver
+class driver_traditional_view
 {
     const KEY_LAYOUT = "display:layout";
     

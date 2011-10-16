@@ -165,11 +165,14 @@ class controller_admin extends Controller {
 			
 			$news = new News;
 			
-			if (!empty($arguments[1])) {
-				$entry = $news->getNews($arguments[1]);
+			$tmpArgs = $arguments;
+			unset($tmpArgs[0]);
+			
+			@$id = implode('/', $tmpArgs);
+			if (!empty($id)) {
+				$entry = $this->getNews($id);
 				if (empty($entry)) 
 					return $this->setError('Invalid id.');
-					
 				$news->editNews($entry['_id'], $_POST['title'], $_POST['text'], (!empty($_POST['commentable']) ? true : false));
 			} else {
 				$news->saveNews($_POST['title'], $_POST['text'], (!empty($_POST['commentable']) ? true : false));
@@ -183,14 +186,18 @@ class controller_admin extends Controller {
 			if (!$canPost) {
 				return $this->setError('You are not allowed to edit news.');
 			}
-			if (!$entry = $this->getNews($arguments[1]))
+			$tmpArgs = $arguments;
+			unset($tmpArgs[0]);
+			
+			@$id = implode('/', $tmpArgs);
+			if (!$entry = $this->getNews($id))
 				return;
 			
 			$this->view['title'] = $entry['title'];
 			$this->view['text'] = $entry['body'];
 			
 			$id = new Id;
-			$this->view['id'] = $id->create(array('id' => $entry['_id'], 'date' => $entry['date']), 'news');
+			$this->view['id'] = $id->create(array('title' => $entry['title'], 'date' => $entry['date']), 'news');
 			$this->view['good'] = true;
 		} else if ($arguments[0] == 'delete' && !empty($arguments[1])) { // ----- DELETING NEWS -----
 			$this->view['good'] = false;
@@ -218,7 +225,7 @@ class controller_admin extends Controller {
 			return false;
 		}
 		
-		return $entry;
+		return $entry[0];
 	}
 	
 	private function findHashed($hash, $navigation, $full = false) {

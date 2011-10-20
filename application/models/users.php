@@ -1,14 +1,15 @@
 <?php
 
-class Users
+class Users extends MongoBase
 {
     const KEY_ID             = "_id";
     const KEY_USERNAME       = "username";
     const KEY_PASSWORD       = "password";
     const KEY_EMAIL          = "email";
+    const KEY_LAST_ACTIVE    = "lastActive";
     const KEY_KEYWORD        = "keyword";
     const KEY_STATUS         = "status";
-    const KEY_WARN_LEVEL     = ""
+    const KEY_WARN_LEVEL     = "warnLevel";
 
     const STATUS_ACTIVATED   = "activated";
     const STATUS_UNACTIVATED = "unactivated";
@@ -45,6 +46,16 @@ class Users
 
     public function create($username, $password, $email)
     {
+        // run the supplied password against the password strength test and
+        // verify that it is secure enough, return false and set the error
+        // message otherwise
+        if (!$this->_passwordStrength($password))
+        {
+            // proper erro code should be set in the passwordStrength method
+            // so we just return false here.
+            return false;
+        }
+
         // query the mongodb user collection to see if a user record exists
         // that has either the supplied username or email address associated
         // with it.
@@ -62,22 +73,8 @@ class Users
             array(
                 self::KEY_USERNAME => 1,
                 self::KEY_EMAIL    => 1
-            ),
+            )
         );
-
-        public function getUserByUsername($username, $only = false)
-        {
-            $query = array(self::KEY_USERNAME => $username);
-
-            if (is_array($only))
-            {
-                return $this->users->findOne($query, $only);
-            }
-            else
-            {
-                return $this->users->findOne($query);
-            }
-        }
 
         // if we returned an entry this means that a user already exists with
         // that email address or that user name, so we examine the returned
@@ -108,6 +105,49 @@ class Users
         // TODO: send activation email, preferably via an MQ
 
         return true;
+    }
+
+    public function getUserByUsername($username, $only = false)
+    {
+        $query = array(self::KEY_USERNAME => $username);
+    
+        if (is_array($only))
+        {
+            return $this->users->findOne($query, $only);
+        }
+        else
+        {
+            return $this->users->findOne($query);
+        }
+    }
+
+    public function usernameExists($username)
+    {
+        // functional programming style for checking if the username exists
+        return (
+            $this->users->findOne(array(
+                self::KEY_USERNAME => $username
+            )) !== null
+        );
+    }
+
+    public function performedActionByUsername($username)
+    {
+        return $this->_performedAction(
+            array(
+                self::KEY_USERNAME => $username
+            )
+        );
+    }
+
+    public function performedActionById($id)
+    {
+        //TODO: implement $this->_toMongoId() in base class
+        return $this->_performedAction(
+            array(
+                self::KEY_ID => $this->_toMongoId($id)
+            )
+        );
     }
 
     public function activate($username, $keyword)
@@ -226,6 +266,16 @@ class Users
         return false;
     }
 
+    private function _performedAction($where)
+    {
+        $this->users->update(
+            $where,
+            array('$set' => time())
+        );
+    
+        return true;
+    }
+
     private function _setUserSatus($username, $status)
     {
         $this->users->update(
@@ -255,6 +305,7 @@ class Users
 
     private function _passwordStrength($password)
     {
-        
+        // TODO: nothing super important yet.
+        return true;
     }
 }

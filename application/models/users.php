@@ -44,6 +44,14 @@ class Users extends MongoBase
         $this->users = $mongoConnection->users;
     }
 
+    /**
+     * Given a username, password and email address this method creates
+     * a new user record in the 'users' mongodb collection
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     * @return boolean  true on successful user creation and false otherwise
+     */
     public function create($username, $password, $email)
     {
         // run the supplied password against the password strength test and
@@ -83,12 +91,12 @@ class Users extends MongoBase
         {
             if ($found[self::KEY_USERNAME] === $username)
             {
-                return $this->setError(self::ERROR_USERNAME_EXISTS);
+                return $this->_setError(self::ERROR_USERNAME_EXISTS);
             }
 
             // if it wasn't the username that matched then it had to of been
             // the email address
-            return $this->setError(self::ERROR_EMAIL_EXISTS);
+            return $this->_setError(self::ERROR_EMAIL_EXISTS);
         }
 
         // the bare minimum user validation has been passed so go
@@ -107,6 +115,13 @@ class Users extends MongoBase
         return true;
     }
 
+    /**
+     * Returns the user record corresponding to the supplied username
+     * @param string $username
+     * @param string $only
+     * @return mixed null when no record was found otherwise the users record
+     *         as an array
+     */
     public function getUserByUsername($username, $only = false)
     {
         $query = array(self::KEY_USERNAME => $username);
@@ -121,6 +136,12 @@ class Users extends MongoBase
         }
     }
 
+    /**
+     * Returns a boolean value based on if a user record with the username 
+     * exists or not.
+     * @param string $username
+     * @return boolean
+     */
     public function usernameExists($username)
     {
         // functional programming style for checking if the username exists
@@ -131,6 +152,11 @@ class Users extends MongoBase
         );
     }
 
+    /**
+     * Updates the last time this user performed an action by username
+     * @param string $username
+     * @return boolean
+     */
     public function performedActionByUsername($username)
     {
         return $this->_performedAction(
@@ -140,9 +166,13 @@ class Users extends MongoBase
         );
     }
 
+    /**
+     * Updates the last time this user performed an action by user id
+     * @param int $id
+     * @return boolean
+     */
     public function performedActionById($id)
     {
-        //TODO: implement $this->_toMongoId() in base class
         return $this->_performedAction(
             array(
                 self::KEY_ID => $this->_toMongoId($id)
@@ -150,6 +180,12 @@ class Users extends MongoBase
         );
     }
 
+    /**
+     * Activates a user record by username given an activation key
+     * @param string $username
+     * @param string $keyword
+     * @return boolean based on the success of the operation
+     */
     public function activate($username, $keyword)
     {
         // we query the users mongodb collection for a user record that matches
@@ -170,7 +206,7 @@ class Users extends MongoBase
 
         if ($user === null) 
         {
-            return $this->setError(self::ERROR_NO_SUCH_USER);
+            return $this->_setError(self::ERROR_NO_SUCH_USER);
         }
 
         // set the users record to activated and remove the keyword field
@@ -191,11 +227,23 @@ class Users extends MongoBase
         return true;
     }
 
+    /**
+     * Sets a users status to deactivated by username
+     * @param string $username
+     * @return boolean
+     */
     public function deactivate($username)
     {
         return $this->_setUserSatus($username, self::STATUS_DEACTIVATED);
     }
 
+    /**
+     * Given a username and password verifies that these credentials match
+     * a user record and if so returns that user record
+     * @param string $username
+     * @param string $password
+     * @return boolean|array
+     */
     public function authenticate($username, $password)
     {
         // query the users collection in mongodb for the username password
@@ -211,7 +259,7 @@ class Users extends MongoBase
         // a false and set the proper error message
         if ($user === null) 
         { 
-            return $this->setError(self::ERROR_BAD_CREDENTIALS);
+            return $this->_setError(self::ERROR_BAD_CREDENTIALS);
         }
 
         // if the query returned a user record but the status is anything but
@@ -220,17 +268,17 @@ class Users extends MongoBase
         {
             if ($user[self::KEY_STATUS] === self::STATUS_UNACTIVATED)
             {
-                return $this->setError(self::ERROR_ACCOUNT_UNACTIVE);
+                return $this->_setError(self::ERROR_ACCOUNT_UNACTIVE);
             }
 
             if ($user[self::KEY_STATUS] === self::STATUS_DEACTIVATED)
             {
-                return $this->setError(self::ERROR_ACCOUNT_DEACTIVE);
+                return $this->_setError(self::ERROR_ACCOUNT_DEACTIVE);
             }
 
             if ($user[self::KEY_STATUS] === self::STATUS_BANNED)
             {
-                return $this->setError(self::ERROR_ACCOUNT_BANNED);
+                return $this->_setError(self::ERROR_ACCOUNT_BANNED);
             }
         }
 
@@ -238,6 +286,10 @@ class Users extends MongoBase
         return $user;
     }
 
+    /**
+     * Sets a users status to banned by username
+     * @param string $username
+     */
     public function ban($username)
     {
         return $this->_setUserSatus($username, self::STATUS_BANNED);
@@ -255,12 +307,23 @@ class Users extends MongoBase
         // TODO:
     }
 
+    /**
+     * This function returns the error message of the last error
+     */
     public function getError()
     {
         return self::$errors[$this->lastError];
     }
 
-    public function setError($error)
+    /**
+     * This function returns the error code of the last error
+     */
+    public function getErrorCode()
+    {
+        return $this->lastError;
+    }
+
+    private function _setError($error)
     {
         $this->lastError = $error;
         return false;

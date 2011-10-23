@@ -45,14 +45,15 @@ class News {
     
     public function deleteNews($id) {
         $idLib = new Id;
-        
         $query = array('type' => 'news', 'ghosted' => false);
-        $query = array_merge($idLib->dissectKeys($id, 'news'), $query);
+        $keys = $idLib->dissectKeys($id, 'news');
+        
+        $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + 86400);
         $results = $this->db->find($query);
         $actual = array();
         
         foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('id' => (string) $result['_id'], 'date' => $result['date']), 'news'))
+            if (!$idLib->validateHash($id, array('title' => $result['title'], 'date' => $result['date']), 'news'))
                 continue;
             
             $actual = $result;
@@ -80,14 +81,22 @@ class News {
         $idLib = new Id;
         
         $query = array('type' => 'news', 'ghosted' => false);
-        $query = array_merge($idLib->dissectKeys($id, 'news'), $query);
+        $keys = $idLib->dissectKeys($id, 'news');
+        
+        $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
+        
         $results = $this->db->find($query);
+        $toReturn = array();
         
         foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('id' => (string) $result['_id'], 'date' => $result['date']), 'news'))
+            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'], 
+				'reportedDate' => $keys['date'], 'date' => $result['date'], 
+				'title' => $result['title']), 'news'))
                 continue;
             
-            return $result;
+            array_push($toReturn, $result);
         }
+        
+        return $toReturn;
     }
 }

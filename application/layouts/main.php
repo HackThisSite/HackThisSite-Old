@@ -63,7 +63,7 @@ class Main {
 		if (empty($this->comments)) $this->comments = new Comments;
 		
 		$idLib = new Id;
-		$id = $idLib->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news');
+		$id = $idLib->create(array('title' => $entry['title'], 'date' => $entry['date']), 'news');
 		$bbcode = new BBCode;
 		$comment = ($entry['commentable'] ? '<a href="/news/view/' . $id . '/#comments">comments (' . (int) $this->comments->totalComments($entry['_id']) . ')</a>' : 'comments disabled');
 		
@@ -84,9 +84,9 @@ class Main {
 		
 		$admin = array();
 		if ($GLOBALS['permissions']->check('postNews'))
-			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/edit/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Edit</a>');
+			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/edit/' . $id->create(array('title' => (string) $entry['title'], 'date' => $entry['date']), 'news') . '">Edit</a>');
 		if ($GLOBALS['permissions']->check('deleteNews')) 
-			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/delete/' . $id->create(array('id' => (string) $entry['_id'], 'date' => $entry['date']), 'news') . '">Delete</a>');
+			array_push($admin, '<a href="' . Config::get("other:baseUrl") . 'admin/post_news/delete/' . $id->create(array('title' => (string) $entry['title'], 'date' => $entry['date']), 'news') . '">Delete</a>');
 		
 		$realAdmin = '';
 		if (!empty($admin))

@@ -2,20 +2,44 @@
 
 class Layout
 {
-    private $layoutPath = '';
+    private static $layout  = '';
+    private static $data = array();
 
-    public function __construct($layoutPath)
+    /**
+     * Used to set layout parameters
+     * @param key $key
+     * @param mixed $value
+     */
+    public static function set($key, $value)
     {
-        $this->layoutPath = $layoutPath;
+        self::$data[$key] = $value;
     }
 
-    // Make the magic happen babeeh.
-    public function parse()
+    /**
+     * Used to fetch layout parameters
+     * @param string $key
+     */
+    public static function get($key)
     {
-        // Import all global variables
-        // NOTE: We should make this more explicit
-        //       later on.
-        extract($GLOBALS);
+        return (isset(self::$data[$key])) ? self::$data[$key] : false;
+    }
+
+    /**
+     * This function is used to select the layout set to use
+     * @param string $layout
+     */
+    public static function selectLayout($layout)
+    {
+        self::$layout = $layout;
+    }
+
+    /**
+     * Renders the templage
+     */
+    public static function render()
+    {
+        // Import all template variables
+        extract(self::$data);
 
         // Store the contents of the current output
         // buffer in $page_content so it can be accessed
@@ -28,9 +52,9 @@ class Layout
         return ob_get_clean();
     }
 
-    // Any use of this object as a string type
-    // (passing to echo and such) will result in
-    // this function being returned.
+    /**
+     * Typical string conversion
+     */
     public function __toString()
     {
         return $this->parse();

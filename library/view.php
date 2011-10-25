@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -36,30 +36,31 @@ class View
     private $viewPath = '';
     private $data = array();
     private $parsed;
-    private $widget;
-    
+
     const VIEW_PATH     = 'application/views/';
     const VIEW_EXT      = '.php';
     const VIEW_SUFFIX   = '_view';
-    const DRIVER_PREFIX = 'driver_';
-    
-    public function __construct($viewPath, $data = false, $driver = 'traditional', $widget = false)
+
+    const DRIVER_PREFIX      = 'driver_';
+    const DRIVER_TRADITIONAL = 'traditional';
+
+    public function __construct($viewPath, $driver = self::DRIVER_TRADITIONAL)
     {
-        
-        $this->viewPath = $GLOBALS['maind'];
+
+        $this->viewPath = dirname(dirnam(__FILE__));
         $this->viewPath .= self::VIEW_PATH;
         $this->viewPath .= $viewPath;
         $this->viewPath .= self::VIEW_EXT;
-        
+
         $this->driver = self::DRIVER_PREFIX . $driver . self::VIEW_SUFFIX;
         $this->widget = $widget;
-        
+
         // If view data is supplied as an array, merge it with the view data.
         // We merge instead of set because the constructor may be called by
         // the __invoke() magical routine.
         if (is_array($data))  $this->data = array_merge($this->data, $data);
     }
-    
+
     // Wrapper for getting view variables
     public function __get($name)
     {
@@ -73,35 +74,19 @@ class View
     }
 
     // This function does the heavy lifting for the view.
-    public function parse()
+    public function render()
     {
-        if ($this->parsed) return $this->parsed;
-        
-        $v = $this->driver;
-        $driver = new $v();
-        $this->parsed = $driver->parse($this->viewPath, $this->data, $this->widget);
-        
-        return $this->parsed;
-        
+        if ($this->parsed) { return $this->parsed; }
+
+        $driver = $this->driver;
+
+        return $this->parsed = $driver::render($this->viewPath, $this->data);
+
     }
-    
-    /*
-    * This function gets 'invoked' automagically when an object
-    * of type view is called as if it were a function. The expected
-    * result is to load the array $data into the view, parse the views
-    * display logic and return the results.
-    * It's syntactic sugar for loading an array worth of data into the 
-    * view and parsing it.
-    */
-    public function __invoke($data = false)
-    {
-        if (is_array($data)) $this->__construct($this->viewPath, $data);
-        return $this->parse();
-    }
-    
+
     public function __toString()
     {
-        return $this->parse();
+        return $this->render();
     }
 }
 ?>

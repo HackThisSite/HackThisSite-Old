@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -31,9 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *   Thetan ( Joseph Moniz )
 **/
 
-$maind = getcwd().'/../';
-
-set_include_path(get_include_path() . PATH_SEPARATOR . $maind.'library');
+// add our library path to the include path
+set_include_path(
+    get_include_path() .
+    PATH_SEPARATOR .
+    dirname(dirname(__FILE__)) .
+    'library'
+);
 
 class lazyLoader
 {
@@ -41,23 +45,27 @@ class lazyLoader
     const PREFIX_MODEL      = "model:";
     const PREFIX_CONTROLLER = "controller:";
     const PREFIX_LIBRARY    = "library:";
-    const PREFIX_HOOK       = "hook:";
+    const PREFIX_EVENT      = "events:";
     const PREFIX_DRIVER     = "drivers:";
 
+    private $root;
+
     private static $instance;
-    
-    private function __construct($hooks = false)
+
+    private function __construct()
     {
+        $this->root = dirname(dirname(__FILE__));
+
         spl_autoload_register(null, false);
         spl_autoload_extensions('.php');
         spl_autoload_register(array($this, 'cached'));
         spl_autoload_register(array($this, 'library'));
         spl_autoload_register(array($this, 'model'));
-        spl_autoload_register(array($this, 'hook'));
+        spl_autoload_register(array($this, 'event'));
         spl_autoload_register(array($this, 'controller'));
         spl_autoload_register(array($this, 'driver'));
     }
-    
+
     public function cached($name)
     {
         $cached = apc_fetch(self::PREFIX . $name);
@@ -84,7 +92,7 @@ class lazyLoader
             return true;
         }
 
-        if ($name[0] != strtoupper($name[0]))
+        if ($name[0] == strtoupper($name[0]))
         {
             apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
@@ -92,8 +100,7 @@ class lazyLoader
         }
 
         $name = strtolower($name);
-        $main = $GLOBALS['maind'];
-        $file = "{$main}application/models/{$name}.php";
+        $file = "{$this->root}application/models/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -127,8 +134,7 @@ class lazyLoader
         }
 
         $name = substr($name, 11);
-        $main = $GLOBALS['maind'];
-        $file = "{$main}application/controllers/{$name}.php";
+        $file = "{$this->root}application/controllers/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -160,10 +166,9 @@ class lazyLoader
             apc_store($key, null);
             return false;
         }
-        
+
         $name = strtolower($name);
-        $main = $GLOBALS['maind'];
-        $file = "{$main}library/{$name}.php";
+        $file = "{$this->root}library/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -175,10 +180,10 @@ class lazyLoader
         apc_store($key, $file);
         include $file;
     }
-    
-    public function hook($name)
+
+    public function event($name)
     {
-        $key    = self::PREFIX . self::PREFIX_HOOK . $name;
+        $key    = self::PREFIX . self::PREFIX_EVENT . $name;
         $cached = apc_fetch($key);
 
         if ($cached === null) {
@@ -191,16 +196,15 @@ class lazyLoader
             return true;
         }
 
-        if (strncmp($name, 'hook_', 5) !== 0)
+        if (strncmp($name, 'event_', 5) !== 0)
         {
             apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
-        $name = substr($name, 5);
-        $main = $GLOBALS['maind'];
-        $file = "{$main}application/hooks/{$name}.php";
+        $name = str_replace("_", "/", substr($name, 5));
+        $file = "{$this->root}application/events/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -236,8 +240,7 @@ class lazyLoader
         }
 
         $name = substr($name, 7, -5);
-        $main = $GLOBALS['maind'];
-        $file = "{$main}drivers/{$name}.php";
+        $file = "{$this->root}drivers/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -250,7 +253,7 @@ class lazyLoader
         include $file;
     }
 
-    public static function initialize($hooks = false) 
+    public static function initialize($hooks = false)
     {
         if (!isset(self::$instance))
         {
@@ -259,92 +262,29 @@ class lazyLoader
         }
         return self::$instance;
     }
-    
+
     public function __clone()
     {
         die('Error: Can not be cloned.');
     }
 }
 
-function genKey($sensitivity) {
-    if ($sensitivity == 'all') {
-        $data = serialize($_GET) . serialize($_POST);
-    } else if ($sensitivity == 'unique') {
-        $data = serialize($_GET) . serialize($_POST) .serialize($_COOKIE) . serialize($_SERVER);
-    } else {
-        return false;
-    }
-    
-    $hash = hash('adler32', $data);
-    return $hash;
-}
-
-function dispatch($controller, $request = false, $viewData = false, $standAlone = false)
-{
-    $controller = 'controller_' . $controller;
-
-    // if the controller doesn't exist, route to the 404 handler immediately
-    if (!class_exists($controller))
-    {
-        include_once(
-            dirname(dirname(__FILE__)) .
-            "/application/errors/404.php"
-        );
-        return false;
-    }
-    $GLOBALS['errors'] = array();
-    
-    // if no route is set then default to index
-    if (empty($request[0]))
-    {
-        $request = array(0 => "index");
-    }
-
-    // if the supplied method doesn't exist then default it to the index
-    // handler method
-    if (!method_exists($controller, $request[0]))
-    {
-        $request = array_merge(array(0 => 'index'), $request);
-    }
-
-    $state = new $controller($request);
-
-    $GLOBALS['errors'] = $state->getErrors();
-
-    if (!$standAlone)
-    {
-       return $state->getResult();
-    }
-
-    echo $state->getResult()->parse();
-}
-
 lazyLoader::initialize();
 
-$hooks = HookHandler::singleton(
+$observer = Observer::singleton(
     array(
-        'ini' => array(
-            'startup',
+        'received' => array(
+            'timer',
+            'layout',
+            'dispatch'
         ),
-        'end' => array(
+        'ended' => array(
+            'timer',
+            'layout'
         )
     )
 );
 
-// proccess request string
-function cleanArray($var) {
-    if ($var !== null && $var !== '') return true;
-    return false;
-}
+$observer->trigger("request/received");
 
-list($uri) = explode("?", $_SERVER['REQUEST_URI']);
-$request = array_filter(explode('/', $uri), 'cleanArray');
-if (!count($request))
-{
-    $request = array("index", "index");
-}
-$controller = array_shift($request);
-
-dispatch($controller, $request, false, true);
-
-$hooks->runHooks('end');
+$observer->trigger('request/end');

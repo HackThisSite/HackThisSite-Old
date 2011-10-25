@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *   Thetan ( Joseph Moniz )
 **/
 
-class HookHandler
+class Observer
 {
     private static $instance;
     private $hooks;
@@ -40,11 +40,10 @@ class HookHandler
     private function __construct($hooks = false)
     {
         if (!$hooks) return;
-        $this->addHooks($hooks);
-        $this->runHooks('ini');
+        $this->listen($hooks);
     }
-    
-    public static function singleton($hooks = false) 
+
+    public static function singleton($hooks = false)
     {
         if (!isset(self::$instance))
         {
@@ -53,8 +52,8 @@ class HookHandler
         }
         return self::$instance;
     }
-    
-    public function runHooks($hook)
+
+    public function trigger($hook)
     {
         if (empty($this->hooks[$hook])) return;
         foreach ($this->hooks[$hook] as $h)
@@ -62,8 +61,8 @@ class HookHandler
             $obj = new $h();
         }
     }
-    
-    private function addHooks($hooks)
+
+    private function listen($hooks)
     {
         foreach ($hooks as $x => $hookSet)
         {
@@ -73,7 +72,7 @@ class HookHandler
             }
         }
     }
-    
+
     public function __clone()
     {
         die("Error, can not be cloned");

@@ -49,11 +49,12 @@ class View
 
         $this->viewPath = dirname(dirnam(__FILE__));
         $this->viewPath .= self::VIEW_PATH;
+        $this->viewPath .= Layout::getLayout();
+        $this->viewPath .= '/';
         $this->viewPath .= $viewPath;
         $this->viewPath .= self::VIEW_EXT;
 
         $this->driver = self::DRIVER_PREFIX . $driver . self::VIEW_SUFFIX;
-        $this->widget = $widget;
 
         // If view data is supplied as an array, merge it with the view data.
         // We merge instead of set because the constructor may be called by

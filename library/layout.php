@@ -2,7 +2,10 @@
 
 class Layout
 {
-    private static $layout  = '';
+    const FOLDER_LAYOUTS   = "layouts/";
+    const LAYOUT_EXTENSION = ".php";
+
+    private static $layout  = "";
     private static $data = array();
 
     /**
@@ -33,6 +36,11 @@ class Layout
         self::$layout = $layout;
     }
 
+    public static function getLayout()
+    {
+        return self::$layout;
+    }
+
     /**
      * Renders the templage
      */
@@ -48,7 +56,12 @@ class Layout
         // results.
         $page_content = ob_get_clean();
         ob_start();
-        require_once $this->layoutPath;
+        require_once dirnname(dirname(__FILE__))
+                   . self::FOLDER_LAYOUTS
+                   . self::$layout
+                   . self::LAYOUT_EXTENSION
+                   ;
+
         return ob_get_clean();
     }
 

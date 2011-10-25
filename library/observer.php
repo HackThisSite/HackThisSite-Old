@@ -34,41 +34,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Observer
 {
     private static $instance;
-    private $hooks;
+    private $events;
 
     // singleton
-    private function __construct($hooks = false)
+    private function __construct($events = false)
     {
-        if (!$hooks) return;
-        $this->listen($hooks);
+        if (!$events) return;
+        $this->listen($events);
     }
 
-    public static function singleton($hooks = false)
+    public static function singleton($events = false)
     {
         if (!isset(self::$instance))
         {
             $thisClass = __CLASS__;
-            self::$instance = new $thisClass($hooks);
+            self::$instance = new $thisClass($events);
         }
         return self::$instance;
     }
 
     public function trigger($hook)
     {
-        if (empty($this->hooks[$hook])) return;
-        foreach ($this->hooks[$hook] as $h)
+        if (empty($this->events[$hook])) return;
+        foreach ($this->events[$hook] as $h)
         {
             $obj = new $h();
         }
     }
 
-    private function listen($hooks)
+    private function listen($events)
     {
-        foreach ($hooks as $x => $hookSet)
+        foreach ($events as $x => $eventset)
         {
-            foreach ($hookSet as $hook)
+            foreach ($eventset as $hook)
             {
-                $this->hooks[$x][] = "hook_{$hook}";
+                $this->events[$x][] = "hook_{$hook}";
             }
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-class Users extends MongoBase
+class users extends mongoBase
 {
     const KEY_ID             = "_id";
     const KEY_USERNAME       = "username";
@@ -9,13 +9,14 @@ class Users extends MongoBase
     const KEY_LAST_ACTIVE    = "lastActive";
     const KEY_KEYWORD        = "keyword";
     const KEY_STATUS         = "status";
+    const KEY_GROUP          = "group";
     const KEY_WARN_LEVEL     = "warnLevel";
 
     const STATUS_ACTIVATED   = "activated";
     const STATUS_UNACTIVATED = "unactivated";
     const STATUS_DEACTIVATED = "deactivated";
     const STATUS_BANNED      = "banned";
-    
+
     const ERROR_USERNAME_EXISTS  = 0;
     const ERROR_EMAIL_EXISTS     = 1;
     const ERROR_NO_SUCH_USER     = 2;
@@ -125,7 +126,7 @@ class Users extends MongoBase
     public function getUserByUsername($username, $only = false)
     {
         $query = array(self::KEY_USERNAME => $username);
-    
+
         if (is_array($only))
         {
             return $this->users->findOne($query, $only);
@@ -137,7 +138,7 @@ class Users extends MongoBase
     }
 
     /**
-     * Returns a boolean value based on if a user record with the username 
+     * Returns a boolean value based on if a user record with the username
      * exists or not.
      * @param string $username
      * @return boolean
@@ -204,7 +205,7 @@ class Users extends MongoBase
             )
         );
 
-        if ($user === null) 
+        if ($user === null)
         {
             return $this->_setError(self::ERROR_NO_SUCH_USER);
         }
@@ -257,8 +258,8 @@ class Users extends MongoBase
 
         // if the results from the query failed to return a user record return
         // a false and set the proper error message
-        if ($user === null) 
-        { 
+        if ($user === null)
+        {
             return $this->_setError(self::ERROR_BAD_CREDENTIALS);
         }
 
@@ -335,7 +336,7 @@ class Users extends MongoBase
             $where,
             array('$set' => time())
         );
-    
+
         return true;
     }
 
@@ -362,7 +363,7 @@ class Users extends MongoBase
     private function _passwordHash($password)
     {
         // super simple but it's localized and we chan swap it out for
-        // bcrypt later one
+        // bcrypt later on.
         return sha1($password);
     }
 

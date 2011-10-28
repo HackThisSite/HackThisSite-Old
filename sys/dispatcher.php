@@ -270,7 +270,7 @@ class lazyLoader
 }
 
 lazyLoader::initialize();
-apc_clear_cache('user'); // do not push this line
+
 $observer = Observer::singleton(
     array(
         'request/received' => array(

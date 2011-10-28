@@ -54,7 +54,7 @@ class lazyLoader
 
     private function __construct()
     {
-        $this->root = dirname(dirname(__FILE__));
+        $this->root = dirname(dirname(__FILE__)) . '/';
 
         spl_autoload_register(null, false);
         spl_autoload_extensions('.php');
@@ -196,15 +196,15 @@ class lazyLoader
             return true;
         }
 
-        if (strncmp($name, 'event_', 5) !== 0)
+        if (strncmp($name, 'events_', 7) !== 0)
         {
             apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
 
-        $name = str_replace("_", "/", substr($name, 5));
-        $file = "{$this->root}application/events/{$name}.php";
+        $name = str_replace("_", "/", $name);
+        $file = "{$this->root}application/{$name}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -270,15 +270,15 @@ class lazyLoader
 }
 
 lazyLoader::initialize();
-
+apc_clear_cache('user'); // do not push this line
 $observer = Observer::singleton(
     array(
-        'received' => array(
+        'request/received' => array(
             'timer',
             'layout',
             'dispatch'
         ),
-        'ended' => array(
+        'request/ended' => array(
             'timer',
             'layout'
         )
@@ -287,4 +287,4 @@ $observer = Observer::singleton(
 
 $observer->trigger("request/received");
 
-$observer->trigger('request/end');
+$observer->trigger("request/ended");

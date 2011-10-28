@@ -36,18 +36,19 @@ class View
     private $viewPath = '';
     private $data = array();
     private $parsed;
+    private $driver;
 
-    const VIEW_PATH     = 'application/views/';
+    const VIEW_PATH     = '/application/views/';
     const VIEW_EXT      = '.php';
     const VIEW_SUFFIX   = '_view';
 
     const DRIVER_PREFIX      = 'driver_';
     const DRIVER_TRADITIONAL = 'traditional';
 
-    public function __construct($viewPath, $driver = self::DRIVER_TRADITIONAL)
+    public function __construct($viewPath, $data = array(), $driver = self::DRIVER_TRADITIONAL)
     {
 
-        $this->viewPath = dirname(dirnam(__FILE__));
+        $this->viewPath = dirname(dirname(__FILE__));
         $this->viewPath .= self::VIEW_PATH;
         $this->viewPath .= Layout::getLayout();
         $this->viewPath .= '/';
@@ -55,11 +56,7 @@ class View
         $this->viewPath .= self::VIEW_EXT;
 
         $this->driver = self::DRIVER_PREFIX . $driver . self::VIEW_SUFFIX;
-
-        // If view data is supplied as an array, merge it with the view data.
-        // We merge instead of set because the constructor may be called by
-        // the __invoke() magical routine.
-        if (is_array($data))  $this->data = array_merge($this->data, $data);
+        $this->data = $data;
     }
 
     // Wrapper for getting view variables

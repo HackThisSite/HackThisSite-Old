@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -34,29 +34,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Controller
 {
     public $view = array();
-    protected $parsedViewResult;
+    protected $parsedViewResult = '';
     protected $request;
-    private $controllerState = array('viewPath' => '',
-                                     'viewClass' => '',
-                                     'errors' => array()
-                                    );
+    private $controllerState = array(
+        'viewPath' => '',
+        'viewClass' => '',
+        'errors' => array()
+    );
+
     // class wide error messages
     const E_404 = "404";
-    
+
     public function __construct($request, $viewData = 0, $silent = 0)
-    {  
+    {
         if (is_array($viewData)) $this->view = $viewData;
-        
-        // The setting of $silent to non zero will allow us to 
+
+        // The setting of $silent to non zero will allow us to
         // initialize a controller object without implicitly calling
         // a controller method, this is done by returning immediately.
         $this->request = $request;
-        if ($silent) return;    
-        
-        if (method_exists($this, 'firstRun')) $this->firstRun();
-        $this->processRequest();    
+        if ($silent) return;
+
+        $this->processRequest();
     }
-    
+
     public function processRequest()
     {
         // Pull view driver from extension
@@ -71,39 +72,32 @@ class Controller
         {
             $this->driver = 'traditional';
         }
-        
+
         // If no method was specified default to index
-        $method = (isset($this->request[0])) ? 
-                                             array_shift($this->request) 
+        $method = (isset($this->request[0])) ?
+                                             array_shift($this->request)
                                              : 'index';
 
         $this->__call($method, $this->request);
     }
-    
+
     // A wrapper to call controller methods
     public function __call($name, $arguments)
-    { 
+    {
         // Return with false if the controller method doesn't exist.
         if (!method_exists($this, $name))
             return $this->setError('No such method:'.$name);
 
         $controller = substr(get_class($this), 11);
         // Set the implicit view
-        $this->setView($controller.'_'.$name);
-        
-        
-        // Journal this dispatch for reference later
-        $_SESSION['this_last_dispatch'] = array(
-            $controller,
-            array_merge(array($name), $arguments)
-        );
+        $this->setView($controller . '/' . $name);
 
         // Call the actual function.
         $this->$name($arguments);
-        
+
         // Load and parse view
         $this->parsedViewResult = new View(
-            $this->controllerState['view'], 
+            $this->controllerState['view'],
             $this->view,
             $this->driver
         );
@@ -126,59 +120,36 @@ class Controller
         {
             $this->driver = 'traditional';
         }
-		
-		$this->setView($controller . '_' . $name);
-		
+
+        $this->setView($controller . '/' . $name);
+
         $this->parsedViewResult = new View(
-            $this->controllerState['view'], 
+            $this->controllerState['view'],
             $this->view,
             $this->driver
         );
-		
+
         return $this->parsedViewResult;
     }
-    
+
     public function getResult()
     {
         return $this->parsedViewResult;
     }
-    
+
     public function setView($view)
     {
         $this->controllerState['view'] = $view;
     }
-    
-    public function isError()
-    {
-        return (bool) count($this->controllerState['errors']);
-    }
-    
-    public function getErrors()
-    {
-        return $this->controllerState['errors'];
-    }
-    
+
+
     public function getDriver()
     {
         return $this->driver;
     }
-    
-    protected function setError($error)
+
+    public function __toString()
     {
-        $this->controllerState['errors'][] = $error;
-        return false;
-    }
-    
-    // Sensitivity = all, unique
-    // What = c, v (controller, view)
-    protected function cache($sensitivity = 'all', $what = 'v', $ttl = 10)
-    {
-        $GLOBALS['cache'] = true;
-        $GLOBALS['cacheKey'] = genKey($sensitivity);
-        $GLOBALS['cacheData'] = array('what' => $what);
-        $GLOBALS['cacheTtl'] = $ttl;
-        
-        return true;
+        return (string)$this->parsedViewResult;
     }
 }
-?>

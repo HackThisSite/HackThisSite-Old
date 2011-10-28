@@ -2,7 +2,7 @@
 
 class Layout
 {
-    const FOLDER_LAYOUTS   = "layouts/";
+    const FOLDER_LAYOUTS   = "/application/layouts/";
     const LAYOUT_EXTENSION = ".php";
 
     private static $layout  = "";
@@ -56,7 +56,7 @@ class Layout
         // results.
         $page_content = ob_get_clean();
         ob_start();
-        require_once dirnname(dirname(__FILE__))
+        require_once dirname(dirname(__FILE__))
                    . self::FOLDER_LAYOUTS
                    . self::$layout
                    . self::LAYOUT_EXTENSION

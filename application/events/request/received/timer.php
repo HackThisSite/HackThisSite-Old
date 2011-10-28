@@ -1,9 +1,9 @@
 <?php
 
-class event_request_received_timer
+class events_request_received_timer
 {
     static public function handler($data = null)
     {
-        // prep timer
+        Layout::set("pageExecutionTime", microtime(true));
     }
 }

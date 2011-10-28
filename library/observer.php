@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Observer
 {
+    const EVENT_BASE = 'events_';
+
     private static $instance;
     private $events;
 
@@ -53,22 +55,23 @@ class Observer
         return self::$instance;
     }
 
-    public function trigger($hook)
+    public function trigger($event, $data = null)
     {
-        if (empty($this->events[$hook])) return;
-        foreach ($this->events[$hook] as $h)
+        if (empty($this->events[$event])) return;
+        foreach ($this->events[$event] as $action)
         {
-            $obj = new $h();
+            $action::handler($data);
         }
     }
 
     private function listen($events)
     {
-        foreach ($events as $x => $eventset)
+        foreach ($events as $x => $eventSet)
         {
-            foreach ($eventset as $hook)
+            foreach ($eventSet as $event)
             {
-                $this->events[$x][] = "hook_{$hook}";
+                $event = str_replace('/', '_', $x . '/' . $event);
+                $this->events[$x][] = self::EVENT_BASE . $event;
             }
         }
     }

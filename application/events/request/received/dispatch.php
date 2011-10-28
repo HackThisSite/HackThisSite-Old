@@ -1,6 +1,6 @@
 <?php
 
-class event_request_received_dispatch
+class events_request_received_dispatch
 {
     const CONTROLLER_PREFIX  = "controller_";
     const DEFAULT_CONTROLLER = "index";
@@ -19,7 +19,7 @@ class event_request_received_dispatch
         // filter out all blank segments of the uri
         $request = array_filter(explode('/', $uri), function($n)
         {
-            return ($var !== null && $var !== '');
+            return ($n !== null && $n !== '');
         });
 
         // if the uri is empty default it to index
@@ -27,6 +27,7 @@ class event_request_received_dispatch
             $request = array(self::DEFAULT_CONTROLLER, self::DEFAULT_METHOD);
         }
 
+        return $request;
     }
 
     static private function dispatch($request)
@@ -36,17 +37,17 @@ class event_request_received_dispatch
         // if no route is set then default to index
         if (!count($request))
         {
-            $request = array(0 => "index");
+            $request = array(0 => self::DEFAULT_CONTROLLER);
         }
 
         // if the supplied method doesn't exist then default it to the index
         // handler method
         if (!method_exists($controller, $request[0]))
         {
-            $request = array_merge(array(0 => 'index'), $request);
+            $request = array_merge(array(0 => self::DEFAULT_METHOD), $request);
         }
 
         // pass the request to the controller and return the result
-        echo new $controller($request);
+        Layout::set("content", new $controller($request));
     }
 }

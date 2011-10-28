@@ -6,11 +6,12 @@
 
 class Partial
 {
-    const PARTIAL_PATH = '../widgets/';
+    const PARTIAL_BASE = '../../partials/';
 
     public static function render($partial, $data = array())
     {
-        $partial = new View(self::PARTIAL_PATH . $viewPath, $data);
+        $path = self::PARTIAL_BASE . Layout::getLayout() . '/';
+        $partial = new View($path . $partial, $data);
         return $partial->render();
     }
 }

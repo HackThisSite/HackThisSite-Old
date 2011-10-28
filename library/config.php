@@ -1,7 +1,7 @@
 <?php
 /*
  * Site wide cascading configuration system that's highly cached
- * 
+ *
  * @author    Joseph Moniz <joseph.moniz@gmail.com>
  */
 
@@ -10,11 +10,19 @@ class Config
     const PREFIX          = "_config:";
     const ENVIRONMENT_KEY = "system:environment";
 
+    const DIR_CONF_BASE   = "/application/configs";
+    const DIR_SERVER_BASE = "/servers/";
+    const DIR_COMMON_BASE = "/common";
+    const DIR_ENV_BASE    = "/environment/";
+    const DIR_LOCAL_BASE  = "/local";
+
+    const MISSING_ENV = "You need to have the %s set to either dev, stage or prod in this servers config";
+
     static private $_localized = array();
 
     /*
      * Fetches a config parmeter from shared memory (cache) or if the
-     * applications config hasn't been loaded into cache yet, it will 
+     * applications config hasn't been loaded into cache yet, it will
      * preload all parameters in cache in the propper cascading order.
      */
     static public function get($key)
@@ -44,24 +52,25 @@ class Config
             // yay, we already loaded the config, return to what we were doing.
             return;
         }
-        
+
         // load the local configs for this server based on hostname
-        $configBase = dirname(dirname(__FILE__)) . "/application/configs";
-        $serverConf = self::_loadConfigsRecursively($configBase . "/servers/" . gethostname());
+        $configBase = dirname(dirname(__FILE__)) . self::DIR_CONF_BASE;
+        $serverConf = self::_loadConfigsRecursively($configBase . self::DIR_SERVER_BASE . gethostname());
 
         if (!isset($serverConf[self::ENVIRONMENT_KEY]))
         {
-            throw new Exception("You need to have the '".self::ENVIRONMENT_KEY."' set to either dev, stage or prod in this servers config");
+            throw new Exception(sprintf(self::MISSING_ENV, self::ENVIRONMENT_KEY));
         }
 
-        // Next we overide config parameters in a cascading order, `common` 
+        // Next we overide config parameters in a cascading order, `common`
         // being the first config parameters to be overidden, followed by the
         // `environment` parameters, with the server specific parameters having
         // the final say in the matter.
         $finalConf = array_merge(
-            self::_loadConfigsRecursively($configBase . "/common"),
-            self::_loadConfigsRecursively($configBase . "/environment/" . $serverConf[self::ENVIRONMENT_KEY]),
-            $serverConf
+            self::_loadConfigsRecursively($configBase . self::DIR_COMMON_BASE),
+            self::_loadConfigsRecursively($configBase . self::DIR_ENV_BASE . $serverConf[self::ENVIRONMENT_KEY]),
+            $serverConf,
+            self::_loadConfigsRecursively($configBase . self::DIR_LOCAL_BASE)
         );
 
         // populate the shared memory cache with the final config state.
@@ -81,7 +90,7 @@ class Config
      */
     static private function _loadConfigsRecursively($path)
     {
-        $configs = array(); 
+        $configs = array();
         $files   = array_diff(
             scandir($path),
             array(
@@ -96,7 +105,7 @@ class Config
             if (is_dir($filePath))
             {
                 $configs = array_merge(
-                    $configs, 
+                    $configs,
                     self::_loadConfigsRecursively($filePath)
                 );
                 continue;

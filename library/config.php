@@ -19,6 +19,7 @@ class Config
     const MISSING_ENV = "You need to have the %s set to either dev, stage or prod in this servers config";
 
     static private $_localized = array();
+    static private $_isLoaded = false;
 
     /*
      * Fetches a config parmeter from shared memory (cache) or if the
@@ -46,10 +47,14 @@ class Config
 
     static private function _preloadConfigIfNotLoaded()
     {
+        // avoid doing string operations and a call to APC if we can
+        if (self::$_isLoaded) { return; }
+
         $isLoadedKey = "_" . self::PREFIX . "is_loaded";
         if (apc_fetch($isLoadedKey) !== false)
         {
             // yay, we already loaded the config, return to what we were doing.
+            self::$_isLoaded = true;
             return;
         }
 

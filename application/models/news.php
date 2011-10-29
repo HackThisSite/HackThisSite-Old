@@ -66,15 +66,13 @@ class news {
     }
 
     public function realGetNewPosts() {
-        return iterator_to_array(
-            $this->db->find(
-                array(
-                    'type' => 'news',
-                    'ghosted' => false
-                )
-            )->sort(array('date' => -1))
-              ->limit(10)
-        );
+        return $this->db->find(
+            array(
+                'type' => 'news',
+                'ghosted' => false
+            )
+        )->sort(array('date' => -1))
+         ->limit(10);
     }
 
     public function realGetNews($id) {
@@ -90,8 +88,8 @@ class news {
 
         foreach ($results as $result) {
             if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
-				'reportedDate' => $keys['date'], 'date' => $result['date'],
-				'title' => $result['title']), 'news'))
+                'reportedDate' => $keys['date'], 'date' => $result['date'],
+                'title' => $result['title']), 'news'))
                 continue;
 
             array_push($toReturn, $result);

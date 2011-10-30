@@ -10,7 +10,8 @@ class ConnectionFactory
 
     public static function get($type, $data = array())
     {
-        $path = apc_fetch(self::CACHE_PREFIX . $type);
+        $cacheKey = self::CACHE_PREFIX . $type;
+        $path     = apc_fetch($cacheKey);
         if ($path === null) { return false; }
 
         if ($path === false)
@@ -20,6 +21,7 @@ class ConnectionFactory
                   . $type
                   . self::EXTENSION;
             if (!file_exists($path)) { return false; }
+            apc_store($cacheKey, $path);
         }
 
         require_once $path;

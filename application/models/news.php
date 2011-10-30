@@ -11,11 +11,7 @@ class news {
     }
 
     public function getNewPosts($cache = true) {
-        // temporarilly disabling cache for development - Joseph Moniz
-        //if ($cache && apc_exists('top_news')) return apc_fetch('top_news');
-
         $news = $this->realGetNewPosts();
-        //if ($cache && !empty($news)) apc_add('top_news', $news, 10);
         return $news;
     }
 

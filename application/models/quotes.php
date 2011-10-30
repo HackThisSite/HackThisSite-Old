@@ -5,16 +5,19 @@ class quotes extends mongoBase
     const KEY_ID    = "_id";
     const KEY_QUOTE = "quote";
 
+    const DB_NAME = "mongo:db";
+
     const CACHE_KEY_COUNT = "cache:quotes:count";
     const CACHE_PREFIX    = "cache:quotes:i:";
 
     private $mongo;
     private $quotes;
 
-    public function __construct($mongoConnection)
+    public function __construct($mongo)
     {
-        $this->mongo  = $mongoConnection;
-        $this->quotes = $mongoConnection->quotes;
+        $db           = Config::get(self::DB_NAME);
+        $this->mongo  = $mongo->$db;
+        $this->quotes = $mongo->$db->quotes;
     }
 
     public function add($quote)

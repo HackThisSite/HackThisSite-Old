@@ -5,10 +5,8 @@ class news {
 
     var $db;
 
-    public function __construct() {
-        $db    = Config::get(self::KEY_DB);
-        $mongo = new Mongo(Config::get(self::KEY_SERVER));
-
+    public function __construct(Mongo $mongo) {
+        $db       = Config::get(self::KEY_DB);
         $this->db = $mongo->$db->content;
     }
 

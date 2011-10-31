@@ -13,10 +13,9 @@ class quotes extends mongoBase
     private $mongo;
     private $quotes;
 
-    public function __construct($mongo)
+    public function __construct(Mongo $mongo)
     {
         $db           = Config::get(self::DB_NAME);
-        $this->mongo  = $mongo->$db;
         $this->quotes = $mongo->$db->quotes;
     }
 

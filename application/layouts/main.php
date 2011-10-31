@@ -33,6 +33,9 @@
             <br />
             <a class="nav" href="<?php echo Config::get("other:baseUrl"); ?>forums/">Login</a>
             <br />
+            <?php foreach ($leftNav as $title => $section): ?>
+                <?php echo Partial::render("navSection", array("title" => $title, "links" => $section)); ?>
+            <?php endforeach; ?>
             </div>
           </td>
           <td valign="top" class="sitebuffer">

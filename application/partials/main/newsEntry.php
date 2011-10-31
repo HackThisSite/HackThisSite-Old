@@ -1,7 +1,10 @@
 <tr>
   <td class="normal-td" style="font-size: 16px;">
     <b>
-      <span style="font-size: 12px"><?php echo $date; ?>:&nbsp;&nbsp;</span>
+      <span style="font-size: 12px">
+        <img src="<?php echo Config::get("static:cdn"); ?>/images/tick.gif" alt="#">
+        <?php echo date("j M, Y", $date); ?>:&nbsp;&nbsp;
+      </span>
       <?php echo $title; ?>
     </b>
     <span style="display:none; font-size: 9px;"><br /></span>

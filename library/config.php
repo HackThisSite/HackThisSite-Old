@@ -58,6 +58,11 @@ class Config
             return;
         }
 
+        self::forceReload($isLoadedKey);
+    }
+
+    static public function forceReload($isLoadedkey = null)
+    {
         // load the local configs for this server based on hostname
         $configBase = dirname(dirname(__FILE__)) . self::DIR_CONF_BASE;
         $serverConf = self::_loadConfigsRecursively($configBase . self::DIR_SERVER_BASE . gethostname());
@@ -72,10 +77,10 @@ class Config
         // `environment` parameters, with the server specific parameters having
         // the final say in the matter.
         $finalConf = array_merge(
-            self::_loadConfigsRecursively($configBase . self::DIR_COMMON_BASE),
-            self::_loadConfigsRecursively($configBase . self::DIR_ENV_BASE . $serverConf[self::ENVIRONMENT_KEY]),
-            $serverConf,
-            self::_loadConfigsRecursively($configBase . self::DIR_LOCAL_BASE)
+        self::_loadConfigsRecursively($configBase . self::DIR_COMMON_BASE),
+        self::_loadConfigsRecursively($configBase . self::DIR_ENV_BASE . $serverConf[self::ENVIRONMENT_KEY]),
+        $serverConf,
+        self::_loadConfigsRecursively($configBase . self::DIR_LOCAL_BASE)
         );
 
         // populate the shared memory cache with the final config state.
@@ -86,6 +91,10 @@ class Config
 
         // set the flag indicating that the shared memory cache has been
         // populated with the config state for this machine
+        if ($isLoadedKey === null)
+        {
+            $isLoadedKey = "_" . self::PREFIX . "is_loaded";
+        }
         apc_store($isLoadedKey, true);
     }
 

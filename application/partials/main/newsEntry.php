@@ -13,7 +13,7 @@
     <br />
     <br />
     <span style="font-size: 10px;">
-      <a href="/news/view/{id}">read more...</a>
+      <a href="/news/view/<?php echo Id::create(array('date' => $date, 'title' => $title), 'news'); ?>">read more...</a>
       <br />
       <br />
     </span>

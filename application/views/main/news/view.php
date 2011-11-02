@@ -7,14 +7,15 @@ if (!empty($news)) {
 				echo '<br/ ><hr /><br />';
 			}
 			
-			echo $template->showNews($post);
+			echo Partial::render('newsPost', $post);
 			$first = false;
 		}
 	} else {
-		echo $template->showNews($news[0]);
+		
+		echo Partial::render('newsPost', $news[0]);
 		
 		if ($news[0]['commentable']) {
-			echo new Widget('comment', array('id' => $news[0]['_id'], 'page' => 1));
+			echo Partial::render('comment', array('id' => $news[0]['_id'], 'page' => 1));
 		}
 	}
 }

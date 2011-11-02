@@ -5,19 +5,13 @@ class news {
 
     var $db;
 
-    public function __construct() {
-        $db    = Config::get(self::KEY_DB);
-        $mongo = new Mongo(Config::get(self::KEY_SERVER));
-
+    public function __construct(Mongo $mongo) {
+        $db       = Config::get(self::KEY_DB);
         $this->db = $mongo->$db->content;
     }
 
     public function getNewPosts($cache = true) {
-        // temporarilly disabling cache for development - Joseph Moniz
-        //if ($cache && apc_exists('top_news')) return apc_fetch('top_news');
-
         $news = $this->realGetNewPosts();
-        //if ($cache && !empty($news)) apc_add('top_news', $news, 10);
         return $news;
     }
 

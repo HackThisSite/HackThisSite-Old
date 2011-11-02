@@ -278,6 +278,10 @@ $observer = Observer::singleton(
             'layout',
             'dispatch'
         ),
+        'controller/ended' => array(
+            'getquote',
+            'buildnav'
+        ),
         'request/ended' => array(
             'timer',
             'layout'

@@ -23,7 +23,7 @@
     </div>
   <table width="780" border="0" cellpadding="0" cellspacing="0" class="siteheader">
     <tr>
-      <td class="sitetopheader"><blockquote>Quotes go here pl0x TODO</blockquote></td>
+      <td class="sitetopheader"><blockquote><?php echo $randomQuote; ?></blockquote></td>
     </tr>
     <tr>
 
@@ -33,6 +33,9 @@
             <br />
             <a class="nav" href="<?php echo Config::get("other:baseUrl"); ?>forums/">Login</a>
             <br />
+            <?php foreach ($leftNav as $title => $section): ?>
+                <?php echo Partial::render("navSection", array("title" => $title, "links" => $section)); ?>
+            <?php endforeach; ?>
             </div>
           </td>
           <td valign="top" class="sitebuffer">

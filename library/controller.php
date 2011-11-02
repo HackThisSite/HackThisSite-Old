@@ -102,6 +102,9 @@ class Controller
             $this->driver
         );
 
+        $observer = Observer::singleton();
+        $observer->trigger("controller/ended");
+
         return $this->parsedViewResult;
 
     }

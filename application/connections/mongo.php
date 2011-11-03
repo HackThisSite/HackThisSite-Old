@@ -8,19 +8,13 @@ class ConnectionMongo
     const KEY_PASSWORD = "password";
 
     static private $connections = array();
-    static private $indexKeys = array(
-        self::KEY_HOST     => "",
-        self::KEY_PORT     => "",
-        self::KEY_USERNAME => "",
-        self::KEY_PASSWORD => ""
-    );
     static private $keyDefaults = array(
-        self::KEY_HOST     => "localhost",
-        self::KEY_PORT     => "27017"
     );
 
     static public function builder($data = array())
     {
+		if (count(self::$keyDefaults) == 0) self::populateDefaults();
+		
         // set the defaults
         $data = array_merge(self::$keyDefaults, $data);
 
@@ -32,7 +26,7 @@ class ConnectionMongo
         {
             return self::$connections[$key];
         }
-
+		print_r($data);
         // filter out auth keys from mongo options
         $options = array_diff_key($data, self::$keyDefaults);
 
@@ -42,6 +36,13 @@ class ConnectionMongo
             $options
         );
     }
+    
+    static private function populateDefaults() {
+		self::$keyDefaults[self::KEY_HOST] = Config::get('mongo:server');
+		self::$keyDefaults[self::KEY_PORT] = Config::get('mongo:port');
+		self::$keyDefaults[self::KEY_USERNAME] = Config::get('mongo:user');
+		self::$keyDefaults[self::KEY_PASSWORD] = Config::get('mongo:pass');
+	}
 
     static private function dataToKey($data)
     {

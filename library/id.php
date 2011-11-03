@@ -1,7 +1,7 @@
 <?php
 class Id {
 	
-	public function create($data, $type) {
+	static public function create($data, $type) {
 		switch ($type) {
 			case 'news':
 				return date('Y/m/dHi_', $data['date']) . str_replace(' ', '_', strtolower(preg_replace('/[^\w\d_ -]/si', '', $data['title'])));
@@ -10,7 +10,7 @@ class Id {
 		return false;
 	}
 	
-	public function dissectKeys($hash, $type) {
+	static public function dissectKeys($hash, $type) {
 		switch ($type) {
 			case 'news':
 				$sections = explode('/', $hash);
@@ -48,7 +48,7 @@ class Id {
 		return false;
 	}
 	
-	public function validateHash($hash, $data, $type) {
+	static public function validateHash($hash, $data, $type) {
 		switch ($type) {
 			case 'news':
 				$realHash = $this->create($data, $type);

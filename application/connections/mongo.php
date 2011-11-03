@@ -45,16 +45,6 @@ class ConnectionMongo
 
     static private function dataToKey($data)
     {
-        // set the defaults for the index keys and then crop just the index
-        // keys out of the data
-        $data = array_intersect_key(
-            self::$indexKeys,
-            array_merge(
-                self::$indexKeys,
-                $data
-            )
-        );
-
         // normalize the data by sorting on keys
         ksort($data);
         return implode(':', $data);

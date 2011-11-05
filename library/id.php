@@ -4,7 +4,11 @@ class Id {
 	static public function create($data, $type) {
 		switch ($type) {
 			case 'news':
-				return date('Y/m/dHi_', $data['date']) . str_replace(' ', '_', strtolower(preg_replace('{(-)\1+}', '-', preg_replace('/[^\w\d_ -]/si', '-', $data['title']))));
+				$string = trim(strtolower($data['title']));
+				$string = preg_replace('{(-)\1+}', '-', preg_replace('/[^\w\d_ -]/si', '-', $string));
+				$string = trim(str_replace(' ', '_', $string), '-_');
+				
+				return date('Y/m/dHi_', $data['date']) . $string;
 		}
 		
 		return false;

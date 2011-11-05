@@ -8,7 +8,7 @@ class controller_news extends Controller {
 	public function view($arguments) {
 		@$id = implode('/', $arguments);
 		if (empty($id)) return $this->setError('Invalid id.');
-		$newsModel = new news;
+		$newsModel = new news(ConnectionFactory::get('mongo'));
 		$news = $newsModel->getNews($id);
 		
 		if (empty($news)) return $this->setError('Invalid id.');

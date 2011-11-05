@@ -51,7 +51,7 @@ class Id {
 	static public function validateHash($hash, $data, $type) {
 		switch ($type) {
 			case 'news':
-				$realHash = $this->create($data, $type);
+				$realHash = self::create($data, $type);
 				return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
 				
 		}

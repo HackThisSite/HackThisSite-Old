@@ -66,21 +66,26 @@ class Config
         // load the local configs for this server based on hostname
         $configBase = dirname(dirname(__FILE__)) . self::DIR_CONF_BASE;
         $serverConf = self::_loadConfigsRecursively($configBase . self::DIR_SERVER_BASE . gethostname());
-
-        if (!isset($serverConf[self::ENVIRONMENT_KEY]))
-        {
-            throw new Exception(sprintf(self::MISSING_ENV, self::ENVIRONMENT_KEY));
-        }
+        $initialConf = array_merge(
+            (is_array($serverConf)) ? $serverConf : array(),
+            self::_loadConfigsRecursively($configBase . self::DIR_LOCAL_BASE)
+        );
 
         // Next we overide config parameters in a cascading order, `common`
         // being the first config parameters to be overidden, followed by the
         // `environment` parameters, with the server specific parameters having
         // the final say in the matter.
+
+
+        if (!isset($initialConf[self::ENVIRONMENT_KEY]))
+        {
+            throw new Exception(sprintf(self::MISSING_ENV, self::ENVIRONMENT_KEY));
+        }
+
         $finalConf = array_merge(
-        self::_loadConfigsRecursively($configBase . self::DIR_COMMON_BASE),
-        self::_loadConfigsRecursively($configBase . self::DIR_ENV_BASE . $serverConf[self::ENVIRONMENT_KEY]),
-        $serverConf,
-        self::_loadConfigsRecursively($configBase . self::DIR_LOCAL_BASE)
+            self::_loadConfigsRecursively($configBase . self::DIR_COMMON_BASE),
+            self::_loadConfigsRecursively($configBase . self::DIR_ENV_BASE . $initialConf[self::ENVIRONMENT_KEY]),
+            $initialConf
         );
 
         // populate the shared memory cache with the final config state.

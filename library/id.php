@@ -1,16 +1,20 @@
 <?php
 class Id {
 	
-	public function create($data, $type) {
+	static public function create($data, $type) {
 		switch ($type) {
 			case 'news':
-				return date('Y/m/dHi_', $data['date']) . str_replace(' ', '_', strtolower(preg_replace('/[^\w\d_ -]/si', '', $data['title'])));
+				$string = trim(strtolower($data['title']));
+				$string = preg_replace('{(-)\1+}', '-', preg_replace('/[^\w\d_ -]/si', '-', $string));
+				$string = trim(str_replace(' ', '_', $string), '-_');
+				
+				return date('Y/m/dHi_', $data['date']) . $string;
 		}
 		
 		return false;
 	}
 	
-	public function dissectKeys($hash, $type) {
+	static public function dissectKeys($hash, $type) {
 		switch ($type) {
 			case 'news':
 				$sections = explode('/', $hash);
@@ -48,10 +52,10 @@ class Id {
 		return false;
 	}
 	
-	public function validateHash($hash, $data, $type) {
+	static public function validateHash($hash, $data, $type) {
 		switch ($type) {
 			case 'news':
-				$realHash = $this->create($data, $type);
+				$realHash = self::create($data, $type);
 				return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
 				
 		}

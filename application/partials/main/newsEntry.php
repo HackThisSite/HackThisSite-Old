@@ -3,7 +3,7 @@
     <b>
       <span style="font-size: 12px">
         <img src="<?php echo Config::get("static:cdn"); ?>/images/tick.gif" alt="#">
-        <?php echo date("j M, Y", $date); ?>:&nbsp;&nbsp;
+        <?php echo Date::dayFormat("j M, Y", $date); ?>:&nbsp;&nbsp;
       </span>
       <?php echo $title; ?>
     </b>
@@ -16,7 +16,7 @@
     <br />
     <br />
     <span style="font-size: 10px;">
-      <a href="/news/view/{id}">read more...</a>
+      <a href="/news/view/<?php echo Id::create(array('date' => $date, 'title' => $title), 'news'); ?>">read more...</a>
       <br />
       <br />
     </span>

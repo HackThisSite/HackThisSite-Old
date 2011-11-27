@@ -2,7 +2,7 @@
 
 class ConnectionMongo
 {
-    const KEY_HOST     = "host";
+    const KEY_HOST     = "server";
     const KEY_PORT     = "port";
     const KEY_USERNAME = "username";
     const KEY_PASSWORD = "password";
@@ -14,13 +14,19 @@ class ConnectionMongo
         self::KEY_USERNAME => "",
         self::KEY_PASSWORD => ""
     );
-    static private $keyDefaults = array(
-        self::KEY_HOST     => "localhost",
-        self::KEY_PORT     => "27017"
-    );
+    static private $keyDefaults = array();
+    
+    static private function populateDefaults() {
+		foreach (self::$indexKeys as $key => $nil) {
+			self::$keyDefaults[$key] = Config::get('mongo:' . $key);
+		}
+	}
 
     static public function builder($data = array())
     {
+		if (empty(self::$keyDefaults))
+			self::populateDefaults();
+		
         // set the defaults
         $data = array_merge(self::$keyDefaults, $data);
 
@@ -35,7 +41,7 @@ class ConnectionMongo
 
         // filter out auth keys from mongo options
         $options = array_diff_key($data, self::$keyDefaults);
-
+		print_r($data);
         // create a new connection and store it for later reuse
         return self::$connections[$key] = new Mongo(
             "mongodb://{$data[self::KEY_HOST]}:{$data[self::KEY_PORT]}",
@@ -45,16 +51,6 @@ class ConnectionMongo
 
     static private function dataToKey($data)
     {
-        // set the defaults for the index keys and then crop just the index
-        // keys out of the data
-        $data = array_intersect_key(
-            self::$indexKeys,
-            array_merge(
-                self::$indexKeys,
-                $data
-            )
-        );
-
         // normalize the data by sorting on keys
         ksort($data);
         return implode(':', $data);

@@ -1,0 +1,4 @@
+@CHARSET "UTF-8";
+#registration_form { display: block; margin-left: auto; margin-right: auto; width: 230px; }
+#registration_email { margin-left: 29px; }
+#registration_password1, #registration_password2 { margin-left: 5px; }

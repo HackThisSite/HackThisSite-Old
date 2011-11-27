@@ -1,40 +1,46 @@
 <?php
 class Filter
 {
-    private $input;
+    static protected $input = null;
 
-    protected function __construct($input)
+    static protected function import($input)
     {
-        $this->input = $input;
+        if (self::$input === null)
+        {
+            self::$input = $input;
+        }
     }
 
-    public function int($key)
+    static public function int($key)
     {
-        if (!isset($input[$key]) || $input[$key] === null)
+        static::import();
+        if (!isset(self::$input[$key]) || self::$input[$key] === null)
         {
             return null;
         }
 
-        return (int) $input[$key];
+        return (int) self::$input[$key];
     }
 
-    public function string($key)
+    static public function string($key)
     {
-        if (!isset($input[$key]) || $input[$key] === null)
+        static::import();
+        if (!isset(self::$input[$key]) || self::$input[$key] === null)
         {
             return null;
         }
 
-        return htmlentities($input[$key], ENT_QUOTES);
+        return htmlentities(self::$input[$key], ENT_QUOTES);
     }
 
-    public function raw($key)
+    static public function raw($key)
     {
-        if (!isset($input[$key]) || $input[$key] === null)
+        static::import();
+        if (!isset(self::$input[$key]) || self::$input[$key] === null)
         {
             return null;
         }
 
-        return $input[$key];
+        return self::$input[$key];
     }
 }

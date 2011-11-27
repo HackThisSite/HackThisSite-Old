@@ -2,8 +2,10 @@
 
 class Get extends Filter
 {
-    public function __construct()
+    static protected $input = null;
+
+    static protected function import()
     {
-        parent::__construct($_GET);
+        parent::import($_GET);
     }
 }

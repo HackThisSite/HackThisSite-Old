@@ -1,4 +1,4 @@
-<form method="post" id="registration_form" target="/register/submit">
+<form method="POST" id="registration_form" action="/register/submit">
   <p>
     <label for="username">Username:</label>
     <input type="text" name="username" id="registration_username" />

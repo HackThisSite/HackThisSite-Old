@@ -2,8 +2,10 @@
 
 class Post extends Filter
 {
-    public function __construct()
+    static protected $input = null;
+
+    static protected function import()
     {
-        parent::__construct($_POST);
+        parent::import($_POST);
     }
 }

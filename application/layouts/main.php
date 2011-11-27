@@ -10,6 +10,7 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
   <link href="<?php echo Config::get("static:cdn"); ?>/themes/Dark/Dark.css" rel="stylesheet" type="text/css" />
+  <link href="<?php echo Config::get("other:baseUrl"); ?>static/css/main.css" rel="stylesheet" type="text/css" />
   <base href="<?php echo Config::get("other:baseUrl"); ?>" />
 </head>
 

@@ -26,28 +26,27 @@ class events_request_received_dispatch
         if (!count($request)) {
             $request = array(self::DEFAULT_CONTROLLER, self::DEFAULT_METHOD);
         }
-
+		
         return $request;
     }
 
     static private function dispatch($request)
     {
         $controller = self::CONTROLLER_PREFIX . array_shift($request);
-
+		
         // if no route is set then default to index
         if (!count($request))
         {
             $request = array(0 => self::DEFAULT_CONTROLLER);
         }
-
-        // if the supplied method doesn't exist then default it to the index
-        // handler method
-        if (!method_exists($controller, $request[0]))
-        {
-            $request = array_merge(array(0 => self::DEFAULT_METHOD), $request);
-        }
+		
+        if (!class_exists($controller))
+            $controller = "controller_nil";
+            
+		$class = new $controller($request);
 
         // pass the request to the controller and return the result
-        Layout::set("content", new $controller($request));
+        Layout::set("content", $class);
+        
     }
 }

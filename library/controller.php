@@ -48,7 +48,7 @@ class Controller
     public function __construct($request, $viewData = 0, $silent = 0)
     {
         if (is_array($viewData)) $this->view = $viewData;
-
+        
         // The setting of $silent to non zero will allow us to
         // initialize a controller object without implicitly calling
         // a controller method, this is done by returning immediately.
@@ -77,31 +77,33 @@ class Controller
         $method = (isset($this->request[0])) ?
                                              array_shift($this->request)
                                              : 'index';
-
+        
         $this->__call($method, $this->request);
     }
 
     // A wrapper to call controller methods
     public function __call($name, $arguments)
     {
-        // Return with false if the controller method doesn't exist.
-        if (!method_exists($this, $name))
-            return $this->setError('No such method:'.$name);
-
         $controller = substr(get_class($this), 11);
-        // Set the implicit view
-        $this->setView($controller . '/' . $name);
+
+        if (!method_exists($this, $name)) {
+            $name = 'nil';
+            $this->setView('nil');
+        } else {
+            // Set the implicit view
+            $this->setView($controller . '/' . $name);
+        }
 
         // Call the actual function.
         $this->$name($arguments);
-
+        
         // Load and parse view
         $this->parsedViewResult = new View(
             $this->controllerState['view'],
             $this->view,
             $this->driver
         );
-
+        
         $observer = Observer::singleton();
         $observer->trigger("controller/ended");
 
@@ -155,4 +157,6 @@ class Controller
     {
         return (string)$this->parsedViewResult;
     }
+    
+    private function nil() {}
 }

@@ -17,6 +17,9 @@ class quotes extends mongoBase
     {
         $db           = Config::get(self::DB_NAME);
         $this->quotes = $mongo->$db->quotes;
+        
+        $count = apc_fetch(self::CACHE_KEY_COUNT);
+        if (empty($count)) $this->_populateCache();
     }
 
     public function add($quote)
@@ -39,7 +42,7 @@ class quotes extends mongoBase
         $count = apc_fetch(self::CACHE_KEY_COUNT);
         if (!$count) { return false; }
 
-        return apc_fetch(self::CACHE_PREFIX . $count);
+        return apc_fetch(self::CACHE_PREFIX . rand(0, $count));
     }
 
     public function getAllFromDb()
@@ -62,7 +65,7 @@ class quotes extends mongoBase
         $i = 0;
         foreach ($this->getAllFromDb() as $quote)
         {
-            apc_store(self::CACHE_PREFIX . $i++);
+            apc_store(self::CACHE_PREFIX . $i++, $quote['text']);
         }
         apc_store(self::CACHE_KEY_COUNT, --$i);
     }

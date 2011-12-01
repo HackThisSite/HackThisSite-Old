@@ -1,5 +1,5 @@
 <?php
-class news {
+class articles {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
 
@@ -20,7 +20,7 @@ class news {
     public function get($id, $cache = true, $idlib = true) {
         if ($cache && apc_exists('news_' . $id)) return apc_fetch('news_' . $id);
 
-        $news = $this->realGetNews($id, $idlib);
+        $news = $this->realGet($id, $idlib);
         if ($cache && !empty($news)) apc_add('news_' . $id, $news, 10);
         return $news;
     }
@@ -28,7 +28,7 @@ class news {
     public function create($title, $text, $commentable) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'news', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'article', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
@@ -45,7 +45,7 @@ class news {
     public function realGetNewPosts() {
         $posts = $this->db->find(
             array(
-                'type' => 'news',
+                'type' => 'article',
                 'ghosted' => false
             )
         )->sort(array('date' => -1))
@@ -59,11 +59,11 @@ class news {
          return $posts;
     }
 
-    public function realGetNews($id, $idlib) {
+    public function realGet($id, $idlib) {
         if ($idlib) {
             $idLib = new Id;
 
-            $query = array('type' => 'news', 'ghosted' => false);
+            $query = array('type' => 'article', 'ghosted' => false);
             $keys = $idLib->dissectKeys($id, 'news');
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
@@ -75,7 +75,7 @@ class news {
         
         if (!$idlib)
             return iterator_to_array($results);
-            
+        
         $toReturn = array();
 
         foreach ($results as $result) {

@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Authors:
 *   Thetan ( Joseph Moniz )
 **/
-
+error_reporting(E_ALL);
 // add our library path to the include path
 set_include_path(
     get_include_path() .
@@ -65,16 +65,16 @@ class lazyLoader
         spl_autoload_register(array($this, 'controller'));
         spl_autoload_register(array($this, 'driver'));
     }
-
+	
     public function cached($name)
     {
         $cached = apc_fetch(self::PREFIX . $name);
-
+		
         if ($cached === null || $cached === false)
         {
             return false;
         }
-
+        
         include $cached;
         return true;
     }
@@ -99,8 +99,8 @@ class lazyLoader
             return false;
         }
 
-        $name = strtolower($name);
-        $file = "{$this->root}application/models/{$name}.php";
+        $newName = strtolower($name);
+        $file = "{$this->root}application/models/{$newName}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -117,7 +117,7 @@ class lazyLoader
     {
         $key    = self::PREFIX . self::PREFIX_CONTROLLER . $name;
         $cached = apc_fetch($key);
-
+		
         if ($cached === null) { return false; }
         if ($cached !== false)
         {
@@ -125,23 +125,23 @@ class lazyLoader
             include $cached;
             return true;
         }
-
+        
         if (strncmp($name, "controller_", 11) !== 0)
         {
             apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
-
-        $name = substr($name, 11);
-        $file = "{$this->root}application/controllers/{$name}.php";
+		
+        $newName = substr($name, 11);
+        $file = "{$this->root}application/controllers/{$newName}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
             apc_store($key, null);
             return false;
         }
-
+        
         apc_store(self::PREFIX . $name, $file);
         apc_store($key, $file);
         include $file;
@@ -167,8 +167,8 @@ class lazyLoader
             return false;
         }
 
-        $name = strtolower($name);
-        $file = "{$this->root}library/{$name}.php";
+        $newName = strtolower($name);
+        $file = "{$this->root}library/{$newName}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -203,8 +203,8 @@ class lazyLoader
             return false;
         }
 
-        $name = str_replace("_", "/", $name);
-        $file = "{$this->root}application/{$name}.php";
+        $newName = str_replace("_", "/", $name);
+        $file = "{$this->root}application/{$newName}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -239,8 +239,8 @@ class lazyLoader
             return false;
         }
 
-        $name = substr($name, 7, -5);
-        $file = "{$this->root}drivers/{$name}.php";
+        $newName = substr($name, 7, -5);
+        $file = "{$this->root}drivers/{$newName}.php";
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);
@@ -275,6 +275,7 @@ $observer = Observer::singleton(
     array(
         'request/received' => array(
             'timer',
+            'session',
             'layout',
             'dispatch'
         ),
@@ -284,7 +285,8 @@ $observer = Observer::singleton(
         ),
         'request/ended' => array(
             'timer',
-            'layout'
+            'layout',
+            'session',
         )
     )
 );

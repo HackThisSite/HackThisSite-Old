@@ -3,11 +3,11 @@ class controller_news extends Controller {
     
 	public function view($arguments) {
 		@$id = implode('/', $arguments);
-		if (empty($id)) return $this->setError('Invalid id.');
+		if (empty($id)) return Error::set('Invalid id.');
 		$newsModel = new news(ConnectionFactory::get('mongo'));
 		$news = $newsModel->get($id);
 		
-		if (empty($news)) return $this->setError('Invalid id.');
+		if (empty($news)) return Error::set('Invalid id.');
 		
 		$this->view['news'] = $news;
 		$this->view['multiple'] = (count($news) > 1);

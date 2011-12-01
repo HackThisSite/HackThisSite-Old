@@ -3,8 +3,8 @@ return array(
     "display:layout" => "main",
     "display:leftnav" => array(
         "Get Informed" => array(
-            "News"     => 'asdkjfknvkldjfknv kdjfknv kdjfdknvdkfj',
-            "Articles" => "#",
+            "News"     => 'news/view/' . date('Y') . '/',
+            "Articles" => 'article',
             "Lectures" => "#",
         ),
         "Challenges" => array(

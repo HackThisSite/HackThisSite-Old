@@ -45,7 +45,7 @@ endif;
                 <?php foreach ($leftNav as $title => $section): ?>
                 <b><u><?php echo $title; ?></u></b><br />
                 <?php foreach ($section as $name => $location): ?>
-                <a href="<?php echo $location; ?>"><?php echo $name; ?></a><br />
+                <a href="<?php echo Url::format($location); ?>"><?php echo $name; ?></a><br />
                 <?php endforeach; ?>
                 <br />
                 <?php endforeach; ?>

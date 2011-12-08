@@ -39,7 +39,9 @@ endif;
 ?>
                 <hr />
 <?php if (CheckAcl::can('viewAdminPanel')): ?>
-    <?php if (CheckAcl::can('postNews')) : ?><a href="<?php echo Url::format('/news/post'); ?>">Post News</a><?php endif; ?>
+    <?php if (CheckAcl::can('postNews')) : ?><a href="<?php echo Url::format('/news/post'); ?>">Post News</a><br /><?php endif; ?>
+    <?php if (CheckAcl::can('approveArticles')): ?><a href="<?php echo Url::format('article/approve'); ?>">Approve Articles</a><br /><?php endif; ?>
+    <?php if (CheckAcl::can('postLectures')) : ?><a href="<?php echo Url::format('lecture/post'); ?>">Post Lecture</a><br /><?php endif; ?>
 <hr />
 <?php endif; ?>
                 <?php foreach ($leftNav as $title => $section): ?>

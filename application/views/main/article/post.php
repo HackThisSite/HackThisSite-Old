@@ -5,7 +5,6 @@
     <b>Title:  </b> <input type="text" name="title" /><br />
     <b>Text:  </b><br />
     <textarea cols="50" rows="20" name="text"></textarea><br />
-    <b>Commentable:  </b> <input type="checkbox" name="commentable" value="yes" /><br />
     <input type="submit" name="submit" value="Post Article" />
 </form>
 <?php endif; ?>

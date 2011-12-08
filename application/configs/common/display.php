@@ -5,7 +5,10 @@ return array(
         "Get Informed" => array(
             "News"     => 'news/view/' . date('Y') . '/',
             "Articles" => 'article',
-            "Lectures" => "#",
+            "Lectures" => 'lecture',
+        ),
+        "Get Involved" => array(
+            "Submit Article" => 'article/post'
         ),
         "Challenges" => array(
             "Basic"       => "#",

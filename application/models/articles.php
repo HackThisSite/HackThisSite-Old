@@ -11,6 +11,21 @@ class articles {
         $this->mongo = $mongo->$db;
         $this->db = $mongo->$db->content;
     }
+    
+    private function UserInfo($record, $single = false) {
+        if (empty($record))
+            return $record;
+        
+        if ($single) {
+            $record['user'] = MongoDBRef::get($this->mongo, $record['user']);
+        } else {
+            foreach ($record as $key => $entry) {
+                $record[$key]['user'] = MongoDBRef::get($this->mongo, $entry['user']);
+            }
+        }
+        
+        return $record;
+    }
 
     public function getNewPosts($cache = true) {
         $news = $this->realGetNewPosts();
@@ -24,11 +39,17 @@ class articles {
         if ($cache && !empty($news)) apc_add('news_' . $id, $news, 10);
         return $news;
     }
+    
+    public function getNextUnapproved() {
+        $record = $this->db->findOne(array('published' => false, 'ghosted' => false));
+        $record = $this->UserInfo($record, true);
+        return $record;
+    }
 
-    public function create($title, $text, $commentable) {
+    public function create($title, $text) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'article', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'article', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => true, 'published' => false, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
@@ -38,7 +59,7 @@ class articles {
     }
 
     public function delete($id) {
-        $this->db->remove(array('_id' => new MongoId($id)), array('justOne' => true));
+        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array('ghosted' => true)));
         return true;
     }
 
@@ -46,15 +67,13 @@ class articles {
         $posts = $this->db->find(
             array(
                 'type' => 'article',
-                'ghosted' => false
+                'ghosted' => false,
+                'published' => true
             )
         )->sort(array('date' => -1))
          ->limit(10);
          $posts = iterator_to_array($posts);
-         
-         foreach ($posts as $key => $post) {
-             $posts[$key]['user'] = MongoDBRef::get($this->mongo, $post['user']);
-         }
+         $posts = $this->UserInfo($posts);
          
          return $posts;
     }
@@ -63,16 +82,16 @@ class articles {
         if ($idlib) {
             $idLib = new Id;
 
-            $query = array('type' => 'article', 'ghosted' => false);
+            $query = array('type' => 'article', 'ghosted' => false, 'published' => true);
             $keys = $idLib->dissectKeys($id, 'news');
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => new MongoId($id));
+            $query = array('_id' => new MongoId($id), 'published' => true, 'ghosted' => false);
         }
-        
+
         $results = $this->db->find($query);
-        
+
         if (!$idlib)
             return iterator_to_array($results);
         
@@ -84,10 +103,15 @@ class articles {
                 'title' => $result['title']), 'news'))
                 continue;
 
-            $result['user'] = MongoDBRef::get($this->mongo, $result['user']);
+            $result = $this->UserInfo($result, true);
             array_push($toReturn, $result);
         }
 
         return $toReturn;
+    }
+    
+    public function approve($id) {
+        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array('published' => true)));
+        return true;
     }
 }

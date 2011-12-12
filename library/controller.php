@@ -62,7 +62,7 @@ class Controller
     {
         // Pull view driver from extension
         $extension = explode('.', end($this->request));
-        if (count($extension) == 2)
+        if (get_class($this) != 'controller_missions' && count($extension) == 2)
         {
             $this->driver = $extension[1];
             array_pop($this->request);

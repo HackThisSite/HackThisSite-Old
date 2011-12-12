@@ -17,8 +17,8 @@ if (!empty($access)) {
 }
 ?></td></tr>
     <tr><td><p><?php echo $lecture['description']; ?></p><br />
-    <sub><?php echo Date::minuteFormat($lecture['time'] - $lecture['duration']); ?> to 
-    <?php echo Date::minuteFormat($lecture['time']); ?></sub></td></tr>
+    <sub><?php echo Date::minuteFormat($lecture['time']); ?> to 
+    <?php echo Date::minuteFormat($lecture['time'] + $lecture['duration']); ?></sub></td></tr>
 </table>
 <?php endforeach;
 endif; ?>

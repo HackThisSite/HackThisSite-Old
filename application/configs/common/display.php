@@ -11,7 +11,7 @@ return array(
             "Submit Article" => 'article/post'
         ),
         "Challenges" => array(
-            "Basic"       => "#",
+            "Basic"       => "missions/basic", /*
             "Realistic"   => "#",
             "Application" => "#",
             "Programming" => "#",
@@ -19,7 +19,7 @@ return array(
             "ExtBasic"    => "#",
             "Javascript"  => "#",
             "Stego"       => "#",
-            "IRC"         => "#",
+            "IRC"         => "#", */
         )
     )
 );

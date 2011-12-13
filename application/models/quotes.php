@@ -24,7 +24,7 @@ class quotes extends mongoBase
 
     public function add($quote)
     {
-        $this->quotes->insert(array(self::KEY_QUOTE => $quote));
+        $this->quotes->insert(array(self::KEY_QUOTE => $this->clean($quote)));
         $this->_invalidateCache();
         $this->_populateCache();
     }

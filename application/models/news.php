@@ -1,5 +1,5 @@
 <?php
-class news {
+class news extends mongoBase {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
 
@@ -28,17 +28,17 @@ class news {
     public function create($title, $text, $commentable) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'news', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'news', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
     public function edit($id, $title, $text, $commentable) {
-        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array(
-            'title' => htmlentities($title), 'body' => $text, 'commentable' => (bool) $commentable)));
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array(
+            'title' => $this->clean($title), 'body' => $this->clean($text), 'commentable' => (bool) $commentable)));
     }
 
     public function delete($id) {
-        $this->db->remove(array('_id' => new MongoId($id)), array('justOne' => true));
+        $this->db->remove(array('_id' => $this->_toMongoId($id)), array('justOne' => true));
         return true;
     }
 
@@ -68,7 +68,7 @@ class news {
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => new MongoId($id));
+            $query = array('_id' => $this->_toMongoId($id));
         }
         
         $results = $this->db->find($query);

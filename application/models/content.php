@@ -1,5 +1,5 @@
 <?php
-class content {
+class content extends mongoBase {
     
     var $db;
     
@@ -8,7 +8,7 @@ class content {
     }
     
     public function getById($id) {
-        return $this->db->content->findOne(array('_id' => new MongoID($id)));
+        return $this->db->content->findOne(array('_id' => $this->_toMongoId($id)));
     }
     
 }

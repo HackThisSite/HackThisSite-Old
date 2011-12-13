@@ -1,5 +1,5 @@
 <?php
-class acl {
+class acl extends mongoBase {
 
     const KEY_DB     = "mongo:db";
     const CACHE_PREFIX  = "aclGroupPerms_";
@@ -21,7 +21,7 @@ class acl {
     }
     
     public function dbAclForGroup($group) {
-        $permissions = $this->db->acl->findOne(array("group" => $group));
+        $permissions = $this->db->acl->findOne(array("group" => $this->clean($group)));
         return $permissions['permissions'];
     }
     

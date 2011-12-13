@@ -1,5 +1,5 @@
 <?php
-class lectures {
+class lectures extends mongoBase {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
 
@@ -39,8 +39,8 @@ class lectures {
         if (empty($time))return self::ERROR_INVALIDDATE;
         if (empty($duration)) return self::ERROR_INVALIDDURATION;
         
-        return $this->db->insert(array('type' => 'lecture', 'title' => $title, 
-            'lecturer' => $lecturer, 'description' => $description,'time' => $time, 
+        return $this->db->insert(array('type' => 'lecture', 'title' => $this->clean($title), 
+            'lecturer' => $this->clean($lecturer), 'description' => $this->clean($description),'time' => $time, 
             'duration' => $duration, 'ghosted' => false));
     }
     
@@ -50,17 +50,17 @@ class lectures {
         if (empty($time))return self::ERROR_INVALIDDATE;
         if (empty($duration)) return self::ERROR_INVALIDDURATION;
         
-        return $this->db->update(array('_id' => new MongoId($id)), array('$set' => 
-            array('title' => $title, 'lecturer' => $lecturer, 'description' => $description,
+        return $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => 
+            array('title' => $this->clean($title), 'lecturer' => $this->clean($lecturer), 'description' => $this->clean($description),
             'time' => $time, 'duration' => $duration)));
     }
     
     public function delete($id) {
-        $entry = $this->db->findOne(array('_id' => new MongoId($id)));
+        $entry = $this->db->findOne(array('_id' => $this->_toMongoId($id)));
         if (empty($entry))
             return self::ERROR_NONEXISTANT;
         
-        return $this->db->update(array('_id' => new MongoId($id)), 
+        return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }
 }

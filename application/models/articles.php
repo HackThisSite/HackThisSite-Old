@@ -1,5 +1,5 @@
 <?php
-class articles {
+class articles extends mongoBase {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
 
@@ -17,10 +17,10 @@ class articles {
             return $record;
         
         if ($single) {
-            $record['user'] = MongoDBRef::get($this->mongo, $record['user']);
+            $record['user'] = MongoDBRef::get($this->mongo, $this->clean($record['user']));
         } else {
             foreach ($record as $key => $entry) {
-                $record[$key]['user'] = MongoDBRef::get($this->mongo, $entry['user']);
+                $record[$key]['user'] = MongoDBRef::get($this->mongo, $this->clean($entry['user']));
             }
         }
         
@@ -49,17 +49,17 @@ class articles {
     public function create($title, $text) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'article', 'title' => htmlentities($title), 'body' => $text, 'user' => $ref, 'date' => time(), 'commentable' => true, 'published' => false, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'article', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'commentable' => true, 'published' => false, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
     public function edit($id, $title, $text, $commentable) {
         $this->db->update(array('_id' => new MongoId($id)), array('$set' => array(
-            'title' => htmlentities($title), 'body' => $text, 'commentable' => (bool) $commentable)));
+            'title' => $this->clean($title), 'body' => $this->clean($text), 'commentable' => (bool) $commentable)));
     }
 
     public function delete($id) {
-        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array('ghosted' => true)));
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('ghosted' => true)));
         return true;
     }
 
@@ -87,7 +87,7 @@ class articles {
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => new MongoId($id), 'published' => true, 'ghosted' => false);
+            $query = array('_id' => $this->_toMongoId($id), 'published' => true, 'ghosted' => false);
         }
 
         $results = $this->db->find($query);
@@ -111,7 +111,7 @@ class articles {
     }
     
     public function approve($id) {
-        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array('published' => true)));
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('published' => true)));
         return true;
     }
 }

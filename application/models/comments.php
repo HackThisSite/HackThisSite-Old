@@ -8,6 +8,14 @@ class comments extends mongoBase {
     }
     
     public function create($id, $text) {
+        $content = new contents(ConnectionFactory::get('mongo'));
+        $entry = $content->getById($id);
+        
+        if (empty($entry))
+			return 'Invalid content ID.';
+		if (empty($entry['commentable']))
+			return 'This is not commentable.';
+
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         return $this->db->content->insert(array('type' => 'comment', 'contentId' => (string) $id, 
             'ghosted' => false, 'user' => $ref, 'text' => $this->clean($text), 'date' => time()));
@@ -33,6 +41,8 @@ class comments extends mongoBase {
     }
     
     public function delete($id) {
-        return $this->db->content->update(array('type' => 'comment', '_id' => $this->_toMongoId($id)), array('$set' => array('ghosted' => true)));
+        return $this->db->content->update(array('type' => 'comment', 
+			'_id' => $this->_toMongoId($id)), 
+			array('$set' => array('ghosted' => true)));
     }
 }

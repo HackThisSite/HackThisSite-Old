@@ -33,7 +33,7 @@ class lectures extends mongoBase {
         return $records;
     }
     
-    public function add($title, $lecturer, $description, $time, $duration) {
+    public function create($title, $lecturer, $description, $time, $duration) {
         $time = strtotime($time);
         $duration = strtotime($duration) - time();
         if (empty($time))return self::ERROR_INVALIDDATE;

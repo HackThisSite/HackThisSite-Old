@@ -1,6 +1,13 @@
 <?php
-class controller_comment extends Controller {
+class controller_comment extends Content {
     
+    var $name = 'comment';
+    var $model = 'comments';
+    var $db = 'mongo';
+    var $permission = 'Comment';
+    var $createForms = array('@id', 'text');
+   
+    /*
     public function post($arguments) {
         if (!CheckAcl::can('postComment'))
             return Error::set('You can not post comments!');
@@ -42,5 +49,6 @@ class controller_comment extends Controller {
         if (!empty($_SERVER['HTTP_REFERER']))
             header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
+    */
     
 }

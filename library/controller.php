@@ -72,7 +72,7 @@ class Controller
         {
             $this->driver = 'traditional';
         }
-
+				
         // If no method was specified default to index
         $method = (isset($this->request[0])) ?
                                              array_shift($this->request)
@@ -152,10 +152,6 @@ class Controller
     {
         return $this->driver;
     }
-    
-    public function setError($error) {
-		array_push($this->controllerState['errors'], $error);
-	}
 
     public function __toString()
     {

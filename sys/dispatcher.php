@@ -135,7 +135,6 @@ class lazyLoader
 		
         $newName = substr($name, 11);
         $file = "{$this->root}application/controllers/{$newName}.php";
-
         if (!file_exists($file))
         {
             apc_store(self::PREFIX . $name, null);

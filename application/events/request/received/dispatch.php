@@ -40,25 +40,10 @@ class events_request_received_dispatch
             $request = array(0 => self::DEFAULT_CONTROLLER);
         }
 		
-<<<<<<< HEAD
-		// This has to be created before method_exists because it will 
-		// be re-included when it's added to the layout (fatal error).
-		// - Brendan
-		
-		$class = new $controller($request);
-		
-        // if the supplied method doesn't exist then default it to the index
-        // handler method
-        if (!method_exists($controller, $request[0]))
-        {
-            $request = array_merge(array(0 => self::DEFAULT_METHOD), $request);
-        }
-=======
         if (!class_exists($controller))
             $controller = "controller_nil";
             
 		$class = new $controller($request);
->>>>>>> 166d409133cbdcd78b46a38b9cadeb840cb5897c
 
         // pass the request to the controller and return the result
         Layout::set("content", $class);

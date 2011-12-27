@@ -2,7 +2,9 @@
 class news extends mongoBase {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
-
+	
+	const ERROR_NONEXISTANT = "No news found by that id.";
+	
     var $db;
     var $mongo;
     
@@ -38,8 +40,12 @@ class news extends mongoBase {
     }
 
     public function delete($id) {
-        $this->db->remove(array('_id' => $this->_toMongoId($id)), array('justOne' => true));
-        return true;
+        $entry = $this->db->findOne(array('_id' => $this->_toMongoId($id)));
+        if (empty($entry))
+            return self::ERROR_NONEXISTANT;
+        
+        return $this->db->update(array('_id' => $this->_toMongoId($id)), 
+            array('$set' => array('ghosted' => true)));
     }
 
     public function realGetNewPosts() {
@@ -70,7 +76,7 @@ class news extends mongoBase {
         } else {
             $query = array('_id' => $this->_toMongoId($id));
         }
-        
+
         $results = $this->db->find($query);
         
         if (!$idlib)

@@ -27,7 +27,7 @@ foreach ($comments as $comment) {
 if (CheckAcl::can('postComment')):
 ?>
 <h4><u>New Comment</u></h4>
-<form action="<?php echo Url::format('/comment/post/' . $id); ?>" method="post">
+<form action="<?php echo Url::format('/comment/post/save/' . $id); ?>" method="post">
     <textarea name="text"></textarea><br />
     <input type="submit" name="submit" value="Post Comment" />
 </form>

@@ -1,12 +1,14 @@
 <?php
-class news {
+class news extends mongoBase {
     const KEY_SERVER = "mongo:server";
     const KEY_DB     = "mongo:db";
 
     var $db;
-
+    var $mongo;
+    
     public function __construct(Mongo $mongo) {
         $db       = Config::get(self::KEY_DB);
+        $this->mongo = $mongo->$db;
         $this->db = $mongo->$db->content;
     }
 
@@ -15,69 +17,65 @@ class news {
         return $news;
     }
 
-    public function getNews($id, $cache = true) {
+    public function get($id, $cache = true, $idlib = true) {
         if ($cache && apc_exists('news_' . $id)) return apc_fetch('news_' . $id);
 
-        $news = $this->realGetNews($id);
+        $news = $this->realGetNews($id, $idlib);
         if ($cache && !empty($news)) apc_add('news_' . $id, $news, 10);
         return $news;
     }
 
-    public function saveNews($title, $text, $commentable) {
-        $forums = new Forums;
-        $data = $forums->loginData();
-        $id = $data['id'];
+    public function create($title, $text, $commentable) {
+        $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'news', 'title' => htmlentities($title), 'body' => $text, 'userId' => $id, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'news', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
-    public function editNews($id, $title, $text, $commentable) {
-        $this->db->update(array('_id' => $id), array('$set' => array(
-            'title' => htmlentities($title), 'body' => $text, 'commentable' => (bool) $commentable)));
+    public function edit($id, $title, $text, $commentable) {
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array(
+            'title' => $this->clean($title), 'body' => $this->clean($text), 'commentable' => (bool) $commentable)));
     }
 
-    public function deleteNews($id) {
-        $idLib = new Id;
-        $query = array('type' => 'news', 'ghosted' => false);
-        $keys = $idLib->dissectKeys($id, 'news');
-
-        $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + 86400);
-        $results = $this->db->find($query);
-        $actual = array();
-
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('title' => $result['title'], 'date' => $result['date']), 'news'))
-                continue;
-
-            $actual = $result;
-        }
-
-        if (empty($actual)) return false;
-
-        $this->db->remove(array('_id' => $actual['_id']), array('justOne' => true));
+    public function delete($id) {
+        $this->db->remove(array('_id' => $this->_toMongoId($id)), array('justOne' => true));
         return true;
     }
 
     public function realGetNewPosts() {
-        return $this->db->find(
+        $posts = $this->db->find(
             array(
                 'type' => 'news',
                 'ghosted' => false
             )
         )->sort(array('date' => -1))
          ->limit(10);
+         $posts = iterator_to_array($posts);
+         
+         foreach ($posts as $key => $post) {
+             $posts[$key]['user'] = MongoDBRef::get($this->mongo, $post['user']);
+         }
+         
+         return $posts;
     }
 
-    public function realGetNews($id) {
-        $idLib = new Id;
+    public function realGetNews($id, $idlib) {
+        if ($idlib) {
+            $idLib = new Id;
 
-        $query = array('type' => 'news', 'ghosted' => false);
-        $keys = $idLib->dissectKeys($id, 'news');
+            $query = array('type' => 'news', 'ghosted' => false);
+            $keys = $idLib->dissectKeys($id, 'news');
 
-        $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
-
+            $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
+        } else {
+            $query = array('_id' => $this->_toMongoId($id));
+        }
+        
         $results = $this->db->find($query);
+        
+        if (!$idlib)
+            return iterator_to_array($results);
+            
         $toReturn = array();
 
         foreach ($results as $result) {
@@ -86,6 +84,7 @@ class news {
                 'title' => $result['title']), 'news'))
                 continue;
 
+            $result['user'] = MongoDBRef::get($this->mongo, $result['user']);
             array_push($toReturn, $result);
         }
 

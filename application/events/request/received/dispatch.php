@@ -40,6 +40,7 @@ class events_request_received_dispatch
             $request = array(0 => self::DEFAULT_CONTROLLER);
         }
 		
+<<<<<<< HEAD
 		// This has to be created before method_exists because it will 
 		// be re-included when it's added to the layout (fatal error).
 		// - Brendan
@@ -52,6 +53,12 @@ class events_request_received_dispatch
         {
             $request = array_merge(array(0 => self::DEFAULT_METHOD), $request);
         }
+=======
+        if (!class_exists($controller))
+            $controller = "controller_nil";
+            
+		$class = new $controller($request);
+>>>>>>> 166d409133cbdcd78b46a38b9cadeb840cb5897c
 
         // pass the request to the controller and return the result
         Layout::set("content", $class);

@@ -91,7 +91,7 @@ class Config
 
         // set the flag indicating that the shared memory cache has been
         // populated with the config state for this machine
-        if ($isLoadedKey === null)
+        if (empty($isLoadedKey))
         {
             $isLoadedKey = "_" . self::PREFIX . "is_loaded";
         }

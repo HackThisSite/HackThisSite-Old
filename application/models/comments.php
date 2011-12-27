@@ -1,46 +1,38 @@
 <?php
-class comments {
-    const KEY_SERVER = "mongo:server";
-    const KEY_DB     = "mongo:db";
-
+class comments extends mongoBase {
+    
     var $db;
-
-    private function connect() {
-        $db    = Config::get(self::KEY_DB);
-        $mongo = new Mongo(Config::get(self::KEY_SERVER));
-
-        $this->db = $mongo->$db->content;
+    
+    public function __construct($connection) {
+        $this->db = $connection->{Config::get('mongo:db')};
     }
-
-    public function totalComments($id) {
-        if (apc_exists('numComments_' . $id)) return apc_fetch('numComments_' . $id);
-
-        $comments = $this->realTotalComments($id);
-        if (!empty($comments)) apc_add('numComments_' . $id, $comments, 30);
-        return $comments;
+    
+    public function create($id, $text) {
+        $ref = MongoDBRef::create('users', Session::getVar('_id'));
+        return $this->db->content->insert(array('type' => 'comment', 'contentId' => (string) $id, 
+            'ghosted' => false, 'user' => $ref, 'text' => $this->clean($text), 'date' => time()));
     }
-
-    public function getComments($id, $page) {
-        if (apc_exists('comments_' . $id . '_' . $page)) return apc_fetch('comments_' . $id . '_' . $page);
-
-        $comments = $this->realGetComments($id, $page);
-        if (!empty($comments)) apc_add('comments_' . $id . '_' . $page, $comments, 30);
-        return $comments;
-    }
-
-    private function realTotalComments($id) {
-        if (empty($this->db)) $this->connect();
-        $num = $this->db->find(array('type' => 'comment', 'contentId' => (string) $id, 'ghosted' => false),
-        array('userId' => 1, 'date' => 1, 'body' => 1))->count();
-        return $num;
-    }
-
-    private function realGetComments($id, $page) {
-        if (empty($this->db)) $this->connect();
+    
+    public function get($id, $page) {
         $pageLimit = 10;
-        $comments = $this->db->find(array('type' => 'comment', 'contentId' => (string) $id, 'ghosted' => false),
-        array('userId' => 1, 'date' => 1, 'body' => 1))->skip(($page - 1) * $pageLimit)->limit($pageLimit);
-        return iterator_to_array($comments);
+        $comments = $this->db->content->find(array('type' => 'comment', 'contentId' => $this->clean($id), 'ghosted' => false),
+        array('user' => 1, 'date' => 1, 'text' => 1))->skip(($page - 1) * $pageLimit)->limit($pageLimit);
+        $comments = iterator_to_array($comments);
+        
+        foreach ($comments as $key => $comment) {
+            $comments[$key]['user'] = MongoDBRef::get($this->db, $comment['user']);
+        }
+        
+        return $comments;
     }
-
+    
+    public function getById($id) {
+        $comment = $this->db->content->findOne(array('type' => 'comment', '_id' => $this->_toMongoId($id)));
+        $comment['user'] = MongoDBRef::get($this->db, $comment['user']);
+        return $comment;
+    }
+    
+    public function delete($id) {
+        return $this->db->content->update(array('type' => 'comment', '_id' => $this->_toMongoId($id)), array('$set' => array('ghosted' => true)));
+    }
 }

@@ -2,6 +2,8 @@
 
 class users extends mongoBase
 {
+    const KEY_DB     = "mongo:db";
+    
     const KEY_ID             = "_id";
     const KEY_USERNAME       = "username";
     const KEY_PASSWORD       = "password";
@@ -16,7 +18,8 @@ class users extends mongoBase
     const STATUS_UNACTIVATED = "unactivated";
     const STATUS_DEACTIVATED = "deactivated";
     const STATUS_BANNED      = "banned";
-
+    const DEFAULT_GROUP      = "user";
+    
     const ERROR_USERNAME_EXISTS  = 0;
     const ERROR_EMAIL_EXISTS     = 1;
     const ERROR_NO_SUCH_USER     = 2;
@@ -38,11 +41,11 @@ class users extends mongoBase
     private $users;
     private $mongoConnection;
     private $lastError;
-
+    
     public function __construct($mongoConnection)
     {
-        $this->mongo = $mongoConnection;
-        $this->users = $mongoConnection->users;
+        $this->mongo = $mongoConnection->{Config::get(self::KEY_DB)};
+        $this->users = $this->mongo->users;
     }
 
     /**
@@ -73,10 +76,6 @@ class users extends mongoBase
                 '$or' => array(
                     array(self::KEY_USERNAME => $username),
                     array(self::KEY_EMAIL    => $email)
-                ),
-                array(
-                    self::KEY_USERNAME => '1',
-                    self::KEY_EMAIL    => '1'
                 )
             ),
             array(
@@ -88,7 +87,7 @@ class users extends mongoBase
         // if we returned an entry this means that a user already exists with
         // that email address or that user name, so we examine the returned
         // user recourd to see which one it is and set the propper error message
-        if ($found !== null)
+        if (!empty($found))
         {
             if ($found[self::KEY_USERNAME] === $username)
             {
@@ -106,9 +105,10 @@ class users extends mongoBase
             self::KEY_USERNAME   => $username,
             self::KEY_EMAIL      => $email,
             self::KEY_PASSWORD   => $this->_passwordHash($password),
-            self::KEY_STATUS     => self::STATUS_UNACTIVATED,
+            self::KEY_STATUS     => self::STATUS_ACTIVATED, //self::STATUS_UNACTIVATED,
             self::KEY_KEYWORD    => $this->_generateKeyword(),
             self::KEY_WARN_LEVEL => 0,
+            self::KEY_GROUP      => self::DEFAULT_GROUP,
         ));
 
         // TODO: send activation email, preferably via an MQ
@@ -198,7 +198,7 @@ class users extends mongoBase
             array(
                 self::KEY_USERNAME => $username,
                 self::KEY_KEYWORD  => $keyword,
-                self::KEY_STATS    => self::STATS_UNACTIVATED,
+                self::KEY_STATUS    => self::STATUS_UNACTIVATED,
             ),
             array(
                 self::KEY_ID => '1'
@@ -306,6 +306,11 @@ class users extends mongoBase
     public function lowerWarn($username)
     {
         // TODO:
+    }
+    
+    // Update user info
+    public function update($username, $changes) {
+        return $this->users->update(array('username' => (string) $username), array('$set' => $changes));
     }
 
     /**

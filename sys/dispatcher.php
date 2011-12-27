@@ -65,16 +65,16 @@ class lazyLoader
         spl_autoload_register(array($this, 'controller'));
         spl_autoload_register(array($this, 'driver'));
     }
-
+	
     public function cached($name)
     {
         $cached = apc_fetch(self::PREFIX . $name);
-
+		
         if ($cached === null || $cached === false)
         {
             return false;
         }
-
+        
         include $cached;
         return true;
     }
@@ -117,7 +117,7 @@ class lazyLoader
     {
         $key    = self::PREFIX . self::PREFIX_CONTROLLER . $name;
         $cached = apc_fetch($key);
-
+		
         if ($cached === null) { return false; }
         if ($cached !== false)
         {
@@ -132,7 +132,7 @@ class lazyLoader
             apc_store($key, null);
             return false;
         }
-
+		
         $name = substr($name, 11);
         $file = "{$this->root}application/controllers/{$name}.php";
         if (!file_exists($file))

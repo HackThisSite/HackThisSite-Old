@@ -150,6 +150,10 @@ class Controller
     {
         return $this->driver;
     }
+    
+    public function setError($error) {
+		array_push($this->controllerState['errors'], $error);
+	}
 
     public function __toString()
     {

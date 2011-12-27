@@ -26,20 +26,26 @@ class events_request_received_dispatch
         if (!count($request)) {
             $request = array(self::DEFAULT_CONTROLLER, self::DEFAULT_METHOD);
         }
-
+		
         return $request;
     }
 
     static private function dispatch($request)
     {
         $controller = self::CONTROLLER_PREFIX . array_shift($request);
-
+		
         // if no route is set then default to index
         if (!count($request))
         {
             $request = array(0 => self::DEFAULT_CONTROLLER);
         }
-
+		
+		// This has to be created before method_exists because it will 
+		// be re-included when it's added to the layout (fatal error).
+		// - Brendan
+		
+		$class = new $controller($request);
+		
         // if the supplied method doesn't exist then default it to the index
         // handler method
         if (!method_exists($controller, $request[0]))
@@ -48,6 +54,7 @@ class events_request_received_dispatch
         }
 
         // pass the request to the controller and return the result
-        Layout::set("content", new $controller($request));
+        Layout::set("content", $class);
+        
     }
 }

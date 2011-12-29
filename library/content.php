@@ -4,7 +4,7 @@ class Content extends Controller {
 	private function validatePost($arguments) {
 		$return = array();
 		$skippable = false;
-		$argPos = 1;
+		$argPos = 0;
 		
 		foreach ($this->createForms as $field) {
 			$medium = $_POST;
@@ -61,8 +61,6 @@ class Content extends Controller {
 			
 			$this->view['valid'] = false;
 			Error::set(ucwords($this->name) . ' posted!', true);
-			
-			if (in_array('post', $this->redirect)) die(Url::format($this->location));
 		}
 	}
 	
@@ -73,7 +71,7 @@ class Content extends Controller {
 			return Error::set('No ' . $this->name . ' id was found!');
 		
 		$model = new $this->model(ConnectionFactory::get($this->db));
-		$entry = $model->get($arguments[0], false, false);
+		$entry = $model->get($arguments[0], false, false, true);
 		
 		if (is_string($entry))
 			return Error::set($entry);
@@ -84,14 +82,15 @@ class Content extends Controller {
 		if (!empty($arguments[1]) && $arguments[1] == 'save') {
 			if (($forms = $this->validatePost($arguments)) == false)
 				return Error::set('All forms need to be filled out.');
-			
-			$args = array_unshift($forms, $arguments[0]);
+
+            $this->view['forms'] = $forms;
+			array_unshift($forms, $arguments[0]);
 			$return = call_user_func_array(array($model, 'edit'), $forms);
 			
 			if (is_string($return))
 				return Error::set($return);
 			
-			$this->view['post'] = $model->get($arguments[0], false, false);
+			$this->view['post'] = $model->get($arguments[0], false, false, true);
 			Error::set('Entry edited!', true);
 		}
 	}
@@ -109,6 +108,7 @@ class Content extends Controller {
 			return Error::set($return);
 		
 		Error::set(ucwords($this->name) . ' deleted!', true);
-		header('Location: ' . Url::format($this->location));
+		if (!isset($this->dnr) || (isset($this->dnr) && !$this->dnr))
+            header('Location: ' . Url::format($this->location));
 	}
 }

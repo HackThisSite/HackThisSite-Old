@@ -21,7 +21,10 @@ class comments extends mongoBase {
             'ghosted' => false, 'user' => $ref, 'text' => $this->clean($text), 'date' => time()));
     }
     
-    public function get($id, $page) {
+    public function get($id, $cache = false, $idlib = false, $justOne = false, $page = false) {
+        if ($justOne)
+            return $this->getById($id);
+        
         $pageLimit = 10;
         $comments = $this->db->content->find(array('type' => 'comment', 'contentId' => $this->clean($id), 'ghosted' => false),
         array('user' => 1, 'date' => 1, 'text' => 1))->skip(($page - 1) * $pageLimit)->limit($pageLimit);
@@ -36,8 +39,16 @@ class comments extends mongoBase {
     
     public function getById($id) {
         $comment = $this->db->content->findOne(array('type' => 'comment', '_id' => $this->_toMongoId($id)));
+        if (empty($comment))
+            return 'Invalid comment Id.';
+
         $comment['user'] = MongoDBRef::get($this->db, $comment['user']);
         return $comment;
+    }
+    
+    public function edit($id, $contentId, $text) {
+        return $this->db->content->update(array('type' => 'comment', '_id' => $this->_toMongoId($id)),
+            array('$set' => array('text' => $this->clean($text))));
     }
     
     public function delete($id) {

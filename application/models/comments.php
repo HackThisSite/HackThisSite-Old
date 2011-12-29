@@ -56,4 +56,9 @@ class comments extends mongoBase {
 			'_id' => $this->_toMongoId($id)), 
 			array('$set' => array('ghosted' => true)));
     }
+    
+    public function authChange($type, $comment) {
+        return (CheckAcl::can($type . 'AllComment') || (CheckAcl::can($type . 'Comment') && 
+            Session::getVar('username') == $comment['user']['username']));
+    }
 }

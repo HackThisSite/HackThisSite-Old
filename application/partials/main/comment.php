@@ -17,10 +17,10 @@ foreach ($comments as $comment) {
         <?php echo Date::minuteFormat($comment['date']); ?></td>
         <td><?php echo $comment['text']; ?></td>
         <td width="5%">
-<?php if (CheckAcl::can('editAllComment') || (CheckAcl::can('editComment') && Session::getVar('username') == $comment['username'])): ?>
+<?php if (CheckAcl::can('editAllComment') || (CheckAcl::can('editComment') && Session::getVar('username') == $comment['user']['username'])): ?>
             <a href="<?php echo Url::format('/comment/edit/' . $comment['_id']); ?>">Edit</a>
 <?php endif; ?>
-<?php if (CheckAcl::can('deleteAllComment') || (CheckAcl::can('deleteComment') && Session::getVar('username') == $comment['username'])): ?>
+<?php if (CheckAcl::can('deleteAllComment') || (CheckAcl::can('deleteComment') && Session::getVar('username') == $comment['user']['username'])): ?>
             <a href="<?php echo Url::format('/comment/delete/' . $comment['_id']); ?>">Delete</a>
 <?php endif; ?>
         </td>

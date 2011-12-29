@@ -68,14 +68,17 @@ class Content extends Controller {
 	}
 	
 	public function edit($arguments) {
-		if (!CheckAcl::can('edit' . $this->permission))
-			return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
+		$model = new $this->model(ConnectionFactory::get($this->db));
+        
 		if (empty($arguments[0]))
 			return Error::set('No ' . $this->name . ' id was found!');
+		if (!method_exists($model, 'authChange') && !CheckAcl::can('edit' . $this->permission))
+			return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
 		
-		$model = new $this->model(ConnectionFactory::get($this->db));
 		$entry = $model->get($arguments[0], false, false, true);
-		
+
+        if (!(method_exists($model, 'authChange') && $model->authChange('edit', $entry)))
+			return Error::set('You are not allowed to edit this ' . $this->name . '!');
 		if (is_string($entry))
 			return Error::set($entry);
 		
@@ -102,14 +105,22 @@ class Content extends Controller {
 	}
 	
 	public function delete($arguments) {
-		if (!CheckAcl::can('delete' . $this->permission))
-			return Error::set('You are not allowed to delete ' . $this->pluralize($this->name) . '!');
+		$model = new $this->model(ConnectionFactory::get($this->db));
+        
 		if (empty($arguments[0]))
 			return Error::set('No ' . $this->name . ' id was found!');
+        if (!method_exists($model, 'authChange') && !CheckAcl::can('delete' . $this->permission))
+			return Error::set('You are not allowed to delete ' . $this->pluralize($this->name) . '!');
 		
         Log::write(LOG_INFO, 'Attempting to delete ' . $this->name . ' ' . $arguments[0]);
         
-		$model = new $this->model(ConnectionFactory::get($this->db));
+        if (method_exists($model, 'authChange')) {
+            $entry = $model->get($arguments[0], false, false, true);
+            
+            if (!(method_exists($model, 'authChange') && $model->authChange('delete', $entry)))
+                return Error::set('You are not allowed to delete this ' . $this->name . '!');
+        }
+        
 		$return = call_user_func_array(array($model, 'delete'), array($arguments[0]));
 		
 		if (is_string($return))

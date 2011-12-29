@@ -48,7 +48,7 @@ class Content extends Controller {
 			return Error::set('You are not allowed to post ' . $this->pluralize($this->name) . '!');
 
 		$this->view['valid'] = true;
-		
+        
 		if (!empty($arguments[0]) && $arguments[0] == 'save') {
 			if (($forms = $this->validatePost($arguments)) == false)
 				return Error::set('All forms need to be filled out.');
@@ -61,7 +61,10 @@ class Content extends Controller {
 			
 			$this->view['valid'] = false;
 			Error::set(ucwords($this->name) . ' posted!', true);
-		}
+            Log::write(LOG_INFO, 'Posted a ' . $this->name);
+		} else {
+            Log::write(LOG_INFO, 'Composing a ' . $this->name);
+        }
 	}
 	
 	public function edit($arguments) {
@@ -78,7 +81,7 @@ class Content extends Controller {
 		
 		$this->view['valid'] = true;
 		$this->view['post'] = $entry;
-		
+        
 		if (!empty($arguments[1]) && $arguments[1] == 'save') {
 			if (($forms = $this->validatePost($arguments)) == false)
 				return Error::set('All forms need to be filled out.');
@@ -92,7 +95,10 @@ class Content extends Controller {
 			
 			$this->view['post'] = $model->get($arguments[0], false, false, true);
 			Error::set('Entry edited!', true);
-		}
+            Log::write(LOG_INFO, 'Successfully edited ' . $this->name . ' ' . $arguments[0]);
+		} else {
+            Log::write(LOG_INFO, 'Editing ' . $this->name . ' ' . $arguments[0]);
+        }
 	}
 	
 	public function delete($arguments) {
@@ -101,6 +107,8 @@ class Content extends Controller {
 		if (empty($arguments[0]))
 			return Error::set('No ' . $this->name . ' id was found!');
 		
+        Log::write(LOG_INFO, 'Attempting to delete ' . $this->name . ' ' . $arguments[0]);
+        
 		$model = new $this->model(ConnectionFactory::get($this->db));
 		$return = call_user_func_array(array($model, 'delete'), array($arguments[0]));
 		
@@ -110,5 +118,7 @@ class Content extends Controller {
 		Error::set(ucwords($this->name) . ' deleted!', true);
 		if (!isset($this->dnr) || (isset($this->dnr) && !$this->dnr))
             header('Location: ' . Url::format($this->location));
+            
+        Log::write(LOG_INFO, 'Successfully deleted ' . $this->name . ' ' . $arguments[0]);
 	}
 }

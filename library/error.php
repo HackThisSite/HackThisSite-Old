@@ -6,8 +6,10 @@ class Error {
     
     public static function set($error, $notice = false) {
         if ($notice) {
+            Log::write(LOG_NOTICE, $error);
             array_push(self::$notices, $error);
         } else {
+            Log::write(LOG_ERROR, $error);
             array_push(self::$errors, $error);
         }
         

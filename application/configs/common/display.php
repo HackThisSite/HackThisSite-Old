@@ -13,16 +13,17 @@ return array(
             "Stego"       => "#",
             "IRC"         => "#", */
         ),
-        "Get Informed" => array(
+        'Get Informed' => array(
             'News'     => 'news/view/' . date('Y') . '/',
             'Articles' => 'article',
             'Lectures' => 'lecture',
             'HackThisZine' => 'http://hackbloc.org/?action=zine'
         ),
-        "Get Involved" => array(
+        'Get Involved' => array(
             'Donate to HackThisSite!' => '/pages/info/donate',
             'Store' => 'http://www.cafepress.com/htsstore',
-            "Submit Article" => 'article/post'
+            'Submit Article' => 'article/post',
+            'Submit Bug Report' => 'bugs',
         ),
         'Communicate' => array(
             'Forums' => 'forums',
@@ -31,7 +32,7 @@ return array(
             'IRC Quotes' => 'http://qdb.hackthissite.org/',
             'IRC Command Reference' => 'pages/info/reference'
         ),
-        "About HTS" => array(
+        'About HTS' => array(
             'About the Project' => 'pages/info/guide',
             'Bill of Rights' => 'pages/info/billofrights',
             'Legal Disclaimer' => 'pages/info/legal',

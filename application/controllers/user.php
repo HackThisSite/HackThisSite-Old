@@ -30,9 +30,18 @@ class controller_user extends Controller {
         
         if (!empty($arguments[0]) && $arguments[0] == 'save') {
             if (empty($_POST['email']))
-                Error::set('Email required.');
-
-            $user->update(Session::getVar('username'), array('email' => trim($_POST['email'])));
+                return Error::set('Email required.');
+                
+            $changes = array('email' => trim($_POST['email']));
+            
+            if (!empty($_POST['group'])) {
+                if (!CheckAcl::can('editAcl')) return Error::set('You are not allowed to change ACls.');
+                if (!in_array($_POST['group'], acl::$acls, true)) return Error::set('Invalid ACL.');
+                
+                $changes['group'] = $_POST['group'];
+            }
+            
+            $user->update(Session::getVar('_id'), $changes);
             $this->view['user'] = $user->getUserByUsername(Session::getVar('username'));
             Error::set('User profile saved.', true);
         } else {

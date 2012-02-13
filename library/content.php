@@ -20,11 +20,11 @@ class Content extends Controller {
 				$argPos++;
 			}
 			
-			if (empty($medium[$keyfield]) && !$skippable) {
+			if (empty($medium[$keyfield]) && (isset($medium[$keyfield]) && $medium[$keyfield] != 0) && !$skippable) {
 				$return = false;
 				break;
-			} else if (empty($medium[$keyfield]) && $skippable) {
-				$medium[$field] = false;
+			} else if (empty($medium[$keyfield]) && !isset($medium[$keyfield]) && $skippable) {
+				$medium[$keyfield] = false;
 			}
 			
 			$return[$field] = $medium[$keyfield];
@@ -34,7 +34,7 @@ class Content extends Controller {
 		return $return;
 	}
 	
-	public function pluralize($name) {
+	private function pluralize($name) {
 		$last = $name[strlen($name) - 1];
 		
 		if ($last != 's')
@@ -77,7 +77,7 @@ class Content extends Controller {
 		
 		$entry = $model->get($arguments[0], false, false, true);
 
-        if (!(method_exists($model, 'authChange') && $model->authChange('edit', $entry)))
+        if (method_exists($model, 'authChange') && !$model->authChange('edit', $entry))
 			return Error::set('You are not allowed to edit this ' . $this->name . '!');
 		if (is_string($entry))
 			return Error::set($entry);

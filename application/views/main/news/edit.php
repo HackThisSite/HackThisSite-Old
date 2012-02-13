@@ -7,6 +7,7 @@ extract(reset($post)); ?>
     <b>Text:  </b><br />
     <textarea cols="50" rows="20" name="text"><?php echo $body; ?></textarea><br />
     <b>Commentable:  </b> <input type="checkbox" name="commentable" value="yes"<?php echo ($commentable ? ' checked="checked"' : ''); ?> /><br />
+    <b>Short News:  </b> <input type="checkbox" name="shortNews" value="yes"<?php echo ($shortNews ? ' checked = "checked"' : ''); ?> /><br />
     <input type="submit" name="submit" value="Edit News" />
 </form>
 <?php endif; ?>

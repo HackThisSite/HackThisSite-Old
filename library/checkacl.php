@@ -5,7 +5,7 @@ class CheckAcl {
     private static $acl;
     
     private static function _populate() {
-        self::$acl = new acl(ConnectionFactory::get('mongo'));
+        self::$acl = new acl(ConnectionFactory::get('redis'));
         self::$populated = true;
     }
     
@@ -16,7 +16,7 @@ class CheckAcl {
         if (empty($group))
             $group = 'guest';
         
-        $perms = self::$acl->aclForGroup($group);
-        return in_array($name, $perms);
+        $result = self::$acl->can($group, $name);
+        return $result;
     }
 }

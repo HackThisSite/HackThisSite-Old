@@ -87,7 +87,7 @@ class articles extends mongoBase {
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'published' => true, 'ghosted' => false);
+            $query = array('_id' => $this->_toMongoId($id), 'type' => 'article', 'published' => true, 'ghosted' => false);
         }
 
         $results = $this->db->find($query);

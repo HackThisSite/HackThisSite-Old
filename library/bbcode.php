@@ -1,7 +1,7 @@
 <?php
 class BBCode {
 	
-	public function parse($data, $link) {
+	static public function parse($data, $link) {
 		$data = str_replace("javascript", 'java<b></b>script', $data);
 		$data = htmlentities(html_entity_decode($data));
 	 

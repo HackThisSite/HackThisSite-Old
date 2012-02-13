@@ -136,6 +136,10 @@ class users extends mongoBase
             return $this->users->findOne($query);
         }
     }
+    
+    public function getUserByReference($reference) {
+        return MongoDBRef::get($this->mongo, $reference);
+    }
 
     /**
      * Returns a boolean value based on if a user record with the username
@@ -309,8 +313,8 @@ class users extends mongoBase
     }
     
     // Update user info
-    public function update($username, $changes) {
-        return $this->users->update(array('username' => (string) $username), array('$set' => $changes));
+    public function update($id, $changes) {
+        return $this->users->update(array('_id' => $this->_toMongoId($id)), array('$set' => $changes));
     }
 
     /**

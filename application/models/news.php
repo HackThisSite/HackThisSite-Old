@@ -14,8 +14,8 @@ class news extends mongoBase {
         $this->db = $mongo->$db->content;
     }
 
-    public function getNewPosts($cache = true) {
-        $news = $this->realGetNewPosts();
+    public function getNewPosts($cache = true, $shortNews = false) {
+        $news = $this->realGetNewPosts($shortNews);
         return $news;
     }
 
@@ -27,16 +27,16 @@ class news extends mongoBase {
         return $news;
     }
 
-    public function create($title, $text, $commentable) {
+    public function create($title, $text, $shortNews, $commentable) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'news', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array('type' => 'news', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'shortNews' => (bool) $shortNews, 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
         $this->db->insert($entry);
     }
 
-    public function edit($id, $title, $text, $commentable) {
+    public function edit($id, $title, $text, $shortNews, $commentable) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array(
-            'title' => $this->clean($title), 'body' => $this->clean($text), 'commentable' => (bool) $commentable)));
+            'title' => $this->clean($title), 'body' => $this->clean($text), 'shortNews' => (bool) $shortNews, 'commentable' => (bool) $commentable)));
     }
 
     public function delete($id) {
@@ -48,16 +48,17 @@ class news extends mongoBase {
             array('$set' => array('ghosted' => true)));
     }
 
-    public function realGetNewPosts() {
+    public function realGetNewPosts($shortNews) {
         $posts = $this->db->find(
             array(
                 'type' => 'news',
+                'shortNews' => false,
                 'ghosted' => false
             )
         )->sort(array('date' => -1))
          ->limit(10);
          $posts = iterator_to_array($posts);
-         
+
          foreach ($posts as $key => $post) {
              $posts[$key]['user'] = MongoDBRef::get($this->mongo, $post['user']);
          }
@@ -74,7 +75,7 @@ class news extends mongoBase {
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => $this->_toMongoId($id));
+            $query = array('_id' => $this->_toMongoId($id), 'type' => 'news');
         }
 
         $results = $this->db->find($query);

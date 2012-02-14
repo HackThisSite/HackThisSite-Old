@@ -49,7 +49,17 @@ class articles extends mongoBase {
     public function create($title, $text) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'article', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'commentable' => true, 'published' => false, 'ghosted' => false, 'flaggable' => false);
+        $entry = array(
+            'type' => 'article', 
+            'title' => substr($this->clean($title), 0, 100), 
+            'body' => substr($this->clean($text), 0, 1000), 
+            'user' => $ref, 
+            'date' => time(), 
+            'commentable' => true, 
+            'published' => false, 
+            'ghosted' => false, 
+            'flaggable' => false
+            );
         $this->db->insert($entry);
     }
 

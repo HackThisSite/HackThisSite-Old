@@ -4,6 +4,7 @@ extract(reset($post)); ?>
 
 <form action="<?php echo Url::format('/news/edit/' . $_id . '/save'); ?>" method="post">
     <b>Title:  </b> <input type="text" name="title" value="<?php echo $title; ?>" /><br />
+    <b>Department:  </b> <input type="text" name="department" value="<?php echo (!empty($department) ? $department : ''); ?>" /><br />
     <b>Text:  </b><br />
     <textarea cols="50" rows="20" name="text"><?php echo $body; ?></textarea><br />
     <b>Commentable:  </b> <input type="checkbox" name="commentable" value="yes"<?php echo ($commentable ? ' checked="checked"' : ''); ?> /><br />

@@ -101,12 +101,12 @@ class bugs extends mongoBase {
         
         $entry = array(
             'type' => 'bug',
-            'title' => $title,
+            'title' => substr($title, 0, 100),
             'reporter' => MongoDBRef::create('users', Session::getVar('_id')),
             'category' => (int) $category,
             'status' => 0,
-            'description' => $description,
-            'reproduction' => $reproduction,
+            'description' => substr($description, 0, 5000),
+            'reproduction' => substr($reproduction, 0, 5000),
             'created' => time(),
             'lastUpdate' => time(),
             'public' => $public,

@@ -27,16 +27,35 @@ class news extends mongoBase {
         return $news;
     }
 
-    public function create($title, $text, $shortNews, $commentable) {
+    public function create($title, $department, $text, $shortNews, $commentable) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
 
-        $entry = array('type' => 'news', 'title' => $this->clean($title), 'body' => $this->clean($text), 'user' => $ref, 'date' => time(), 'shortNews' => (bool) $shortNews, 'commentable' => (bool) $commentable, 'ghosted' => false, 'flaggable' => false);
+        $entry = array(
+            'type' => 'news', 
+            'title' => substr($this->clean($title), 0, 100), 
+            'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80), 
+            'body' => substr($this->clean($text), 0, 5000), 
+            'user' => $ref, 
+            'date' => time(), 
+            'shortNews' => (bool) $shortNews, 
+            'commentable' => (bool) $commentable, 
+            'ghosted' => false, 
+            'flaggable' => false
+            );
+            
         $this->db->insert($entry);
     }
 
-    public function edit($id, $title, $text, $shortNews, $commentable) {
-        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array(
-            'title' => $this->clean($title), 'body' => $this->clean($text), 'shortNews' => (bool) $shortNews, 'commentable' => (bool) $commentable)));
+    public function edit($id, $title, $department, $text, $shortNews, $commentable) {
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
+            '$set' => array(
+                'title' => substr($this->clean($title), 0, 100), 
+                'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80),
+                'body' => substr($this->clean($text), 0, 5000), 
+                'shortNews' => (bool) $shortNews, 
+                'commentable' => (bool) $commentable
+                )
+            ));
     }
 
     public function delete($id) {

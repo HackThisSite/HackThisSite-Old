@@ -60,11 +60,11 @@ $colors = array(
     </tr>
     <tr>
         <th>Description</th>
-        <td colspan="3"><?php echo BBCode::parse($bug['description'], '#'); ?></td>
+        <td colspan="3"><?php echo wordwrap(BBCode::parse($bug['description'], '#'), 150, "<br />\n", true); ?></td>
     </tr>
     <tr>
         <th>Steps to Reproduce</th>
-        <td colspan="3"><?php echo BBCode::parse($bug['reproduction'], '#'); ?></td>
+        <td colspan="3"><?php echo wordwrap(BBCode::parse($bug['reproduction'], '#'), 150, "<br />\n", true); ?></td>
     </tr>
 </table></center>
 <br /><hr /><br />

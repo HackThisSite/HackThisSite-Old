@@ -5,7 +5,7 @@ class controller_news extends Content {
     var $model = 'news';
     var $db = 'mongo';
     var $permission = 'News';
-    var $createForms = array('title', 'text', '?shortNews', '?commentable');
+    var $createForms = array('title', '?department', 'text', '?shortNews', '?commentable');
 	var $location = '';
 
     public function view($arguments) {

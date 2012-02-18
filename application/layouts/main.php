@@ -44,6 +44,10 @@ endif;
     <?php if (CheckAcl::can('postLectures')) : ?><a href="<?php echo Url::format('lecture/post'); ?>">Post Lecture</a><br /><?php endif; ?>
 <hr />
 <?php endif; ?>
+<form action="<?php echo Url::format('search'); ?>" method="post">
+    <input type="text" name="query" value="Search" /><input type="submit" name="submit" value="Go" />
+</form>
+<hr />
                 <?php foreach ($leftNav as $title => $section): ?>
                 <b><u><?php echo $title; ?></u></b><br />
                 <?php foreach ($section as $name => $location): ?>

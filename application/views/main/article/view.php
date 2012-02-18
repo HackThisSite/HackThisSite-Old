@@ -11,7 +11,7 @@ if (!empty($article)) {
 			$first = false;
 		}
 	} else {
-		
+        $article[0]['mlt'] = $mlt;
 		echo Partial::render('articleFull', $article[0]);
 		
 		if ($article[0]['commentable']) {

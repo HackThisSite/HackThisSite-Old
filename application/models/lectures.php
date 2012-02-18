@@ -39,9 +39,21 @@ class lectures extends mongoBase {
         if (empty($time))return self::ERROR_INVALIDDATE;
         if (empty($duration)) return self::ERROR_INVALIDDURATION;
         
-        return $this->db->insert(array('type' => 'lecture', 'title' => $this->clean($title), 
-            'lecturer' => $this->clean($lecturer), 'description' => $this->clean($description),'time' => $time, 
-            'duration' => $duration, 'ghosted' => false));
+        $entry = array(
+            'type' => 'lecture', 
+            'title' => $this->clean($title), 
+            'lecturer' => $this->clean($lecturer), 
+            'description' => $this->clean($description),
+            'time' => $time, 
+            'duration' => $duration, 
+            'ghosted' => false
+            );
+        
+        $this->db->insert($entry);
+        
+        $id = $entry['_id'];
+        unset($entry['_id'], $entry['time'], $entry['duration']);
+        Search::index($id, $entry);
     }
     
     public function edit($id, $title, $lecturer, $description, $time, $duration) {
@@ -50,9 +62,21 @@ class lectures extends mongoBase {
         if (empty($time))return self::ERROR_INVALIDDATE;
         if (empty($duration)) return self::ERROR_INVALIDDURATION;
         
-        return $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => 
-            array('title' => $this->clean($title), 'lecturer' => $this->clean($lecturer), 'description' => $this->clean($description),
-            'time' => $time, 'duration' => $duration)));
+        $entry = array(
+            'type' => 'lecture',
+            'title' => $this->clean($title), 
+            'lecturer' => $this->clean($lecturer), 
+            'description' => $this->clean($description),
+            'time' => $time, 
+            'duration' => $duration,
+            'ghosted' => false
+            );
+            
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => $entry));
+        
+        $id = $entry['_id'];
+        unset($entry['_id'], $entry['time'], $entry['duration']);
+        Search::index($id, $entry);
     }
     
     public function delete($id) {
@@ -60,6 +84,7 @@ class lectures extends mongoBase {
         if (empty($entry))
             return self::ERROR_NONEXISTANT;
         
+        Search::delete($id);
         return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }

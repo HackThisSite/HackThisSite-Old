@@ -6,6 +6,7 @@
     <b>Department:  </b> <input type="text" name="department" /><br />
     <b>Text:  </b><br />
     <textarea cols="50" rows="20" name="text"></textarea><br />
+    <b>Tags:  </b> <input type="text" name="tags" /> (Comma seperated list of tags)<br />
     <b>Commentable:  </b> <input type="checkbox" name="commentable" value="yes" /><br />
     <b>Short News:  </b> <input type="checkbox" name="shortNews" value="yes" /><br />
     <input type="submit" name="submit" value="Post News" />

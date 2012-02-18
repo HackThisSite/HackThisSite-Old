@@ -5,7 +5,7 @@ class controller_article extends Content {
     var $model = 'articles';
     var $db = 'mongo';
     var $permission = 'Article';
-    var $createForms = array('title', 'text');
+    var $createForms = array('title', 'text', '?tags');
 	var $location = 'article';
 	
     public function index($arguments) {
@@ -23,6 +23,19 @@ class controller_article extends Content {
 		
 		$this->view['article'] = $article;
 		$this->view['multiple'] = (count($article) > 1);
+        
+        if ($this->view['multiple'] == true) return;
+        
+        $mlt = Search::mlt($this->view['article'][0]['_id'], 'article', 'title,body,tags');
+        $this->view['mlt'] = array();
+
+        foreach ($mlt['hits']['hits'] as $article) {
+            $fetched = $articlesModel->get($article['_id'], true, false);
+            $fetched = reset($fetched);
+            
+            if (empty($fetched)) continue;
+            array_push($this->view['mlt'], $fetched);
+        }
 	}
     
     public function approve($arguments) {

@@ -2,8 +2,7 @@
 class BBCode {
 	
 	static public function parse($data, $link) {
-		$data = str_replace("javascript", 'java<b></b>script', $data);
-		$data = htmlentities(html_entity_decode($data));
+		//$data = htmlentities($data, ENT_QUOTES, 'UTF-8', false);
 	 
 		$bbcodedata = array(
 

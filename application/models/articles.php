@@ -17,9 +17,11 @@ class articles extends mongoBase {
             return $record;
         
         if ($single) {
+            if (is_string($record['user'])) return $record;
             $record['user'] = MongoDBRef::get($this->mongo, $this->clean($record['user']));
         } else {
             foreach ($record as $key => $entry) {
+                if (is_string($entry['user'])) continue;
                 $record[$key]['user'] = MongoDBRef::get($this->mongo, $this->clean($entry['user']));
             }
         }
@@ -46,13 +48,16 @@ class articles extends mongoBase {
         return $record;
     }
 
-    public function create($title, $text) {
+    public function create($title, $text, $tags) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
-
+        
+        $func = function($value) { return trim($value); };
+        
         $entry = array(
             'type' => 'article', 
             'title' => substr($this->clean($title), 0, 100), 
             'body' => substr($this->clean($text), 0, 1000), 
+            'tags' => array_map($func, explode(',', $this->clean($tags))),
             'user' => $ref, 
             'date' => time(), 
             'commentable' => true, 
@@ -61,15 +66,33 @@ class articles extends mongoBase {
             'flaggable' => false
             );
         $this->db->insert($entry);
+        
+        $id = $entry['_id'];
+        unset($entry['_id'], $entry['user'], $entry['date'], $entry['commentable'],
+            $entry['published'], $entry['flaggable']);
+        Search::index($id, $entry);
     }
 
-    public function edit($id, $title, $text, $commentable) {
-        $this->db->update(array('_id' => new MongoId($id)), array('$set' => array(
-            'title' => $this->clean($title), 'body' => $this->clean($text), 'commentable' => (bool) $commentable)));
+    public function edit($id, $title, $text, $tags) {
+        $func = function($value) { return trim($value); };
+        
+        $update = array(
+            'type' => 'article',
+            'title' => $this->clean($title), 
+            'body' => $this->clean($text), 
+            'tags' => array_map($func, explode(',', $this->clean($tags))),
+            'ghosted' => false
+            );
+        
+        $this->db->update(array('_id' => new MongoId($id)), array('$set' => $update));
+        
+        unset($update['_id'], $update['commentable']);
+        Search::index($id, $update);
     }
 
     public function delete($id) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('ghosted' => true)));
+        Search::delete($id);
         return true;
     }
 
@@ -102,6 +125,7 @@ class articles extends mongoBase {
 
         $results = $this->db->find($query);
 
+        if ($results->count() == 0) return 'Invalid id.';
         if (!$idlib)
             return iterator_to_array($results);
         

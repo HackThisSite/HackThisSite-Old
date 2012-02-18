@@ -27,14 +27,17 @@ class news extends mongoBase {
         return $news;
     }
 
-    public function create($title, $department, $text, $shortNews, $commentable) {
+    public function create($title, $department, $text, $tags, $shortNews, $commentable) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
+
+        $func = function($value) { return trim($value); };
 
         $entry = array(
             'type' => 'news', 
             'title' => substr($this->clean($title), 0, 100), 
             'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80), 
             'body' => substr($this->clean($text), 0, 5000), 
+            'tags' => array_map($func, explode(',', $this->clean($tags))),
             'user' => $ref, 
             'date' => time(), 
             'shortNews' => (bool) $shortNews, 
@@ -44,18 +47,34 @@ class news extends mongoBase {
             );
             
         $this->db->insert($entry);
+        
+        $id = $entry['_id'];
+        unset($entry['_id'], $entry['user'], $entry['date'], $entry['shortNews'], 
+            $entry['commentable'], $entry['flaggable']);
+        Search::index($id, $entry);
     }
 
-    public function edit($id, $title, $department, $text, $shortNews, $commentable) {
-        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
-            '$set' => array(
+    public function edit($id, $title, $department, $text, $tags, $shortNews, $commentable) {
+        $func = function($value) { return trim($value); };
+        
+        $update = array(
+                'type' => 'news',
                 'title' => substr($this->clean($title), 0, 100), 
                 'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80),
                 'body' => substr($this->clean($text), 0, 5000), 
+                'tags' => array_map($func, explode(',', $this->clean($tags))),
                 'shortNews' => (bool) $shortNews, 
-                'commentable' => (bool) $commentable
-                )
+                'commentable' => (bool) $commentable,
+                'ghosted' => false
+                );
+        
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
+            '$set' => $update
             ));
+        
+        unset($update['_id'], $update['shortNews'], $update['commentable']);
+        Search::index($id, $update);
+        
     }
 
     public function delete($id) {
@@ -63,6 +82,7 @@ class news extends mongoBase {
         if (empty($entry))
             return self::ERROR_NONEXISTANT;
         
+        Search::delete($id);
         return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }
@@ -99,8 +119,15 @@ class news extends mongoBase {
 
         $results = $this->db->find($query);
         
-        if (!$idlib)
-            return iterator_to_array($results);
+        if (!$idlib) {
+            $toReturn = iterator_to_array($results);
+            
+            foreach ($toReturn as $key => $entry) {
+                $toReturn[$key]['user'] = MongoDBRef::get($this->mongo, $toReturn[$key]['user']);
+            }
+            
+            return $toReturn;
+        }
             
         $toReturn = array();
 

@@ -6,7 +6,7 @@ class Layout
     const LAYOUT_EXTENSION = ".php";
 
     private static $layout  = "";
-    private static $data = array();
+    public static $data = array();
 
     /**
      * Used to set layout parameters

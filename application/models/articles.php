@@ -29,17 +29,54 @@ class articles extends mongoBase {
         return $record;
     }
 
-    public function getNewPosts($cache = true) {
-        $news = $this->realGetNewPosts();
-        return $news;
+    public function getNewPosts() {
+        $posts = $this->db->find(
+            array(
+                'type' => 'article',
+                'ghosted' => false,
+                'published' => true
+            )
+        )->sort(array('date' => -1))
+         ->limit(10);
+         $posts = iterator_to_array($posts);
+         $posts = $this->UserInfo($posts);
+         
+         return $posts;
     }
 
-    public function get($id, $cache = true, $idlib = true) {
-        if ($cache && apc_exists('news_' . $id)) return apc_fetch('news_' . $id);
+    public function get($id, $idlib = true, $justOne = false) {
+        if ($idlib) {
+            $idLib = new Id;
 
-        $news = $this->realGet($id, $idlib);
-        if ($cache && !empty($news)) apc_add('news_' . $id, $news, 10);
-        return $news;
+            $query = array('type' => 'article', 'ghosted' => false, 'published' => true);
+            $keys = $idLib->dissectKeys($id, 'news');
+
+            $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
+        } else {
+            $query = array('_id' => $this->_toMongoId($id), 'type' => 'article', 'published' => true, 'ghosted' => false);
+        }
+
+        $results = $this->db->find($query);
+
+        if ($results->count() == 0) return 'Invalid id.';
+        if (!$idlib) {
+            $array = iterator_to_array($results);
+            return ($justOne ? reset($array) : $array);
+        }
+        
+        $toReturn = array();
+
+        foreach ($results as $result) {
+            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
+                'reportedDate' => $keys['date'], 'date' => $result['date'],
+                'title' => $result['title']), 'news'))
+                continue;
+
+            $result = $this->UserInfo($result, true);
+            array_push($toReturn, $result);
+        }
+
+        return $toReturn;
     }
     
     public function getNextUnapproved() {
@@ -56,7 +93,7 @@ class articles extends mongoBase {
         $entry = array(
             'type' => 'article', 
             'title' => substr($this->clean($title), 0, 100), 
-            'body' => substr($this->clean($text), 0, 1000), 
+            'body' => substr($this->clean($text), 0, 3500), 
             'tags' => array_map($func, explode(',', $this->clean($tags))),
             'user' => $ref, 
             'date' => time(), 
@@ -76,15 +113,30 @@ class articles extends mongoBase {
     public function edit($id, $title, $text, $tags) {
         $func = function($value) { return trim($value); };
         
+        $old = $this->get($id, false, false);
+        $old = reset($old);
+        
         $update = array(
             'type' => 'article',
-            'title' => $this->clean($title), 
-            'body' => $this->clean($text), 
+            'title' => substr($this->clean($title), 0, 100), 
+            'body' => substr($this->clean($text), 0, 4000000), 
             'tags' => array_map($func, explode(',', $this->clean($tags))),
             'ghosted' => false
             );
         
+        $titleFD = new FineDiff($update['title'], $old['title']);
+        $textFD = new FineDiff($update['body'], $old['body']);
+        $tagsFD = new FineDiff(serialize($update['tags']), serialize($old['tags']));
+        
+        $diff = array(
+            'contentId' => (string) $id,
+            'title' => $titleFD->getOpcodes(),
+            'body' => $textFD->getOpcodes(),
+            'tags' => $tagsFD->getOpcodes(),
+            );
+        
         $this->db->update(array('_id' => new MongoId($id)), array('$set' => $update));
+        $this->mongo->revisions->insert($diff);
         
         unset($update['_id'], $update['commentable']);
         Search::index($id, $update);
@@ -96,54 +148,6 @@ class articles extends mongoBase {
         return true;
     }
 
-    public function realGetNewPosts() {
-        $posts = $this->db->find(
-            array(
-                'type' => 'article',
-                'ghosted' => false,
-                'published' => true
-            )
-        )->sort(array('date' => -1))
-         ->limit(10);
-         $posts = iterator_to_array($posts);
-         $posts = $this->UserInfo($posts);
-         
-         return $posts;
-    }
-
-    public function realGet($id, $idlib) {
-        if ($idlib) {
-            $idLib = new Id;
-
-            $query = array('type' => 'article', 'ghosted' => false, 'published' => true);
-            $keys = $idLib->dissectKeys($id, 'news');
-
-            $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
-        } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'article', 'published' => true, 'ghosted' => false);
-        }
-
-        $results = $this->db->find($query);
-
-        if ($results->count() == 0) return 'Invalid id.';
-        if (!$idlib)
-            return iterator_to_array($results);
-        
-        $toReturn = array();
-
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
-                'reportedDate' => $keys['date'], 'date' => $result['date'],
-                'title' => $result['title']), 'news'))
-                continue;
-
-            $result = $this->UserInfo($result, true);
-            array_push($toReturn, $result);
-        }
-
-        return $toReturn;
-    }
-    
     public function approve($id) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('published' => true)));
         return true;

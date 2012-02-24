@@ -8,6 +8,6 @@ class mongoBase
     }
     
     protected function clean($string) {
-        return htmlentities(utf8_encode((string) $string), ENT_QUOTES, 'ISO8859-15', false);
+        return htmlentities(utf8_encode(trim((string) $string)), ENT_QUOTES, 'ISO8859-15', false);
     }
 }

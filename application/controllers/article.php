@@ -7,6 +7,8 @@ class controller_article extends Content {
     var $permission = 'Article';
     var $createForms = array('title', 'text', '?tags');
 	var $location = 'article';
+    var $hasRevisions = true;
+    var $diffdFields = array('title', 'body', '$tags');
 	
     public function index($arguments) {
         $articles = new articles(ConnectionFactory::get('mongo'));

@@ -1,12 +1,18 @@
 <?php
 class controller_news extends Content {
 
+    public static $cache = array(
+		'view' => array('type' => 'v', 'key' => 'news/view_{REQ}', 'ttl' => 5)
+		);
+        
     var $name = 'news';
     var $model = 'news';
     var $db = 'mongo';
     var $permission = 'News';
     var $createForms = array('title', '?department', 'text', '?tags', '?shortNews', '?commentable');
 	var $location = '';
+    var $hasRevisions = true;
+    var $diffdFields = array('title', 'department', 'body', '$tags');
 
     public function view($arguments) {
 		@$id = implode('/', $arguments);
@@ -19,6 +25,7 @@ class controller_news extends Content {
 		$this->view['news'] = $news;
 		$this->view['multiple'] = (count($news) > 1);
         
+        if (!$this->view['multiple']) Layout::set('title', $this->view['news'][0]['title']);
         /*
         if ($this->view['multiple'] == true) return;
 

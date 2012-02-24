@@ -25,7 +25,7 @@ class controller_search extends Controller {
             switch ($entry['type']) {
                 case 'news':
                     $post = $news->get($result['_id'], true, false);
-                    $post = current($post);
+                    $post = reset($post);
                     if (empty($post)) continue;
                     
                     array_push($this->view['results'], $post);
@@ -33,7 +33,7 @@ class controller_search extends Controller {
                 
                 case 'article':
                     $article = $articles->get($result['_id'], true, false);
-                    $article = current($article);
+                    $article = reset($article);
                     if (empty($article)) continue;
                     
                     array_push($this->view['results'], $article);

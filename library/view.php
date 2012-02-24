@@ -47,15 +47,16 @@ class View
 
     public function __construct($viewPath, $data = array(), $driver = self::DRIVER_TRADITIONAL)
     {
-
-        $this->viewPath = dirname(dirname(__FILE__));
-        $this->viewPath .= self::VIEW_PATH;
-        $this->viewPath .= Layout::getLayout();
-        $this->viewPath .= '/';
-        $this->viewPath .= $viewPath;
-        $this->viewPath .= self::VIEW_EXT;
+        $this->viewPath = dirname(dirname(__FILE__)) . self::VIEW_PATH . 
+            Layout::getLayout() . '/' . $viewPath . self::VIEW_EXT;
+        
+        if (!file_exists($this->viewPath))
+            $this->viewPath = dirname(dirname(__FILE__)) . self::VIEW_PATH . 
+                'main/' . $viewPath . self::VIEW_EXT;
 
         $this->driver = self::DRIVER_PREFIX . $driver . self::VIEW_SUFFIX;
+        if (!class_exists($this->driver)) die('Invalid driver.');
+        
         $this->data = $data;
     }
 

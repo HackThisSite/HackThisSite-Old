@@ -42,20 +42,62 @@ class bugs extends mongoBase {
         $this->db = $mongo->$db->content;
     }
     
-    public function getNew($cache = true, $filter = 'open', $page = 1) {
-        if ($cache && apc_exists('new_bugs_' . $filter . '_' . $page)) return apc_fetch('new_bugs_' . $filter . '_' . $page);
+    public function getNew($filter = 'open', $page = 1) {
+        $pageLimit = 3;
         
-        $bugs = $this->realGetNew($filter, $page);
-        if ($cache && !empty($bugs)) apc_add('new_bugs_' . $filter . '_' . $page, $bugs, 10);
-        return $bugs;
+        $query = array(
+            'type' => 'bug', 
+            'ghosted' => false
+            );
+           
+        $query = array_merge($query, self::$filters[$filter]);
+        $sort = array(
+            'flagged' => -1, 
+            'created' => -1
+            );
+        
+        $results = $this->db->find($query);
+        $total = $results->count();
+        $results = $results->sort($sort)->skip(($page - 1) * $pageLimit)->limit($pageLimit);
+        $count = $results->count();
+        
+        $rows = iterator_to_array($results);
+        
+        $return = array(
+            'total' => $total, 
+            'count' => $count, 
+            'pages' => ceil($total / $pageLimit), 
+            'bugs' => $rows
+            );
+        return $return;
     }
     
-    public function get($id, $cache = true, $idlib = true) {
-        if ($cache && apc_exists('bugs_' . $id)) return apc_fetch('bugs_' . $id);
+    public function get($id, $idlib = true) {
+        if ($idlib) {
+            $idLib = new Id;
 
-        $bug = $this->realGet($id, $idlib);
-        if ($cache && !empty($bug)) apc_add('bugs_' . $id, $bug, 10);
-        return $bug;
+            $query = array('type' => 'bug', 'ghosted' => false);
+            $keys = $idLib->dissectKeys($id, 'bug');
+            
+            $query['created'] = (int) $keys['time'];
+        } else {
+            $query = array('_id' => $this->_toMongoId($id), 'type' => 'bug');
+        }
+        
+        $results = $this->db->find($query);
+        
+        if (!$idlib)
+            return iterator_to_array($results);
+
+        foreach ($results as $result) {
+            if (!$idLib->validateHash($id, array(
+                '_id' => $result['_id'], 
+                'created' => $result['created']), 'bugs')) continue;
+
+            return $result;
+        }
+
+        return false;
     }
     
     public function create($title, $category, $description, $reproduction, $public) {
@@ -117,64 +159,7 @@ class bugs extends mongoBase {
         
         return $entry;
     }
-    
-    private function realGetNew($filter, $page) {
-        $pageLimit = 3;
-        
-        $query = array(
-            'type' => 'bug', 
-            'ghosted' => false
-            );
-        $query = array_merge($query, self::$filters[$filter]);
-        $sort = array(
-            'flagged' => -1, 
-            'created' => -1
-            );
-        
-        $results = $this->db->find($query);
-        $total = $results->count();
-        $results = $results->sort($sort)->skip(($page - 1) * $pageLimit)->limit($pageLimit);
-        $count = $results->count();
-        
-        $rows = iterator_to_array($results);
-        
-        $return = array(
-            'total' => $total, 
-            'count' => $count, 
-            'pages' => ceil($total / $pageLimit), 
-            'bugs' => $rows
-            );
-        return $return;
-    }
-    
-    private function realGet($id, $idlib) {
-        if ($idlib) {
-            $idLib = new Id;
 
-            $query = array('type' => 'bug', 'ghosted' => false);
-            $keys = $idLib->dissectKeys($id, 'bug');
-            
-            $query['created'] = (int) $keys['time'];
-        } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'bug');
-        }
-        
-        $results = $this->db->find($query);
-        
-        if (!$idlib)
-            return iterator_to_array($results);
-
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array(
-                '_id' => $result['_id'], 
-                'created' => $result['created']), 'bugs')) continue;
-
-            return $result;
-        }
-
-        return false;
-    }
-    
     static public function canView($bug) {
         if ($bug['public'] == true) return true;
         if ((Session::isLoggedIn() && 

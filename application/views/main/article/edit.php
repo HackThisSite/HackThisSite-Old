@@ -1,5 +1,5 @@
 <?php if (!empty($valid) && $valid) : 
-extract(reset($post)); ?>
+extract($post); ?>
 <h3><u>Edit Article</u></h3>
 
 <form action="<?php echo Url::format('/article/edit/' . $_id . '/save'); ?>" method="post">

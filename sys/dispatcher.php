@@ -274,19 +274,11 @@ lazyLoader::initialize();
 $observer = Observer::singleton(
     array(
         'request/received' => array(
-            'timer',
-            'session',
-            'layout',
+            'startup',
             'dispatch'
         ),
-        'controller/ended' => array(
-            'getquote',
-            'buildnav'
-        ),
         'request/ended' => array(
-            'timer',
-            'layout',
-            'session',
+            'shutdown'
         )
     )
 );

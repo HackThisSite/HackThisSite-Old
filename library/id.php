@@ -13,9 +13,8 @@ class Id {
                 
             case 'bug':
                 $time = $data['_id']->getTimestamp();
-                $number = self::gmp_convert((string) $data['_id'], 16, 10);
-                $bytes = self::uncompliment($number, 12);
-                $id = self::gmp_convert($time, 10, 62) . str_pad(self::gmp_convert((int) $bytes[11], 10, 62), 2, '0', STR_PAD_LEFT);
+                $number = $data['_id']->getInc();
+                $id = self::gmp_convert($time, 10, 62) . '-' . self::gmp_convert($number, 10, 62);
                 
                 return $id;
                 break;
@@ -52,14 +51,19 @@ class Id {
 				}
 				
 				$toReturn['ambiguity'] = $ambiguity;
-				$toReturn['date'] = mktime($toReturn['hour'], $toReturn['minute'],
-					0, $toReturn['month'], $toReturn['day'], $toReturn['year']);
+				$toReturn['date'] = mktime((int) $toReturn['hour'], 
+					(int) $toReturn['minute'],
+					0, 
+					(int) $toReturn['month'], 
+					(int) $toReturn['day'], 
+					(int) $toReturn['year']);
 				
 				return $toReturn;
                 
             case 'bug':
                 $toReturn = array();
-                $toReturn['time'] = self::gmp_convert(substr($hash, 0, -2), 62, 10);
+                $data = explode('-', $hash);
+                $toReturn['time'] = self::gmp_convert($data[0], 62, 10);
                 
                 return $toReturn;
 				
@@ -75,13 +79,11 @@ class Id {
 				return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
 				
             case 'bugs':
-                $time = self::gmp_convert(substr($hash, 0, -2), 62, 10);
-                $last = self::gmp_convert(substr($hash, -2), 62, 10);
+				$hash = explode('-', $hash);
+                $time = self::gmp_convert($hash[0], 62, 10);
+                $last = self::gmp_convert($hash[1], 62, 10);
                 
-                $number = self::gmp_convert((string) $data['_id'], 16, 10);
-                $bytes = self::uncompliment($number, 12);
-                
-                return ($time == $data['created'] && $last == $bytes[11]);
+                return ($time == $data['_id']->getTimestamp() && $last == $data['_id']->getInc());
 		}
 		
 		return false;

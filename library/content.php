@@ -75,7 +75,7 @@ class Content extends Controller {
 		if (!method_exists($model, 'authChange') && !CheckAcl::can('edit' . $this->permission))
 			return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
 		
-		$entry = $model->get($arguments[0], false, false, true);
+		$entry = $model->get($arguments[0], false, true);
 
         if (method_exists($model, 'authChange') && !$model->authChange('edit', $entry))
 			return Error::set('You are not allowed to edit this ' . $this->name . '!');
@@ -96,7 +96,7 @@ class Content extends Controller {
 			if (is_string($return))
 				return Error::set($return);
 			
-			$this->view['post'] = $model->get($arguments[0], false, false, true);
+			$this->view['post'] = $model->get($arguments[0], false, true);
 			Error::set('Entry edited!', true);
             Log::write(LOG_INFO, 'Successfully edited ' . $this->name . ' ' . $arguments[0]);
 		} else {
@@ -115,7 +115,7 @@ class Content extends Controller {
         Log::write(LOG_INFO, 'Attempting to delete ' . $this->name . ' ' . $arguments[0]);
         
         if (method_exists($model, 'authChange')) {
-            $entry = $model->get($arguments[0], false, false, true);
+            $entry = $model->get($arguments[0], false, true);
             
             if (!(method_exists($model, 'authChange') && $model->authChange('delete', $entry)))
                 return Error::set('You are not allowed to delete this ' . $this->name . '!');
@@ -132,4 +132,53 @@ class Content extends Controller {
             
         Log::write(LOG_INFO, 'Successfully deleted ' . $this->name . ' ' . $arguments[0]);
 	}
+    
+    public function revisions($arguments) {
+        if (!$this->hasRevisions) 
+            return Error::set('Revisions are not enabled for ' . $this->name . '.');
+        if (!CheckAcl::can('view' . $this->permission . 'Revisions'))
+            return Error::set('You are not allowed to view ' . $this->name . ' revisions.');
+        if (empty($arguments[0])) return Error::set('No ' . $this->name . ' id found.');
+        
+        $model = new $this->model(ConnectionFactory::get($this->db));
+        $current = $model->get($arguments[0], false, true);
+        $this->view['current'] = $current;
+        
+        if (empty($current))
+            return Error::set('Invalid id.');
+        if (is_string($current))
+            return Error::set($current);
+        
+        $revisions = new revisions(ConnectionFactory::get('mongo'));
+        
+        // Start excerpt soley for reverting
+        $revert = $this->revert($arguments, $model, $revisions, $current);
+        // End excerpt
+        
+        $revisions = $revisions->getForId($arguments[0]);
+        $this->view['revisions'] = array();
+        
+        if (empty($revisions))
+            return Error::set('This entry has no revisions.');
+        
+        $this->view['revisions'] = revisions::resolve($current, $revisions, $this->diffdFields);
+            
+    }
+    
+    private function revert(&$arguments, &$model, &$revisions, &$current) {
+        if (!empty($arguments[1]) && $arguments[1] == 'revert' && !empty($arguments[2])) {
+            $revision = $revisions->getById($arguments[2], $current, $this->diffdFields);
+            if (is_string($revision)) return Error::set($revision);
+
+            unset($revision['_id'], $revision['contentId']);
+            array_unshift($revision, $current['_id']);
+            $return = call_user_func_array(array($model, 'edit'), $revision);
+            
+            if (is_string($return)) { return Error::set($return);}
+            
+            $current = $model->get($arguments[0], false, true);
+            $this->view['current'] = $current;
+        }
+        return true;
+    }
 }

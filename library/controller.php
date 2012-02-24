@@ -44,7 +44,7 @@ class Controller
 
     // class wide error messages
     const E_404 = "404";
-
+	
     public function __construct($request, $viewData = 0, $silent = 0)
     {
         if (is_array($viewData)) $this->view = $viewData;
@@ -56,6 +56,16 @@ class Controller
         if ($silent) return;
 
         $this->processRequest();
+        
+        $data = $this->getCache($request[0], $this->request);
+		if ($data !== false) {
+			if ($data['type'] == 'v') {
+				apc_add($data['key'], (string) $this->parsedViewResult, $data['ttl']);
+			} else if ($data['type'] == 'c') {
+				apc_add($data['key'], $this->view, $data['ttl']);
+			}
+            apc_add($data['key'] . '_layout', Layout::$data, $data['ttyl']);
+		}
     }
 
     public function processRequest()
@@ -85,27 +95,23 @@ class Controller
     public function __call($name, $arguments)
     {
         $controller = substr(get_class($this), 11);
-
+        
         if (!method_exists($this, $name)) {
-            $name = 'nil';
             $this->setView('nil');
         } else {
             // Set the implicit view
             $this->setView($controller . '/' . $name);
+            
+            // Call the actual function.
+            $this->$name($arguments);
         }
 
-        // Call the actual function.
-        $this->$name($arguments);
-        
         // Load and parse view
         $this->parsedViewResult = new View(
             $this->controllerState['view'],
             $this->view,
             $this->driver
         );
-        
-        $observer = Observer::singleton();
-        $observer->trigger("controller/ended");
 
         return $this->parsedViewResult;
 
@@ -152,7 +158,16 @@ class Controller
     {
         return $this->driver;
     }
-
+    
+    public static function getCache($method, $request) {
+        $class = get_called_class();
+        if (!property_exists($class, 'cache') || empty($class::$cache[$method])) return false;
+        $search = array('{SI}', '{REQ}');
+        $replace = array(session_id(), implode('/', $request));
+        
+        return str_replace($search, $replace, $class::$cache[$method]);
+    }
+    
     public function __toString()
     {
         return (string)$this->parsedViewResult;

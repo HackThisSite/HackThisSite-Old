@@ -1,6 +1,10 @@
 <?php
 class controller_pages extends Controller {
     
+    public static $cache = array(
+        'info' => array('type' => 'v', 'key' => 'pages/info_{REQ}', 'ttl' => 1000)
+        );
+    
     public function info($arguments) {
         if (empty($arguments[0]))
             return $this->setView('nil');

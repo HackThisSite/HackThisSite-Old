@@ -9,7 +9,7 @@ class Error {
             Log::write(LOG_NOTICE, $error);
             array_push(self::$notices, $error);
         } else {
-            Log::write(LOG_ERROR, $error);
+            Log::write(LOG_ERR, $error);
             array_push(self::$errors, $error);
         }
         

@@ -32,7 +32,7 @@ class controller_bugs extends Content {
         if (!empty($arguments[0]) && !isset(bugs::$filters[$arguments[0]])) Error::set('Invalid filter.');
         if (!empty($arguments[1]) && intval($arguments[1]) >= 1) $page = intval($arguments[1]);
 
-        $this->view = $bugs->getNew(true, $filter, $page);
+        $this->view = $bugs->getNew($filter, $page);
         $this->view['page'] = $page;
         $this->view['filter'] = $filter;
     }
@@ -59,7 +59,7 @@ class controller_bugs extends Content {
         if (empty($_POST['id'])) return Error::set('Invalid id.');
         
         $bugs = new bugs(ConnectionFactory::get('mongo'));
-        $bug = $bugs->get($_POST['id'], false, false);
+        $bug = $bugs->get($_POST['id'], false);
         
         if (empty($bug)) return Error::set('Invalid id.');
         

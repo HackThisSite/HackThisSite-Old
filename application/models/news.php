@@ -14,17 +14,67 @@ class news extends mongoBase {
         $this->db = $mongo->$db->content;
     }
 
-    public function getNewPosts($cache = true, $shortNews = false) {
-        $news = $this->realGetNewPosts($shortNews);
-        return $news;
+    public function getNewPosts($shortNews = false) {
+        $posts = $this->db->find(
+            array(
+                'type' => 'news',
+                'shortNews' => false,
+                'ghosted' => false
+            )
+        )->sort(array('date' => -1))
+         ->limit(10);
+         $posts = iterator_to_array($posts);
+
+         foreach ($posts as $key => $post) {
+             $this->resolveUser($posts[$key]['user']);
+         }
+         
+         return $posts;
     }
 
-    public function get($id, $cache = true, $idlib = true) {
-        if ($cache && apc_exists('news_' . $id)) return apc_fetch('news_' . $id);
+    public function get($id, $idlib = true, $justOne = false) {
+        if ($idlib) {
+            $idLib = new Id;
 
-        $news = $this->realGetNews($id, $idlib);
-        if ($cache && !empty($news)) apc_add('news_' . $id, $news, 10);
-        return $news;
+            $query = array('type' => 'news', 'ghosted' => false);
+            $keys = $idLib->dissectKeys($id, 'news');
+
+            $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
+        } else {
+            $query = array('_id' => $this->_toMongoId($id), 'type' => 'news');
+        }
+
+        $results = $this->db->find($query);
+        
+        if (!$idlib) {
+            $toReturn = iterator_to_array($results);
+            
+            foreach ($toReturn as $key => $entry) {
+                $this->resolveUser($toReturn[$key]['user']);
+            }
+            
+            return ($justOne ? reset($toReturn) : $toReturn);
+        }
+            
+        $toReturn = array();
+
+        foreach ($results as $result) {
+            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
+                'reportedDate' => $keys['date'], 'date' => $result['date'],
+                'title' => $result['title']), 'news'))
+                continue;
+
+            if (is_string($result['user'])) {
+                $result['user'] = array('username' => $result['user']);
+            } else {
+                $result['user'] = MongoDBRef::get($this->mongo, $result['user']);
+            }
+            
+            $this->resolveUser($return['user']);
+            array_push($toReturn, $result);
+        }
+
+        return ($justOne ? reset($toReturn) : $toReturn);
     }
 
     public function create($title, $department, $text, $tags, $shortNews, $commentable) {
@@ -57,6 +107,9 @@ class news extends mongoBase {
     public function edit($id, $title, $department, $text, $tags, $shortNews, $commentable) {
         $func = function($value) { return trim($value); };
         
+        $old = $this->get($id, false, false);
+        $old = reset($old);
+        
         $update = array(
                 'type' => 'news',
                 'title' => substr($this->clean($title), 0, 100), 
@@ -68,13 +121,28 @@ class news extends mongoBase {
                 'ghosted' => false
                 );
         
+        $titleFD = new FineDiff($update['title'], $old['title']);
+        $departmentFD = new FineDiff($update['department'], $old['department']);
+        $bodyFD = new FineDiff($update['body'], $old['body']);
+        $tagsFD = new FineDiff(serialize($update['tags']), serialize($old['tags']));
+        
+        $diff = array(
+            'contentId' => (string) $id,
+            'title' => $titleFD->getOpcodes(),
+            'department' => $departmentFD->getOpcodes(),
+            'body' => $bodyFD->getOpcodes(),
+            'tags' => $tagsFD->getOpcodes(),
+            'shortNews' => $old['shortNews'],
+            'commentable' => $old['commentable']
+            );
+        
         $this->db->update(array('_id' => $this->_toMongoId($id)), array(
             '$set' => $update
             ));
+        $this->mongo->revisions->insert($diff);
         
         unset($update['_id'], $update['shortNews'], $update['commentable']);
         Search::index($id, $update);
-        
     }
 
     public function delete($id) {
@@ -86,61 +154,12 @@ class news extends mongoBase {
         return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }
-
-    public function realGetNewPosts($shortNews) {
-        $posts = $this->db->find(
-            array(
-                'type' => 'news',
-                'shortNews' => false,
-                'ghosted' => false
-            )
-        )->sort(array('date' => -1))
-         ->limit(10);
-         $posts = iterator_to_array($posts);
-
-         foreach ($posts as $key => $post) {
-             $posts[$key]['user'] = MongoDBRef::get($this->mongo, $post['user']);
-         }
-         
-         return $posts;
-    }
-
-    public function realGetNews($id, $idlib) {
-        if ($idlib) {
-            $idLib = new Id;
-
-            $query = array('type' => 'news', 'ghosted' => false);
-            $keys = $idLib->dissectKeys($id, 'news');
-
-            $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
+    
+    private function resolveUser(&$user) {
+        if (is_string($user)) {
+            $user = array('username' => $user);
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'news');
+            $user = MongoDBRef::get($this->mongo, $user);
         }
-
-        $results = $this->db->find($query);
-        
-        if (!$idlib) {
-            $toReturn = iterator_to_array($results);
-            
-            foreach ($toReturn as $key => $entry) {
-                $toReturn[$key]['user'] = MongoDBRef::get($this->mongo, $toReturn[$key]['user']);
-            }
-            
-            return $toReturn;
-        }
-            
-        $toReturn = array();
-
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
-                'reportedDate' => $keys['date'], 'date' => $result['date'],
-                'title' => $result['title']), 'news'))
-                continue;
-
-            $result['user'] = MongoDBRef::get($this->mongo, $result['user']);
-            array_push($toReturn, $result);
-        }
-
-        return $toReturn;
     }
 }

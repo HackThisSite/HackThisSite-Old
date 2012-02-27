@@ -44,7 +44,7 @@ $colors = array(
     </tr>
     <tr>
         <th>Reporter</th>
-        <td><?php echo $bug['username']; ?></td>
+        <td><?php echo $bug['reporter']['username']; ?></td>
         <th>View Status</th>
         <td style="background-color: <?php echo $colors[$bug['status']]; ?>">
             <?php echo ucwords(bugs::$status[$bug['status']]); ?>

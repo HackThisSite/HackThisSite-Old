@@ -4,7 +4,7 @@
 // * $page - Comments page
 
 $commLib = new comments(ConnectionFactory::get('mongo'));
-$comments = $commLib->get($id, false, false, false, $page);
+$comments = $commLib->getForId($id, false, false, $page);
 
 if (empty($comments))
 	echo "No comments!";

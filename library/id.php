@@ -18,6 +18,10 @@ class Id {
                 
                 return $id;
                 break;
+            
+            case 'user':
+                return $data['username'];
+                break;
 		}
 		
 		return false;
@@ -57,8 +61,9 @@ class Id {
 					(int) $toReturn['month'], 
 					(int) $toReturn['day'], 
 					(int) $toReturn['year']);
-				
+
 				return $toReturn;
+                break;
                 
             case 'bug':
                 $toReturn = array();
@@ -66,6 +71,11 @@ class Id {
                 $toReturn['time'] = self::gmp_convert($data[0], 62, 10);
                 
                 return $toReturn;
+                break;
+            
+            case 'user':
+                return array('username' => $hash);
+                break;
 				
 		}
 		
@@ -77,13 +87,19 @@ class Id {
 			case 'news':
 				$realHash = self::create($data, $type);
 				return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
-				
+				break;
+                
             case 'bugs':
 				$hash = explode('-', $hash);
                 $time = self::gmp_convert($hash[0], 62, 10);
                 $last = self::gmp_convert($hash[1], 62, 10);
                 
                 return ($time == $data['_id']->getTimestamp() && $last == $data['_id']->getInc());
+                break;
+                
+            case 'user':
+                return ($hash == $data['username']);
+                break;
 		}
 		
 		return false;
@@ -94,32 +110,5 @@ class Id {
     {
         return gmp_strval ( gmp_init($num, $base_a), $base_b );
     }
-    
-    private function uncompliment($number, $length) {
-        $length = $length - 1;
-        $array = array();
-        
-        for ($pos = 0; $pos <= $length;++$pos) {
-            $pow = bcpow(256, ($length - $pos));
-            $var = floor(bcdiv($number, $pow));
-            
-            array_push($array, $var);
-            $number = bcsub($number, bcmul($var, $pow));
-        }
-        
-        return $array;
-    }
-
-    private function compliment($bytes) {
-        $bytes = array_reverse($bytes);
-        $sum = 0;
-        
-        foreach ($bytes as $pow => $value) {
-            $sum = bcadd($sum, bcmul($value, bcpow(256, $pow)));
-        }
-        
-        return $sum;
-    }
-
 	
 }

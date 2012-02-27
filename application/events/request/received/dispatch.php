@@ -43,8 +43,8 @@ class events_request_received_dispatch
         if (!class_exists($controller))
             $controller = "controller_nil";
         
-		if (self::dispatchCache($controller, $request)) 
-			return;
+		//if (self::dispatchCache($controller, $request)) 
+		//	return;
         
 		$class = new $controller($request);
         

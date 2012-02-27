@@ -75,11 +75,20 @@ class controller_user extends Controller {
         $this->view['valid'] = true;
         
         if (!empty($arguments) && $arguments[0] == 'save') {
-            if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']))
+            if (empty($_POST['username']) || empty($_POST['password']) || 
+                empty($_POST['retypePassword']) || empty($_POST['email']) ||
+                empty($_POST['retypeEmail']) || empty($_POST['hideEmail']))
                 return Error::set('All forms are required.');
+            if ($_POST['hideEmail'] != '0' && $_POST['hideEmail'] != '1')
+                return Error::set('Invalid choice.');
+            if ($_POST['password'] != $_POST['retypePassword'])
+                return Error::set('Your passwords are not the same.');
+            if ($_POST['email'] != $_POST['retypeEmail'])
+                return Error::set('Your emails are not the same.');
             
             $users = new users(ConnectionFactory::get('mongo'));
-            $return = $users->create($_POST['username'], $_POST['password'], $_POST['email']);
+            $return = $users->create($_POST['username'], $_POST['password'], 
+                $_POST['email'], $_POST['hideEmail']);
             
             if ($return) {
                 $this->view['valid'] = false;

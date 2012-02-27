@@ -1,19 +1,11 @@
 <?php
-class news extends mongoBase {
-    const KEY_SERVER = "mongo:server";
-    const KEY_DB     = "mongo:db";
-	
-	const ERROR_NONEXISTANT = "No news found by that id.";
-	
-    var $db;
-    var $mongo;
-    
-    public function __construct(Mongo $mongo) {
-        $db       = Config::get(self::KEY_DB);
-        $this->mongo = $mongo->$db;
-        $this->db = $mongo->$db->content;
-    }
+class news extends baseModel {
 
+	const ERROR_NONEXISTANT = "No news found by that id.";
+
+    var $hasSearch = true;
+    var $hasRevisions = true;
+    
     public function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(
@@ -63,71 +55,53 @@ class news extends mongoBase {
                 'reportedDate' => $keys['date'], 'date' => $result['date'],
                 'title' => $result['title']), 'news'))
                 continue;
-
-            if (is_string($result['user'])) {
-                $result['user'] = array('username' => $result['user']);
-            } else {
-                $result['user'] = MongoDBRef::get($this->mongo, $result['user']);
-            }
             
-            $this->resolveUser($return['user']);
+            $this->resolveUser($result['user']);
+            
+            if ($justOne) return $result;
             array_push($toReturn, $result);
         }
 
-        return ($justOne ? reset($toReturn) : $toReturn);
+        return $toReturn;
     }
 
-    public function create($title, $department, $text, $tags, $shortNews, $commentable) {
+    public function validate($title, $department, $text, $tags, $shortNews, $commentable, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
-
         $func = function($value) { return trim($value); };
-
+        
+        $title = substr($this->clean($title), 0, 100);
+        $deparment = substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80);
+        $body = substr($this->clean($text), 0, 5000);
+        $tags = array_map($func, explode(',', $this->clean($tags)));
+        
+        if (empty($title)) return 'Invalid title.';
+        if (empty($body)) return 'Invalid body.';
+        
         $entry = array(
             'type' => 'news', 
-            'title' => substr($this->clean($title), 0, 100), 
-            'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80), 
-            'body' => substr($this->clean($text), 0, 5000), 
-            'tags' => array_map($func, explode(',', $this->clean($tags))),
+            'title' => $title, 
+            'department' => $department, 
+            'body' => $body, 
+            'tags' => $tags,
             'user' => $ref, 
             'date' => time(), 
             'shortNews' => (bool) $shortNews, 
             'commentable' => (bool) $commentable, 
-            'ghosted' => false, 
-            'flaggable' => false
+            'flaggable' => false, 
+            'ghosted' => false
             );
+        if (!$creating) unset($entry['user'], $entry['date'], $entry['flaggable']);
             
-        $this->db->insert($entry);
-        
-        $id = $entry['_id'];
-        unset($entry['_id'], $entry['user'], $entry['date'], $entry['shortNews'], 
-            $entry['commentable'], $entry['flaggable']);
-        Search::index($id, $entry);
+        return $entry;
     }
 
-    public function edit($id, $title, $department, $text, $tags, $shortNews, $commentable) {
-        $func = function($value) { return trim($value); };
-        
-        $old = $this->get($id, false, false);
-        $old = reset($old);
-        
-        $update = array(
-                'type' => 'news',
-                'title' => substr($this->clean($title), 0, 100), 
-                'department' => substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80),
-                'body' => substr($this->clean($text), 0, 5000), 
-                'tags' => array_map($func, explode(',', $this->clean($tags))),
-                'shortNews' => (bool) $shortNews, 
-                'commentable' => (bool) $commentable,
-                'ghosted' => false
-                );
-        
+    public function generateRevision($update, $old) {
         $titleFD = new FineDiff($update['title'], $old['title']);
         $departmentFD = new FineDiff($update['department'], $old['department']);
         $bodyFD = new FineDiff($update['body'], $old['body']);
         $tagsFD = new FineDiff(serialize($update['tags']), serialize($old['tags']));
         
-        $diff = array(
-            'contentId' => (string) $id,
+        $revision = array(
             'title' => $titleFD->getOpcodes(),
             'department' => $departmentFD->getOpcodes(),
             'body' => $bodyFD->getOpcodes(),
@@ -135,31 +109,7 @@ class news extends mongoBase {
             'shortNews' => $old['shortNews'],
             'commentable' => $old['commentable']
             );
-        
-        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
-            '$set' => $update
-            ));
-        $this->mongo->revisions->insert($diff);
-        
-        unset($update['_id'], $update['shortNews'], $update['commentable']);
-        Search::index($id, $update);
-    }
-
-    public function delete($id) {
-        $entry = $this->db->findOne(array('_id' => $this->_toMongoId($id)));
-        if (empty($entry))
-            return self::ERROR_NONEXISTANT;
-        
-        Search::delete($id);
-        return $this->db->update(array('_id' => $this->_toMongoId($id)), 
-            array('$set' => array('ghosted' => true)));
+        return $revision;
     }
     
-    private function resolveUser(&$user) {
-        if (is_string($user)) {
-            $user = array('username' => $user);
-        } else {
-            $user = MongoDBRef::get($this->mongo, $user);
-        }
-    }
 }

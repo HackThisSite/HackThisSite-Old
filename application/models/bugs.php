@@ -1,10 +1,6 @@
 <?php
-class bugs extends mongoBase {
-    const KEY_SERVER = "mongo:server";
-    const KEY_DB     = "mongo:db";
-
-    var $db;
-    var $mongo;
+class bugs extends baseModel {
+    
     static $category = array(
         'Other',
         'News',
@@ -35,12 +31,9 @@ class bugs extends mongoBase {
         'new' => array('status' => 0),
         'sysadmin' => array('status' => 7)
         );
-    
-    public function __construct(Mongo $mongo) {
-        $db       = Config::get(self::KEY_DB);
-        $this->mongo = $mongo->$db;
-        $this->db = $mongo->$db->content;
-    }
+        
+    var $hasSearch = false;
+    var $hasRevisions = false;
     
     public function getNew($filter = 'open', $page = 1) {
         $pageLimit = 3;
@@ -61,7 +54,9 @@ class bugs extends mongoBase {
         $results = $results->sort($sort)->skip(($page - 1) * $pageLimit)->limit($pageLimit);
         $count = $results->count();
         
-        $rows = iterator_to_array($results);
+        // Not required atm, so leaving.
+        //$func = function($value) { $this->resolveUser($value['reporter']);return $reporter; };
+        $rows = iterator_to_array($results); //array_map($func, iterator_to_array($results));
         
         $return = array(
             'total' => $total, 
@@ -72,7 +67,7 @@ class bugs extends mongoBase {
         return $return;
     }
     
-    public function get($id, $idlib = true) {
+    public function get($id, $idlib = true, $justOne = false) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -86,50 +81,33 @@ class bugs extends mongoBase {
         
         $results = $this->db->find($query);
         
-        if (!$idlib)
-            return iterator_to_array($results);
+        if (!$idlib) {
+            $toReturn = iterator_to_array($results);
+            
+            foreach ($toReturn as $key => $entry) {
+                $this->resolveUser($toReturn[$key]['reporter']);
+            }
+            
+            return ($justOne ? reset($toReturn) : $toReturn);
+        }
 
+        $toReturn = array();
+        
         foreach ($results as $result) {
             if (!$idLib->validateHash($id, array(
                 '_id' => $result['_id'], 
                 'created' => $result['created']), 'bugs')) continue;
 
-            return $result;
+            $this->resolveUser($result['reporter']);
+            
+            if ($justOne) return $result;
+            array_push($toReturn, $result);
         }
 
-        return false;
+        return $toReturn;
     }
     
-    public function create($title, $category, $description, $reproduction, $public) {
-        $entry = $this->validate($title, $category, $description, $reproduction, $public);
-        if (is_string($entry)) return $entry;
-        
-        $this->db->insert($entry);
-        return true;
-    }
-    
-    public function edit($id, $title, $category, $description, $reproduction, $public) {
-        $entry = $this->validate($title, $category, $description, $reproduction, $public);
-        if (is_string($entry)) return $entry;
-        
-        $this->db->update(array('_id' => $this->_toMongoId($id)), $entry);
-        return true;
-    }
-    
-    public function alter($id, $diff) {
-        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
-            '$set' => $diff));
-        
-        return true;
-    }
-    
-    public function delete($id) {
-        $this->db->update(array('_id' => $this->_toMongoId($id)), 
-            array('$set' => array('ghosted' => true)));
-        return true;
-    }
-    
-    private function validate($title, $category, $description, $reproduction, $public) {
+    public function validate($title, $category, $description, $reproduction, $public, $creating = true) {
         $title = $this->clean($title);
         $description = $this->clean($description);
         $reproduction = $this->clean($reproduction);
@@ -156,8 +134,17 @@ class bugs extends mongoBase {
             'flagged' => true,
             'ghosted' => false
             );
+        if (!$creating) unset($entry['reporter'], $entry['status'], 
+            $entry['created'], $entry['commentable'], $entry['flagged']);
         
         return $entry;
+    }
+    
+    public function alter($id, $diff) {
+        $this->db->update(array('_id' => $this->_toMongoId($id)), array(
+            '$set' => $diff));
+        
+        return true;
     }
 
     static public function canView($bug) {
@@ -168,4 +155,5 @@ class bugs extends mongoBase {
             
         return false;
     }
+    
 }

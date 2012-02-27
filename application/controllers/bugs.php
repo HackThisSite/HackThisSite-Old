@@ -39,15 +39,13 @@ class controller_bugs extends Content {
     
     public function view($arguments) {
         $bugs = new bugs(ConnectionFactory::get('mongo'));
-        $this->view['bug'] = $bugs->get($arguments[0]);
+        $this->view['bug'] = $bugs->get($arguments[0], true, true);
         
         if (empty($this->view['bug']))
             return Error::set('Invalid id.');
         if (!bugs::canView($this->view['bug']))
             return Error::set('You are not allowed to view this bug.');
         
-        $users = new users(ConnectionFactory::get('mongo'));
-        $user = $users->getUserByReference($this->view['bug']['reporter']);
         $this->view['bug']['username'] = $user['username'];
         
         $this->view['valid'] = true;

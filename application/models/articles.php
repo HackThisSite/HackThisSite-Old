@@ -1,34 +1,9 @@
 <?php
-class articles extends mongoBase {
-    const KEY_SERVER = "mongo:server";
-    const KEY_DB     = "mongo:db";
+class articles extends baseModel {
 
-    var $db;
-    var $mongo;
+    var $hasSearch = true;
+    var $hasRevisions = true;
     
-    public function __construct(Mongo $mongo) {
-        $db       = Config::get(self::KEY_DB);
-        $this->mongo = $mongo->$db;
-        $this->db = $mongo->$db->content;
-    }
-    
-    private function UserInfo($record, $single = false) {
-        if (empty($record))
-            return $record;
-        
-        if ($single) {
-            if (is_string($record['user'])) return $record;
-            $record['user'] = MongoDBRef::get($this->mongo, $this->clean($record['user']));
-        } else {
-            foreach ($record as $key => $entry) {
-                if (is_string($entry['user'])) continue;
-                $record[$key]['user'] = MongoDBRef::get($this->mongo, $this->clean($entry['user']));
-            }
-        }
-        
-        return $record;
-    }
-
     public function getNewPosts() {
         $posts = $this->db->find(
             array(
@@ -38,10 +13,15 @@ class articles extends mongoBase {
             )
         )->sort(array('date' => -1))
          ->limit(10);
-         $posts = iterator_to_array($posts);
-         $posts = $this->UserInfo($posts);
          
-         return $posts;
+         $toReturn = array();
+         
+         foreach ($posts as $post) {
+            $this->resolveUser($post['user']);
+            array_push($toReturn, $post);
+        }
+         
+         return $toReturn;
     }
 
     public function get($id, $idlib = true, $justOne = false) {
@@ -57,13 +37,17 @@ class articles extends mongoBase {
         }
 
         $results = $this->db->find($query);
-
-        if ($results->count() == 0) return 'Invalid id.';
-        if (!$idlib) {
-            $array = iterator_to_array($results);
-            return ($justOne ? reset($array) : $array);
-        }
         
+        if (!$idlib) {
+            $toReturn = iterator_to_array($results);
+            
+            foreach ($toReturn as $key => $entry) {
+                $this->resolveUser($toReturn[$key]['user']);
+            }
+            
+            return ($justOne ? reset($toReturn) : $toReturn);
+        }
+            
         $toReturn = array();
 
         foreach ($results as $result) {
@@ -71,8 +55,10 @@ class articles extends mongoBase {
                 'reportedDate' => $keys['date'], 'date' => $result['date'],
                 'title' => $result['title']), 'news'))
                 continue;
-
-            $result = $this->UserInfo($result, true);
+            
+            $this->resolveUser($result['user']);
+            
+            if ($justOne) return $result;
             array_push($toReturn, $result);
         }
 
@@ -81,20 +67,26 @@ class articles extends mongoBase {
     
     public function getNextUnapproved() {
         $record = $this->db->findOne(array('published' => false, 'ghosted' => false));
-        $record = $this->UserInfo($record, true);
+        if (!empty($record)) $this->resolveUser($record['user']);
         return $record;
     }
 
-    public function create($title, $text, $tags) {
+    public function validate($title, $text, $tags, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
-        
         $func = function($value) { return trim($value); };
+        
+        $title = substr($this->clean($title), 0, 100);
+        $body = substr($this->clean($text), 0, 3500);
+        $tags = array_map($func, explode(',', $this->clean($tags)));
+        
+        if (empty($title)) return 'Invalid title.';
+        if (empty($body)) return 'Invalid body.';
         
         $entry = array(
             'type' => 'article', 
-            'title' => substr($this->clean($title), 0, 100), 
-            'body' => substr($this->clean($text), 0, 3500), 
-            'tags' => array_map($func, explode(',', $this->clean($tags))),
+            'title' => $title, 
+            'body' => $body, 
+            'tags' => $tags,
             'user' => $ref, 
             'date' => time(), 
             'commentable' => true, 
@@ -102,50 +94,26 @@ class articles extends mongoBase {
             'ghosted' => false, 
             'flaggable' => false
             );
-        $this->db->insert($entry);
+        if (!$creating) unset($entry['user'], $entry['date'], 
+            $entry['commentable'], $entry['published'], $entry['flaggable']);
         
-        $id = $entry['_id'];
-        unset($entry['_id'], $entry['user'], $entry['date'], $entry['commentable'],
-            $entry['published'], $entry['flaggable']);
-        Search::index($id, $entry);
+        return $entry;
     }
-
-    public function edit($id, $title, $text, $tags) {
-        $func = function($value) { return trim($value); };
-        
-        $old = $this->get($id, false, false);
-        $old = reset($old);
-        
-        $update = array(
-            'type' => 'article',
-            'title' => substr($this->clean($title), 0, 100), 
-            'body' => substr($this->clean($text), 0, 4000000), 
-            'tags' => array_map($func, explode(',', $this->clean($tags))),
-            'ghosted' => false
-            );
-        
+    
+    public function generateRevision($update, $old) {
         $titleFD = new FineDiff($update['title'], $old['title']);
-        $textFD = new FineDiff($update['body'], $old['body']);
+        $bodyFD = new FineDiff($update['body'], $old['body']);
         $tagsFD = new FineDiff(serialize($update['tags']), serialize($old['tags']));
         
-        $diff = array(
-            'contentId' => (string) $id,
+        $revision = array(
             'title' => $titleFD->getOpcodes(),
-            'body' => $textFD->getOpcodes(),
+            'body' => $bodyFD->getOpcodes(),
             'tags' => $tagsFD->getOpcodes(),
+            'published' => $old['published'],
+            'flaggable' => $old['flaggable'],
+            'commentable' => $old['commentable']
             );
-        
-        $this->db->update(array('_id' => new MongoId($id)), array('$set' => $update));
-        $this->mongo->revisions->insert($diff);
-        
-        unset($update['_id'], $update['commentable']);
-        Search::index($id, $update);
-    }
-
-    public function delete($id) {
-        $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('ghosted' => true)));
-        Search::delete($id);
-        return true;
+        return $revision;
     }
 
     public function approve($id) {

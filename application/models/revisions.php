@@ -24,7 +24,7 @@ class revisions extends mongoBase {
         $data = $this->db->find(array(
             '_id' => array('$gte' => $this->_toMongoId((string) $id))))->sort(array('_id' => -1));
         $data = iterator_to_array($data);
-        
+
         if (empty($data[(string) $id])) return self::ERROR_NONEXISTANT;
         $data = self::resolve($for, $data, $diffdFields, false);
         return end($data);

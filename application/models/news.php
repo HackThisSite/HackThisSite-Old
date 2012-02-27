@@ -1,8 +1,6 @@
 <?php
 class news extends baseModel {
 
-	const ERROR_NONEXISTANT = "No news found by that id.";
-
     var $hasSearch = true;
     var $hasRevisions = true;
     

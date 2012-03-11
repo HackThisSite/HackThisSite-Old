@@ -1,0 +1,57 @@
+blockquote {
+#border : 2px solid #000;
+margin: 1px;
+#background-color: #ccc;
+quotes: "\201C" "\201D";
+text-align: center
+}
+
+blockquote:before { content: open-quote; font-weight: bold; }
+blockquote:after { content: close-quote; font-weight: bold; }
+
+.usercomment
+{
+	width: 515px;
+	max-width: 515px;
+	background: #333333;
+}
+
+.usercommentheader
+{
+      width: 515px;
+	  height: 16px;
+      text-align: left;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      background: #2A363C;
+      border-bottom: 2px solid #161616;
+}
+.usercommentbody
+{
+	width: 515px;
+	max-width: 515px;
+	min-height: 110px;
+	background: #333333;
+}
+.usercommentbody p
+{
+	padding: 0px;
+}
+
+.ucreport
+{
+	float: right;
+}
+
+.ucwho
+{
+	float: left;
+}
+
+.usercommentavatar
+{
+	padding: 5px;
+	width: 70px;
+	float: left;
+}
+

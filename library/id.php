@@ -14,6 +14,7 @@ class Id {
             case 'bug':
                 $time = $data['_id']->getTimestamp();
                 $number = $data['_id']->getInc();
+                
                 $id = self::gmp_convert($time, 10, 62) . '-' . self::gmp_convert($number, 10, 62);
                 
                 return $id;
@@ -61,7 +62,8 @@ class Id {
 					(int) $toReturn['month'], 
 					(int) $toReturn['day'], 
 					(int) $toReturn['year']);
-
+                //echo $toReturn['date'];
+                //die;
 				return $toReturn;
                 break;
                 

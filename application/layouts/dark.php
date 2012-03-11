@@ -62,14 +62,14 @@
 
 
 <a href="http://www.spreadfirefox.com/?q=affiliates&amp;id=0&amp;t=218"><img border="0" alt="Firefox 3" title="Firefox 2" src="http://sfx-images.mozilla.org/affiliates/Buttons/firefox2/ff2o80x15.gif"/></a><br /><br />
-<a href="/"><img src="<?php echo DATA_SERVER; ?>/images/hts_80x15.gif" width="80" height="15" border="0" alt="" /></a><br />
-<a class="nav" href="<?php echo BASE_HREF; ?>/pages/info/linktous.php">Link to us!</a>
+<a href="/"><img src="<?php echo Url::format('/images/hts_80x15.gif', true); ?>" width="80" height="15" border="0" alt="" /></a><br />
+<a class="nav" href="<?php echo Url::format('/pages/info/linktous.php'); ?>">Link to us!</a>
 
 <h4 class="header">Partners</h4><br />
-	<a class="nav" href="http://www.hackbloc.org/"><img src="<?php echo DATA_SERVER; ?>/images/linkhb.gif" border="0" alt="Hackbloc" width="88" height="31" /></a><br />
-	<a class="nav" href="http://www.hellboundhackers.org/"><img src="<?php echo DATA_SERVER; ?>/images/hbhlogo.jpg" width="88" height="31" border="0" alt="Hellbound Hackers" /></a><br />
-	<a class="nav" href="http://wigle.net/"><img src="<?php echo DATA_SERVER; ?>/images/wigle-g-banner.gif" alt="WiGLE.net" width="88" height="31" border="0" /></a><br />
-	<a class="nav" href="http://www.acunetix.com/blog"><img src="<?php echo DATA_SERVER; ?>/images/acunetixblog.gif" alt="Acunetix Security Blog" width="88" height="31" border="0" /></a><br />
+	<a class="nav" href="http://www.hackbloc.org/"><img src="<?php echo Url::format('/images/linkhb.gif', true); ?>" border="0" alt="Hackbloc" width="88" height="31" /></a><br />
+	<a class="nav" href="http://www.hellboundhackers.org/"><img src="<?php echo Url::format('/images/hbhlogo.jpg', true); ?>" width="88" height="31" border="0" alt="Hellbound Hackers" /></a><br />
+	<a class="nav" href="http://wigle.net/"><img src="<?php echo Url::format('/images/wigle-g-banner.gif', true); ?>" alt="WiGLE.net" width="88" height="31" border="0" /></a><br />
+	<a class="nav" href="http://www.acunetix.com/blog"><img src="<?php echo Url::format('/images/acunetixblog.gif', true); ?>" alt="Acunetix Security Blog" width="88" height="31" border="0" /></a><br />
 	<a class="nav" href="http://phoenix-network.org">phoenix free shells</a><br />
 	<a class="nav" href="http://hackergames.net/in.php?ID=199">hackergames.net</a><br />
 </div>
@@ -77,4 +77,32 @@
           </td>
           <td valign="top" class="sitebuffer">
 	<br />
-    <?php echo $content; ?>
+    <p><?php echo $content; ?></p>
+</td>
+        </tr>
+      </table></td>
+    </tr>
+ <tr>
+      <td class="sitebottomheader"><img src="<?php echo Url::format('/themes/Dark/images/hts_bottomheadern.jpg', true); ?>" alt="End Footer" width="780" height="60" /></td>
+    </tr>
+  </table>
+  <br />
+<div align="center" style="font-family:Verdana, Arial, Helvetica, sans-serif; font-size:10px; color:#CCCCCC">This site is the collective work of the 
+HackThisSite staff. Please don't reproduce in part or whole without permission.<br />
+Page Generated: <?php echo date(DATE_RFC1123); ?>
+<br />
+<sub>Page loaded  in <?php echo $pageExecutionTime; ?> seconds!</sub>
+<br />
+</div>
+</div>
+<div align="center">
+  <p>
+   <a href="http://validator.w3.org/check?uri=referer"><img src="<?php echo Url::format('/images/xhtml10.png', true); ?>" width="80" height="15" border="0" alt="" /></a>&nbsp;
+   <a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="<?php echo Url::format('/images/css.png', true); ?>" width="80" height="15" border="0" alt="" /></a> 
+   <a href="http://www.php.net/"> <img src="<?php echo Url::format('/images/phppow.gif', true); ?>" width="80" height="15" border="0" alt="" /></a>
+   <!--<a href="http://www.linux.com/"> <img src="../../images/linux2.gif" width="80" height="15" border="0" alt="" /></a>-->
+   <a href="http://www.freebsd.org/"> <img src="<?php echo Url::format('/images/freebsd.png', true); ?>" width="80" height="15" border="0" alt="" /></a>
+  </p>
+</div>
+    </body>
+</html>

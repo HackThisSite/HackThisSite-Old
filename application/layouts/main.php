@@ -16,7 +16,7 @@
         <?php echo $error; ?><br />
         <?php endforeach;endif; ?>
         
-        <table border="1" width="95%">
+        <table border="1" width="800px;">
         <tr>
             <td width="20%" valign="top">
 <?php
@@ -40,8 +40,9 @@ endif;
                 <hr />
 <?php if (CheckAcl::can('viewAdminPanel')): ?>
     <?php if (CheckAcl::can('postNews')) : ?><a href="<?php echo Url::format('/news/post'); ?>">Post News</a><br /><?php endif; ?>
-    <?php if (CheckAcl::can('approveArticles')): ?><a href="<?php echo Url::format('article/approve'); ?>">Approve Articles</a><br /><?php endif; ?>
-    <?php if (CheckAcl::can('postLectures')) : ?><a href="<?php echo Url::format('lecture/post'); ?>">Post Lecture</a><br /><?php endif; ?>
+    <?php if (CheckAcl::can('approveArticles')): ?><a href="<?php echo Url::format('/article/approve'); ?>">Approve Articles</a><br /><?php endif; ?>
+    <?php if (CheckAcl::can('postLectures')) : ?><a href="<?php echo Url::format('/lecture/post'); ?>">Post Lecture</a><br /><?php endif; ?>
+    <?php if (CheckAcl::can('manageNotice')) : ?><a href="<?php echo Url::format('/notice'); ?>">Manage Notices</a><br /><?php endif; ?>
 <hr />
 <?php endif; ?>
 <form action="<?php echo Url::format('search'); ?>" method="post">
@@ -60,7 +61,7 @@ endif;
         </tr>
         </table>
         
-        <br /><hr /><br />
+        <br /><br />
         Page rendered in <strong><?php echo $pageExecutionTime; ?></strong> seconds.</center>
     </body>
 </html>

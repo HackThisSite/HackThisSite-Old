@@ -1,0 +1,5 @@
+- Use MongoIDs for insertion time.
+- Remove APC entries on update.
+- Cache search/mlt
+- Implement current templates
+

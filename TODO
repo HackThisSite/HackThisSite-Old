@@ -1,6 +1,8 @@
-- Use MongoIDs for insertion time.
-- Use MongoIDs for increment.
 - Remove APC entries on update.
 - Cache search/mlt
 - Implement current templates
+- Connection is automatically the model's need
+- Implement old missions
 
+- Use MongoIDs for insertion time. 
+	-- Could not.  Allows for an unflexible dating system and ID schema.

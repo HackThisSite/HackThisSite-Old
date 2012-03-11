@@ -14,7 +14,7 @@ Replaced on <?php echo Date::dayFormat($_id->getTimestamp()); ?>
 <?php if (CheckAcl::can('revertNews')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/revisions/' . $currentId . '/revert/' . $_id); ?>">Revert</a><?php endif; ?>
 <?php endif; ?>
 </sub>
-<p><?php echo wordwrap(BBCode::parse($body, '#'), 100, "\n", true); ?></p>
+<p><?php echo BBCode::parse(wordwrap($body, 100, "\n", true)); ?></p>
 <hr />
 <?php /*
 <?php if (!empty($mlt)): ?>

@@ -46,7 +46,7 @@ class baseModel extends mongoBase {
         return true;
     }
     
-    public function delete($id) {
+    public function delete($id) { // Insecure
         $entry = $this->db->findOne(array('_id' => $this->_toMongoId($id)));
         if (empty($entry))
             return self::ERROR_NONEXISTANT;

@@ -3,7 +3,7 @@ if (!empty($valid) && $valid):
 ?>
 <u><h2>User Profile:  <?php echo $user['username']; ?></h2></u>
 
-<b>Email: </b> <?php echo htmlentities($user['email'], ENT_QUOTES, '', false); ?><br />
+<b>Email: </b> <?php echo htmlentities($user['email'], ENT_QUOTES, 'ISO8859-1', false); ?><br />
 <b>Warn Level: </b> <?php echo $user['warnLevel']; ?><br />
 <b>Missions:  </b><br />
 <?php foreach ($user['missions'] as $type => $missions): ?>

@@ -1,6 +1,6 @@
 <?php
 if (!empty($_POST['password']) && $_POST['password'] == Mission::generatePassword('basic1')) {
-    echo Partial::render('missionDone', array('id' => $id, 'current' => 'basic 1', 'next' => null));
+    echo Partial::render('missionDone', array('id' => $id, 'current' => 'basic 1', 'next' => 'basic/2'));
     return;
 }
 if (Mission::hasDone($id))

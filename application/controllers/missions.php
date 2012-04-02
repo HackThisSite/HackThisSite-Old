@@ -33,7 +33,7 @@ class controller_missions extends Controller {
             $this->view['uri'] = implode('/', $uri);
             
             $this->view['id'] = $mission['_id'];
-            $this->setView('missions/' . $type . '/' . intval($arguments[0]));
+            $this->setView('missions/' . $type . '/' . intval($arguments[0]) . '/index');
         } else { // Just show a listing of possible missions.
             $this->view['valid'] = true;
             $this->view['missions'] = $missions->getMissionsByType($type);

@@ -16,7 +16,7 @@ class missions extends mongoBase {
     }
     
     public function get($type, $sort) {
-        return $this->db->missions->findOne(array('type' => $this->clean($type), 'sort' => $this->clean($sort)));
+        return $this->db->missions->findOne(array('type' => $this->clean($type), 'sort' => (int) $this->clean($sort)));
     }
     
     public function getById($id) {

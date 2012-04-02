@@ -12,22 +12,13 @@
             <td><input type="text" name="password" /></td>
         </tr>
         <tr>
-            <td><i>Confirm</i></td>
-            <td><input type="text" name="retypePassword" /></td>
-        </tr>
-        <tr>
             <th>Email</th>
             <td><input type="text" name="email" /></td>
         </tr>
         <tr>
-            <td><i>Confirm</i></td>
-            <td><input type="text" name="retypeEmail" /></td>
-        </tr>
-        <tr>
             <th>Hide Your Email?</th>
             <td>
-                <input type="radio" name="hideEmail" value="1" checked="checked" /> Yes
-                <input type="radio" name="hideEmail" value="0" /> No
+                <input type="checkbox" name="hideEmail" value="true" /> Yes
             </td>
         </tr>
         <tr>

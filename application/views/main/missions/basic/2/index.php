@@ -14,6 +14,7 @@ file...<br /><br />
 
 <center><b>Password:</b /><br />
 	<form action="/missions/basic/2/index.php" method="post">
-          <input type="password" name="password" /><br /><br />
-          <input type="submit" value="submit" />
+		  <input type="password" name="password" /><br /><br />
+		  <input type="submit" value="submit" />
 	</form>
+</center>

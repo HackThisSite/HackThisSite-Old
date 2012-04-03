@@ -33,7 +33,35 @@ class controller_missions extends Controller {
             $this->view['uri'] = implode('/', $uri);
             
             $this->view['id'] = $mission['_id'];
-            $this->setView('missions/' . $type . '/' . intval($arguments[0]) . '/index');
+            
+            if (substr($this->view['uri'], -4) == '.php') {
+				$uri = substr($this->view['uri'], 0, -4);
+				$path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
+					$type . '/' . intval($arguments[0]) . '/' . 
+					basename($this->view['uri']);
+				if (file_exists($path)) {
+					
+				}
+			}
+			
+			try {
+				if (substr($this->view['uri'], -4) != '.php')
+					throw new Exception();
+				
+				$uri = substr($this->view['uri'], 0, -4);
+				$path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
+					$type . '/' . intval($arguments[0]) . '/' . basename($this->view['uri']);
+				
+				if (!file_exists($path))
+					throw new Exception();
+				
+				$this->setView('missions/' . $type . '/' . 
+					intval($arguments[0]) . '/' . $uri);
+					
+			} catch(Exception $e) {
+				$this->setView('missions/' . $type . '/' . 
+					intval($arguments[0]) . '/index');
+			}
         } else { // Just show a listing of possible missions.
             $this->view['valid'] = true;
             $this->view['missions'] = $missions->getMissionsByType($type);
@@ -43,5 +71,8 @@ class controller_missions extends Controller {
     
     public function basic($arguments) {
         $this->baseMission('basic', $arguments);
+        
+        if (!empty($arguments[0]) && $arguments[0] == '3' && $arguments[1] == 'password.php')
+			Layout::cut();
     }
 }

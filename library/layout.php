@@ -7,7 +7,8 @@ class Layout
 
     private static $layout  = "";
     public static $data = array();
-
+	private static $template = true;
+	
     /**
      * Used to set layout parameters
      * @param key $key
@@ -54,16 +55,25 @@ class Layout
         // from within the layout view as such. Then load
         // and parse the selected layout, returning the
         // results.
+        if (self::$template) {
         $page_content = ob_get_clean();
         ob_start();
+        
         require_once dirname(dirname(__FILE__))
                    . self::FOLDER_LAYOUTS
                    . self::$layout
                    . self::LAYOUT_EXTENSION
                    ;
+		} else {
+			echo $content;
+		}
 
         return ob_get_clean();
     }
+    
+    public static function cut() {
+		self::$template = false;
+	}
 
     /**
      * Typical string conversion

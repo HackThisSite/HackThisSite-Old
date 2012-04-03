@@ -13,7 +13,7 @@ password the user enters. However, he neglected to upload the password
 file...<br /><br />
 
 <center><b>Password:</b /><br />
-	<form action="/missions/basic/2/index.php" method="post">
+	<form action="<?php echo Url::format('/missions/basic/2/index.php'); ?>" method="post">
 		  <input type="password" name="password" /><br /><br />
 		  <input type="submit" value="submit" />
 	</form>

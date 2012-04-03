@@ -74,5 +74,7 @@ class controller_missions extends Controller {
         
         if (!empty($arguments[0]) && $arguments[0] == '3' && $arguments[1] == 'password.php')
 			Layout::cut();
+        if (!empty($arguments[0]) && $arguments[0] == '4' && $arguments[1] == 'level4.php')
+			Layout::cut();
     }
 }

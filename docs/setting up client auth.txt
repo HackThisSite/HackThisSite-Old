@@ -53,7 +53,7 @@ server {
     
 	root /var/www/html/;
 
-	ssl on;
+	ssl optional;
 	ssl_certificate /var/www/server.crt;
 	ssl_certificate_key /var/www/server.key;
 	ssl_verify_client on;

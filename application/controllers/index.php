@@ -6,10 +6,10 @@ class controller_index extends Controller {
 		);
 	
     public function index($arguments) {
-        $news = new news(ConnectionFactory::get('mongo'));
-        $notices = new notices(ConnectionFactory::get('redis'));
-        $this->view['news'] = $news->getNewPosts();
-        $this->view['notices'] = $notices->getAll();
+        //$news = new news(ConnectionFactory::get('mongo'));
+        //$notices = new notices(ConnectionFactory::get('redis'));
+        $this->view['news'] = array();//$news->getNewPosts();
+        $this->view['notices'] = array();//$notices->getAll();
         Layout::set('title', 'Home');
     }
     

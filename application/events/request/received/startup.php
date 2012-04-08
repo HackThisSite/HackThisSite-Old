@@ -6,7 +6,6 @@ class events_request_received_startup
 
     static public function handler($data = null)
     {
-        $start = microtime(true);
         $GLOBALS['start'] = microtime(true);
         Session::init();
         
@@ -15,7 +14,5 @@ class events_request_received_startup
         // it against user preference.
         Layout::selectLayout(Config::get(self::CONFIG_LAYOUT));
         $end = microtime(true);
-        //echo $end - $start;
-        //die;
     }
 }

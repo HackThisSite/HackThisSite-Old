@@ -57,6 +57,7 @@ class Controller
 
         $this->processRequest();
         
+        /*
         $data = $this->getCache($request[0], $this->request);
 		if ($data !== false) {
 			if ($data['type'] == 'v') {
@@ -66,6 +67,7 @@ class Controller
 			}
             apc_add($data['key'] . '_layout', Layout::$data, $data['ttyl']);
 		}
+		*/
     }
 
     public function processRequest()

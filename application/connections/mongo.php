@@ -45,7 +45,7 @@ class ConnectionMongo
         $options = array_diff_key($data, self::$keyDefaults);
 		
         // create a new connection and store it for later reuse
-        return self::$connections[$key] = new Mongo(
+        return self::$connections[$key] = new LazyMongo(
             "mongodb://{$data[self::KEY_HOST]}:{$data[self::KEY_PORT]}/{$data[self::KEY_DB]}",
             $options
         );

@@ -11,7 +11,7 @@ class users extends baseModel {
     var $hasSearch = false;
     var $hasRevisions = false;
     
-    public function __construct(Mongo $mongo) {
+    public function __construct($mongo) {
         $db       = Config::get(self::KEY_DB);
         $this->mongo = $mongo->$db;
         $this->db = $mongo->$db->users;

@@ -1,0 +1,108 @@
+HTS v5 server
+
+
+stock ubuntu server 11.10 install 
+host HTSv5
+
+Notes:  This does not setup search. (And possibly more)
+
+installing:
+apt-get install make php5 git nginx php-apc php5-fpm php-pear libpcre-dev
+apt-get install mongodb redis-server redis-doc
+
+git clone git://github.com/nicolasff/phpredis.git
+phpize
+./configure
+make && makeinstall
+
+pecl install apc
+pecl install bbcode
+pecl install mongo
+
+
+
+tweaking settings:
+-php
+add "extension=apc.so" to php.ini
+add "extension=bbcode.so" to php.ini
+add "extension=mongo.so" to php.ini
+add "extension=redis.so" to php.ini
+
+note, we'll be using php-fpm so use THAT php.ini, also when you change shit do /etc/init.d/php5-fpm restart
+(this includes changing the config files of the site!!)
+-nginx
+config: 
+/etc/nginx/sites-available/htsv5
+server {
+
+	listen   80; ## listen for ipv4
+	server_name  localhost;
+
+	root /var/www/html/;
+
+	location / {
+		index  sys/dispatcher.php;
+
+		if (-e $request_filename) {
+			break;
+		}
+
+		if (!-e $request_filename) {
+			rewrite ^(.+)$ sys/dispatcher.php last;
+			break;
+		}
+	}
+
+	location ~ (.+)\.php$ {
+        	fastcgi_param  QUERY_STRING       $query_string;
+        	fastcgi_param  REQUEST_METHOD     $request_method;
+	        fastcgi_param  CONTENT_TYPE       $content_type;
+	        fastcgi_param  CONTENT_LENGTH     $content_length;
+ 
+	        fastcgi_param  SCRIPT_NAME        sys/dispatcher.php;
+	        fastcgi_param  SCRIPT_FILENAME    /var/www/html/sys/dispatcher.php;
+	        fastcgi_param  REQUEST_URI        $request_uri;
+	        fastcgi_param  DOCUMENT_URI       $document_uri;
+	        fastcgi_param  DOCUMENT_ROOT      $document_root;
+	        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+ 
+        	fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+	        fastcgi_param  SERVER_SOFTWARE    nginx;
+ 
+        	fastcgi_param  REMOTE_ADDR        $remote_addr;
+	        fastcgi_param  REMOTE_PORT        $remote_port;
+	        fastcgi_param  SERVER_ADDR        $server_addr;
+	        fastcgi_param  SERVER_PORT        $server_port;
+	        fastcgi_param  SERVER_NAME        $server_name;
+ 
+	        fastcgi_pass 127.0.0.1:9000;
+	}
+}
+
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/HTSv5 /etc/nginx/sites-enabled/
+
+-installing the code:
+we'll be putting shit in /var/www make sure proper ownership is set
+make sure you get your git on, make a key if needed; ssh-keygen -t rsa
+and have git use that key for hts
+~/.ssh/config: 
+Host git.hackthissite.org
+     HostName git.hackthissite.org
+     User git
+     IdentityFile /home/uruser/urprivatekey
+
+then in /var/www:
+git clone git@git.hackthissite.org:htsdev.git
+(change the directory name to html as used in the nginx config)
+
+in /var/www/html/application/configs/servers/
+mkdir <your machines hostname>
+in <your machines hostname> make a file named override.php with:
+return array("system:environment" => "dev",
+        "other:baseUrl" => "http://192.168.101.65/",
+        "other:staticUrl" => "http://192.168.101.65/static/");
+
+or whatever url you use as a base (don't forget the trailing /)
+
+and then you're done

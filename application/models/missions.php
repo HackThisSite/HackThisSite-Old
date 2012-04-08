@@ -3,7 +3,7 @@ class missions extends mongoBase {
     
     var $db;
     
-    public function __construct(Mongo $connection) {
+    public function __construct($connection) {
         $this->db = $connection->{Config::get('mongo:db')};
     }
     

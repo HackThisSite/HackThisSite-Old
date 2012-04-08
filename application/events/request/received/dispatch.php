@@ -26,7 +26,6 @@ class events_request_received_dispatch
         if (!count($request)) {
             $request = array(self::DEFAULT_CONTROLLER, self::DEFAULT_METHOD);
         }
-		
         return $request;
     }
 

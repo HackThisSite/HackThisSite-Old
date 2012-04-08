@@ -1,10 +1,9 @@
-<?php print_r($_SERVER); ?>
 <center>
-	<h2><u>Using Public Key Authentication<br />
+	<h2><u>Using Certificate Authentication<br />
 	on HackThisSite</u></h2>
 </center>
 
-<p>Public key authentication allows you to login to your account faster 
+<p>Certificate authentication allows you to login to your account faster 
 than ever, keeps your account secure better than any password system.  
 HackThisSite's PKI is based off of the paper 
 <a href="http://www.phoenix-web.us/compinfo/pubkey/index.html">Public key 
@@ -31,4 +30,7 @@ openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.p12
 <p>Once that has finished, you can import the PKCS #12 file into your 
 browser and login to HackThisSite by either method of your choice.  
 HackThisSite can automatically identify you or you can login by typing 
-your username and a blank password into the login form.</p>
+your username and a blank password into the login form.</p><br />
+
+<a name="auths"></a>
+<u><h3>Authentication Methods</h3></u>

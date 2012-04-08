@@ -13,13 +13,14 @@ class quotes extends mongoBase
     private $mongo;
     private $quotes;
 
-    public function __construct(Mongo $mongo)
-    {
+    public function __construct($mongo)
+    {   
+        $count = apc_fetch(self::CACHE_KEY_COUNT);
+        if (!empty($count)) return true;
+        
         $db           = Config::get(self::DB_NAME);
         $this->quotes = $mongo->$db->quotes;
-        
-        $count = apc_fetch(self::CACHE_KEY_COUNT);
-        if (empty($count)) $this->_populateCache();
+        $this->_populateCache();
     }
 
     public function add($quote)

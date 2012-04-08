@@ -2,6 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <title>Hack This Site!<?php if (isset($title)): ?> | <?php echo $title; ?><?php endif; ?></title>
+        
+        <style type="text/css">
+        code {
+			border: 1px dashed grey;
+			display: block;
+			padding: 10px;
+			margin: 10px;
+		}
+        </style>
     </head>
     
     <body>

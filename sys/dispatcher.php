@@ -275,6 +275,7 @@ $observer = Observer::singleton(
     array(
         'request/received' => array(
             'startup',
+            'autoauth',
             'dispatch'
         ),
         'request/ended' => array(

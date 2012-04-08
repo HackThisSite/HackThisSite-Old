@@ -29,6 +29,9 @@ class controller_user extends Controller {
         $this->view['valid'] = true;
         $user = new users(ConnectionFactory::get('mongo'));
         $this->view['user'] = $user->get(Session::getVar('username'));
+		$this->view['secure'] = (!empty($_SERVER['SSL_CLIENT_RAW_CERT']) ? true : false);
+		if ($this->view['secure']) $this->view['clientSSLKey'] = certs::getKey($_SERVER['SSL_CLIENT_RAW_CERT']);
+		
         if (!empty($arguments[0]) && $arguments[0] == 'save') {
 			if (!empty($_POST['oldpassword']) && !empty($_POST['password'])) {
 				$old = $user->hash($_POST['oldpassword'], $this->view['user']['username']);
@@ -52,10 +55,63 @@ class controller_user extends Controller {
             $this->view['user'] = $user->get(Session::getVar('username'));
             Error::set('User profile saved.', true);
         }
+        
+		if (!empty($arguments[0]) && $arguments[0] == 'saveAuth') {
+			$password = (!empty($_POST['passwordAuth']) ? true : false);
+			$certificate = (!empty($_POST['certificateAuth']) ? true : false);
+			$certAndPass = (!empty($_POST['certAndPassAuth']) ? true : false);
+			$autoauth = (!empty($_POST['autoAuth']) ? true : false);
+			
+			$return = $user->changeAuth(Session::getVar('_id'), $password, 
+				$certificate, $certAndPass, $autoauth);
+			
+			if (is_string($return)) return Error::set($return);
+			$this->view['user'] = $user->get(Session::getVar('username'));
+		}
     }
     
+    public function rmCert() {
+        if (!Session::isLoggedIn())
+            return Error::set('You are not logged in!');
+        if (empty($_POST['hash']))
+			return Error::set('No certificate hash was found.');
+		
+		$certs = new certs(ConnectionFactory::get('redis'));
+		$cert = $certs->get($_POST['hash'], false);
+		
+		if ($cert == null)
+			return Error::set('Invalid certificate hash.');
+		
+		if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
+			return Error::set('You are not allowed to remove this certificate.');
+		
+		$users = new users(ConnectionFactory::get('mongo'));
+		$users->removeCert(Session::getVar('_id'), $_POST['hash']);
+		$certs->removeCert($_POST['hash']);
+		
+		header('Location: ' . Url::format('/user/settings'));
+	}
+	
+	public function viewCert() {
+        if (!Session::isLoggedIn())
+            return Error::set('You are not logged in!');
+        if (empty($_POST['hash']))
+			return Error::set('No certificate hash was found.');
+		
+		$certs = new certs(ConnectionFactory::get('redis'));
+		$cert = $certs->get($_POST['hash'], false);
+		
+		if ($cert == null)
+			return Error::set('Invalid certificate hash.');
+		
+		if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
+			return Error::set('You are not allowed to view this certificate.');
+		
+		$this->view['cert'] = substr($cert, strpos($cert, ':') + 1);
+	}
+    
     public function login() {
-        if (empty($_POST['username']) || empty($_POST['password'])) 
+        if (!isset($_POST['username']) || !isset($_POST['password'])) 
             return Error::set('Username and password are required.');
         
         $users = new users(ConnectionFactory::get('mongo'));
@@ -93,5 +149,38 @@ class controller_user extends Controller {
 			header('Location: ' . Config::get('other:baseUrl'));
         }
     }
+    
+    public function addkey($arguments) {
+        if (!Session::isLoggedIn())
+            return Error::set('Please login to add keys.');
+		if (empty($_POST['csr']))
+			return Error::set('No CSR found.');
+
+		$configargs = array(
+			'config' => '/etc/ssl/openssl.cnf',
+			'digest_alg' => 'md5',
+			'x509_extensions' => 'v3_ca',
+			'req_extensions'   => 'v3_req',
+			'private_key_bits' => 666,
+			'private_key_type' => OPENSSL_KEYTYPE_RSA,
+			'encrypt_key' => false,
+		);
+		
+		$cert = openssl_csr_sign($_POST['csr'], Config::get('ssl:certificate'), 
+			Config::get('ssl:key'), 365, $configargs);
+		$return = openssl_x509_export($cert, $output);
+
+		if (!$return)
+			return Error::set('Invalid CSR.');
+		
+		$certs = new certs(ConnectionFactory::get('redis'));
+		$certs->add($output);
+		
+		$users = new users(ConnectionFactory::get('mongo'));
+		$users->addCert(Session::getVar('_id'), $certs->getKey($output));
+		
+		$this->view['valid'] = true;
+		$this->view['certificate'] = $output;
+	}
     
 }

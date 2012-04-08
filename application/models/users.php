@@ -27,8 +27,27 @@ class users extends baseModel {
             $query = array('_id' => $this->_toMongoId($id));
         }
         
-        if ($justOne) return $this->db->findOne($query);
-        return iterator_to_array($this->db->find($query));
+        if ($justOne) return $this->resolveCerts($this->db->findOne($query));
+        $users = iterator_to_array($this->db->find($query));
+        
+        foreach ($users as $key => $user) { 
+			$users[$key] = $this->resolveCerts($user);
+		}
+		
+		return $users;
+	}
+	
+	private function resolveCerts($user) {
+        if (!empty($user['certs'])) {
+			$certs = new certs(ConnectionFactory::get('redis'));
+			
+			foreach ($user['certs'] as $key => $certKey) {
+				$user['certs'][$key] = openssl_x509_parse($certs->get($certKey), false);
+				$user['certs'][$key]['certKey'] = $certKey;
+				$user['certs'][$key]['subject']['organizationName'] = $this->clean($user['certs'][$key]['subject']['organizationName']);
+			}
+		}
+		return $user;
 	}
 	
 	public function validate($username, $password, $email, $hideEmail, $group, $creating = true) {
@@ -60,7 +79,8 @@ class users extends baseModel {
 			'status' => self::ACCT_OPEN,
 			'hideEmail' => $hideEmail,
 			'warnLevel' => self::WARN_UNWARNED,
-			'group' => ($group == null ? self::DEFAULT_GROUP : $group)
+			'group' => ($group == null ? self::DEFAULT_GROUP : $group),
+			'auths' => array('password')
 		);
 		if (!$creating && !CheckAcl::can('changeUsername')) unset($entry['username']);
 		if (!$creating && !CheckAcl::can('changeAcctStatus')) unset($entry['status']);
@@ -72,24 +92,124 @@ class users extends baseModel {
 		if (!$creating && isset($entry['group'])) Session::setVar('group', $entry['group']);
 		if (!$creating) {
 			Session::setVar('email', $entry['email']);
+			unset($entry['auth']);
 		}
 		
 		return $entry;
 	}
 	
 	public function authenticate($username, $password) {
-		$user = $this->get($username);
-		if (empty($user)) return false;
+		$auths = array('Password', 'Certificate', 'CAP');
+		$applicable = array();
 		
-		if ($user['password'] == $this->hash($password, $username)) {
-		    Session::init();
-			Session::setBatchVars($user);
-			return true;
+		foreach ($auths as $auth) {
+			$good = call_user_func(array($this, 'qualify' . $auth), 
+				$username, $password);
+			if ($good) $applicable[] = $auth;
 		}
+		
+		foreach ($applicable as $auth) {
+			$good = call_user_func(array($this, 'check' . $auth),
+				$username, $password);
+			if ($good != false) {
+				Session::setBatchVars($good);
+				return true;
+			}
+		}
+		
 		return false;
+	}
+	
+	public function addCert($userId, $certKey) {
+		$this->db->update(array('_id' => $this->_toMongoId($userId)), 
+			array('$push' => array('certs' => $certKey)));
+		return true;
+	}
+	
+	public function removeCert($userId, $certKey) {
+		$this->db->update(array('_id' => $this->_toMongoId($userId)),
+			array('$pull' => array('certs' => $certKey)));
+		return true;
+	}
+	
+	public function changeAuth($userId, $password, $certificate, $certAndPass, $autoauth) {
+		$auths = array();
+		if ($password) array_push($auths, 'password');
+		if ($certificate) array_push($auths, 'certificate');
+		if ($certAndPass) array_push($auths, 'cert+pass');
+		if ($autoauth) array_push($auths, 'autoauth');
+		
+		if (empty($auths)) return 'You need some method of authentication!';
+		$this->db->update(array('_id' => $this->_toMongoId($userId)),
+			array('$set' => array('auths' => $auths)));
 	}
 	
 	public function hash($password, $username) {
 		return crypt($password, $username);
 	}
+	
+	
+	// AUTHENTICATION MECHANISMS
+	private function qualifyPassword($username, $password) {
+		if (!empty($username) && !empty($password)) return true;
+		return false;
+	}
+	
+	private function checkPassword($username, $password) {
+		$user = $this->get($username);
+		if (empty($user)) return false;
+		if (!in_array('password', $user['auths'])) return false;
+		
+		if ($user['password'] == $this->hash($password, $username))
+			return $user;
+		
+		return false;
+	}
+	
+	
+	private function qualifyCertificate($username, $password) {
+		if (!empty($username) || !empty($password)) return false;
+		if (empty($_SERVER['SSL_CLIENT_RAW_CERT'])) return false;
+		return true;
+	}
+	
+	private function checkCertificate() {
+		$certs = new certs(ConnectionFactory::get('redis'));
+		$userId = $certs->check($_SERVER['SSL_CLIENT_RAW_CERT']);
+		
+		if ($userId == null) return false;
+		
+		$user = $this->get($userId, false);
+		if (!in_array('certificate', $user['auths'])) return false;
+		
+		return $user;
+	}
+	
+	
+	private function qualifyCAP($username, $password) {
+		if (empty($username) || empty($password)) return false;
+		if (empty($_SERVER['SSL_CLIENT_RAW_CERT'])) return false;
+		return true;
+	}
+	
+	private function checkCAP($username, $password) {
+		$user = $this->get($username);
+		
+		// Check password authentication
+		if (empty($user)) return false;
+		if (!in_array('cert+pass', $user['auths'])) return false;
+		
+		if ($user['password'] != $this->hash($password, $username))
+			return false;
+		
+		// Check certificate authentication
+		$certs = new certs(ConnectionFactory::get('redis'));
+		$userId = $certs->check($_SERVER['SSL_CLIENT_RAW_CERT']);
+		
+		if ($userId == null) return false;
+		if ($userId != $user['_id']) return false;
+		
+		return $user;
+	}
+	
 }

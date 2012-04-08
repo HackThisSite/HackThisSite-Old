@@ -7,7 +7,7 @@ class mongoBase
         return new MongoId($id);
     }
     
-    protected function clean($string) {
+    public function clean($string) {
         return htmlentities(utf8_encode(trim((string) $string)), ENT_QUOTES, 'ISO8859-15', false);
     }
 }

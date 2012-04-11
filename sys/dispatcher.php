@@ -1,5 +1,4 @@
 <?php
-$start = microtime(true);
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -181,6 +180,5 @@ $observer = Observer::singleton(
 $observer->trigger("request/received");
 
 $observer->trigger("request/ended");
-$end = microtime(true);
-echo $end - $start;
+
 

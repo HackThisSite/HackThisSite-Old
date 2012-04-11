@@ -49,7 +49,9 @@ SSL directives:
 	ssl_verify_client optional; # Ask for a client certificate
 	ssl_client_certificate /var/www/ca.crt; # Location of the CA's certificate
 
-Make sure to restart Nginx if it's currently running.
+Make sure to restart Nginx if it's currently running.  Also, if you want 
+to keep your keys safe from other users on your box, you can chown them 
+to your web user (root or www-data are fine), and chmod them to 600.
 
 
 Other Information

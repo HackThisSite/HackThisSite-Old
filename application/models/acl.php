@@ -22,7 +22,7 @@ class acl extends mongoBase {
         
         $result = $this->redis->sIsMember('acl_' . $group, $name);
         
-        if ($cache) apc_add($key, $result, 10);
+        if ($cache) apc_add($key, $result, 60);
         return $result;
     }
     

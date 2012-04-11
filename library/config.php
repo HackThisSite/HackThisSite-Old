@@ -28,7 +28,7 @@ class Config
      */
     static public function get($key)
     {
-        self::_preloadConfigIfNotLoaded();
+        if (!self::$_isLoaded) self::_preloadConfigIfNotLoaded();
         if (isset(self::$_localized[$key])) { return self::$_localized[$key]; }
         return self::$_localized[$key] = apc_fetch(self::PREFIX . $key);
     }
@@ -40,7 +40,7 @@ class Config
      */
     static public function set($key, $value)
     {
-        self::_preloadConfigIfNotLoaded();
+        if (!self::$_isLoaded) self::_preloadConfigIfNotLoaded();
         $this->_localized[$key] = $value;
         apc_store(self::PREFIX . $key, $value);
     }

@@ -9,10 +9,20 @@ class certs extends mongoBase {
         $this->redis = $connection;
     }
     
+	public function preAdd($cert) {
+		$exists = $this->redis->exists($this->getKey($cert));
+		
+		if ($exists) return 'Duplicate certificate';
+		return true;
+	}
+	 
     public function add($cert) {
+		$this->redis->incr('cert_serial');
 		return $this->redis->set($this->getKey($cert),
 			Session::getVar('_id') . ':' . trim($cert));
 	}
+	
+
 	
 	public function get($certKey, $cut = true) {
 		$cert = $this->redis->get($certKey);
@@ -32,6 +42,10 @@ class certs extends mongoBase {
 	
 	public static function getKey($cert) {
 		return self::PREFIX . hash(self::HASH, trim($cert));
+	}
+	
+	public function getSerial() {
+		return (int) $this->redis->get('cert_serial');
 	}
     
 }

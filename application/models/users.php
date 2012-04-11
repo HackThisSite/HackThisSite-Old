@@ -22,7 +22,7 @@ class users extends baseModel {
             $idLib = new Id;
             $keys = $idLib->dissectKeys($id, 'user');
 
-            $query = array('username' => $keys['username']);
+            $query = array('username' => $this->clean($keys['username']));
         } else {
             $query = array('_id' => $this->_toMongoId($id));
         }
@@ -120,6 +120,14 @@ class users extends baseModel {
 		return false;
 	}
 	
+	public function preAdd($userId, $certKey) {
+		$user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
+		if ($user == null) return 'Invalid user id.';
+		
+		if (count($user['certs']) >= 5) return 'You are only allowed 5 certificates.';
+		return true;
+	}
+	
 	public function addCert($userId, $certKey) {
 		$this->db->update(array('_id' => $this->_toMongoId($userId)), 
 			array('$push' => array('certs' => $certKey)));
@@ -146,6 +154,16 @@ class users extends baseModel {
 	
 	public function hash($password, $username) {
 		return crypt($password, $username);
+	}
+	
+	public function resetPassword($userId) {
+		$password = hash('crc32', rand());
+
+		$userInfo = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
+		$this->db->update(array('_id' => $this->_toMongoId($userId)),
+			array('$set' => array('password' => $this->hash($password, $userInfo['username']))));
+		
+		return $password;
 	}
 	
 	

@@ -43,6 +43,8 @@ else:
                     <input type="submit" name="submit" value="Login" />
                 </form><br />
                 <a href="<?php echo Url::format('/user/register'); ?>">Register</a>
+                &nbsp;-&nbsp;
+                <a href="<?php echo Url::format('/lost'); ?>">I can't get in!</a>
 <?php
 endif;
 ?>
@@ -69,8 +71,5 @@ endif;
             <td width="70%" valign="top"><?php echo $content;?></td>
         </tr>
         </table>
-        
-        <br /><br />
-        Page rendered in <strong><?php echo $pageExecutionTime; ?></strong> seconds.</center>
     </body>
 </html>

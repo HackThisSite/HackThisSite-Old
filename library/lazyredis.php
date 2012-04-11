@@ -1,19 +1,20 @@
 <?php
-class LazyMongo {
+class LazyRedis {
 	
 	private $conn;
-	private $connString;
-	private $options;
+	private $ip;
+	private $port;
 	private $connected = false;
 	
-	public function __construct($connString, $options) {
-		$this->connString = $connString;
-		$this->options = $options;
+	public function __construct($ip = '127.0.0.1', $port = 6379) {
+		$this->ip = $ip;
+		$this->port = $port;
 	}
 	
 	private function connect() {
 		$this->connected = true;
-		$this->conn = new Mongo($this->connString, $this->options);
+		$this->conn = new Redis();
+		$this->conn->pconnect($this->ip, $this->port);
 	}
 	
 	public function __call($method, $arguments) {

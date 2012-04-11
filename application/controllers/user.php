@@ -166,17 +166,26 @@ class controller_user extends Controller {
 			'encrypt_key' => false,
 		);
 		
+		$certs = new certs(ConnectionFactory::get('redis'));
+		
 		$cert = openssl_csr_sign($_POST['csr'], Config::get('ssl:certificate'), 
-			Config::get('ssl:key'), 365, $configargs);
+			Config::get('ssl:key'), 365, $configargs, $certs->getSerial());
 		$return = openssl_x509_export($cert, $output);
 
 		if (!$return)
 			return Error::set('Invalid CSR.');
 		
-		$certs = new certs(ConnectionFactory::get('redis'));
-		$certs->add($output);
-		
 		$users = new users(ConnectionFactory::get('mongo'));
+		
+		$check = $certs->preAdd($output);
+		if (is_string($check))
+			return Error::set($check);
+		
+		$check = $users->preAdd(Session::getVar('_id'), $certs->getKey($output));
+		if (is_string($check))
+			return Error::set($check);
+		
+		$certs->add($output);
 		$users->addCert(Session::getVar('_id'), $certs->getKey($output));
 		
 		$this->view['valid'] = true;

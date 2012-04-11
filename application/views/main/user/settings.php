@@ -38,6 +38,7 @@ if (!empty($valid) && $valid):
 <?php if (!empty($user['certs'])): 
 foreach ($user['certs'] as $cert): ?>
 	<tr<?php if ($secure && $clientSSLKey == $cert['certKey']): ?> style="background-color: LightGreen" title="In-Use"<?php endif; ?>>
+		<td style="width: 1%"><?php echo $cert['serialNumber']; ?></td>
 		<td><?php echo $cert['hash']; ?></td>
 		<td><?php echo $cert['subject']['organizationName']; ?></td>
 		<td><?php echo Date::dayFormat($cert['validFrom_time_t']); ?></td>

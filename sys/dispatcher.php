@@ -1,4 +1,5 @@
 <?php
+$start = microtime(true);
 /**
 Copyright (c) 2010, HackThisSite.org
 All rights reserved.
@@ -30,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Authors:
 *   Thetan ( Joseph Moniz )
 **/
-error_reporting(E_ALL);
+
 // add our library path to the include path
 set_include_path(
     get_include_path() .
@@ -49,7 +50,7 @@ class lazyLoader
     const PREFIX_DRIVER     = "drivers:";
 
     private $root;
-
+    private $cache = array();
     private static $instance;
 
     private function __construct()
@@ -64,193 +65,80 @@ class lazyLoader
         spl_autoload_register(array($this, 'event'));
         spl_autoload_register(array($this, 'controller'));
         spl_autoload_register(array($this, 'driver'));
+        
+        $this->cache = apc_fetch('lazyLoader_cache');
     }
 	
     public function cached($name)
     {
-        $cached = apc_fetch(self::PREFIX . $name);
-		
-        if ($cached === null || $cached === false)
-        {
-            return false;
-        }
-        
-        include $cached;
+		if (!isset($this->cache[$name])) return false;
+        require $this->cache[$name];
         return true;
     }
 
     public function model($name)
     {
-        $key    = self::PREFIX . self::PREFIX_MODEL . $name;
-        $cached = apc_fetch($key);
-
-        if ($cached === null) { return false; }
-        if ($cached !== false)
-        {
-            apc_store(self::PREFIX . $name, $cached);
-            include $cached;
-            return true;
-        }
-
         if ($name[0] == strtoupper($name[0]))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 
         $newName = strtolower($name);
         $file = "{$this->root}application/models/{$newName}.php";
         if (!file_exists($file))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 
-        apc_store(self::PREFIX . $name, $file);
-        apc_store($key, $file);
-        include $file;
+        $this->cache[$name] = $file;
+        require $file;
     }
 
     public function controller($name)
     {
-        $key    = self::PREFIX . self::PREFIX_CONTROLLER . $name;
-        $cached = apc_fetch($key);
-		
-        if ($cached === null) { return false; }
-        if ($cached !== false)
-        {
-            apc_store(self::PREFIX . $name, $cached);
-            include $cached;
-            return true;
-        }
-        
         if (strncmp($name, "controller_", 11) !== 0)
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 		
         $newName = substr($name, 11);
         $file = "{$this->root}application/controllers/{$newName}.php";
-        if (!file_exists($file))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
-            return false;
-        }
         
-        apc_store(self::PREFIX . $name, $file);
-        apc_store($key, $file);
-        include $file;
+        $this->cache[$name] = $file;
+        require $file;
     }
 
     public function library($name)
     {
-        $key    = self::PREFIX . self::PREFIX_LIBRARY . $name;
-        $cached = apc_fetch($key);
-
-        if ($cached === null) { return false; }
-        if ($cached !== false)
-        {
-            apc_store(self::PREFIX . $name, $cached);
-            include $cached;
-            return true;
-        }
-
         if ($name[0] != strtoupper($name[0]))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
-
+		
         $newName = strtolower($name);
         $file = "{$this->root}library/{$newName}.php";
+        
         if (!file_exists($file))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 
-        apc_store(self::PREFIX . $name, $file);
-        apc_store($key, $file);
-        include $file;
+		$this->cache[$name] = $file;
+        require $file;
     }
 
     public function event($name)
     {
-        $key    = self::PREFIX . self::PREFIX_EVENT . $name;
-        $cached = apc_fetch($key);
-
-        if ($cached === null) {
-            return false;
-        }
-        if ($cached !== false)
-        {
-            apc_store(self::PREFIX . $name, $cached);
-            include $cached;
-            return true;
-        }
-
         if (strncmp($name, 'events_', 7) !== 0)
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 
         $newName = str_replace("_", "/", $name);
         $file = "{$this->root}application/{$newName}.php";
-        if (!file_exists($file))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
-            return false;
-        }
 
-        apc_store(self::PREFIX . $name, $file);
-        apc_store($key, $file);
-        include $file;
+		$this->cache[$name] = $file;
+        require $file;
     }
 
     public function driver($name)
     {
-        $key    = self::PREFIX . self::PREFIX_DRIVER . $name;
-        $cached = apc_fetch($key);
-
-        if ($cached === null) {
-            return false;
-        }
-        if ($cached !== false)
-        {
-            apc_store(self::PREFIX . $name, $cached);
-            include $cached;
-            return true;
-        }
-
         if (strncmp($name, "driver_", 7) !== 0)
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
             return false;
-        }
 
         $newName = substr($name, 7, -5);
         $file = "{$this->root}drivers/{$newName}.php";
-        if (!file_exists($file))
-        {
-            apc_store(self::PREFIX . $name, null);
-            apc_store($key, null);
-            return false;
-        }
 
-        apc_store(self::PREFIX . $name, $file);
-        apc_store($key, $file);
-        include $file;
+		$this->cache[$name] = $file;
+        require $file;
     }
 
     public static function initialize($hooks = false)
@@ -267,6 +155,11 @@ class lazyLoader
     {
         die('Error: Can not be cloned.');
     }
+    
+    public function __destruct() {
+		if (!empty($this->cache))
+			apc_store('lazyLoader_cache', $this->cache);
+	}
 }
 
 lazyLoader::initialize();
@@ -288,4 +181,6 @@ $observer = Observer::singleton(
 $observer->trigger("request/received");
 
 $observer->trigger("request/ended");
+$end = microtime(true);
+echo $end - $start;
 

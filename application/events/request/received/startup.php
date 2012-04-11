@@ -6,7 +6,6 @@ class events_request_received_startup
 
     static public function handler($data = null)
     {
-        $GLOBALS['start'] = microtime(true);
         Session::init();
         
         // hard code the layout for now, pull

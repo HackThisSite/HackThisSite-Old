@@ -6,6 +6,7 @@ class controller_lost extends Controller {
 	const ERR_INVALID_USERNAME = 'Invalid username.';
 	const ERR_EMPTY_AUTHSET = 'You have no means of authentication.  Please report this to a developer.';
 	const ERR_NO_LOST_ID = 'No id was found.';
+	const ERR_INVALID_MODE = 'Invalid mode.';
 	
 	public function index() {
 		if (Session::isLoggedIn()) return Error::set(self::ERR_LOGGED_IN);
@@ -38,8 +39,15 @@ class controller_lost extends Controller {
 			if ($status == false) { // No valid certificates, set auth to password.
 				$users->changeAuth($user['_id'], true, false, false, false);
 				$this->setView('lost/authSetToPassword');
-			} else { // Tell the user they're fucked. (Just for now, anyways)
-				$this->setView('lost/sorry');
+			} else { // Send email to change user's auth
+				$passReset = new passwordReset(ConnectionFactory::get('redis'));
+				$id = $passReset->auth($user['_id'], $user['email']);
+				
+				$this->view['id'] = $id;
+				$this->view['mail'] = false;
+				if (Config::get('system:mail')) $this->view['mail'] = true;
+			
+				$this->setView('lost/authReset');
 			}
 		} else { // Somehow the user got an empty auth set.
 			return Error::set(self::ERR_EMPTY_AUTHSET);
@@ -49,16 +57,23 @@ class controller_lost extends Controller {
 	public function confirm($arguments) {
 		if (Session::isLoggedIn()) return Error::set(self::ERR_LOGGED_IN);
 		if (empty($arguments[0])) return Error::set(self::ERR_NO_LOST_ID);
+		if (empty($arguments[1]) || ($arguments[1] != 'auth' && $arguments[1] != 'password')) 
+			return Error::set(self::ERR_INIVALID_MODE);
 		
 		$passReset = new passwordReset(ConnectionFactory::get('redis'));
-		$info = $passReset->get($arguments[0]);
+		$info = $passReset->get($arguments[0], ($arguments[1] == 'auth' ? true : false));
 		
 		if (is_string($info)) return Error::set($info);
 		
 		$users = new users(ConnectionFactory::get('mongo'));
-		$password = $users->resetPassword($info[1]);
 		
-		$this->view['password'] = $password;
+		if ($arguments[1] == 'auth') {
+			$users->changeAuth($info[1], true, false, false, false);
+			$this->view['password'] = false;
+		} else {
+			$password = $users->resetPassword($info[1]);
+			$this->view['password'] = $password;
+		}
 	}
 	
 	// Returns true if the user has valid certificates, false if the 

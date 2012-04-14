@@ -2,7 +2,7 @@
 class controller_user extends Controller {
     
     public function view($arguments) {
-        if (!empty($arguments[0]) && !Session::isLoggedIn()) 
+        if (empty($arguments[0])) 
             return Error::set('Username is required.');
         
         if (empty($arguments[0])) {
@@ -20,6 +20,10 @@ class controller_user extends Controller {
         $this->view['valid'] = true;
         $this->view['username'] = $username;
         $this->view['user'] = $userInfo;
+        
+        $irc = new irc(ConnectionFactory::get('redis'));
+        $this->view['onIrc'] = $irc->isOnline($username);
+        $this->view['onSite'] = apc_exists('user_' . $username);
     }
     
     public function settings($arguments) {
@@ -155,21 +159,11 @@ class controller_user extends Controller {
             return Error::set('Please login to add keys.');
 		if (empty($_POST['csr']))
 			return Error::set('No CSR found.');
-
-		$configargs = array(
-			'config' => '/etc/ssl/openssl.cnf',
-			'digest_alg' => 'md5',
-			'x509_extensions' => 'v3_ca',
-			'req_extensions'   => 'v3_req',
-			'private_key_bits' => 666,
-			'private_key_type' => OPENSSL_KEYTYPE_RSA,
-			'encrypt_key' => false,
-		);
 		
 		$certs = new certs(ConnectionFactory::get('redis'));
 		
 		$cert = openssl_csr_sign($_POST['csr'], Config::get('ssl:certificate'), 
-			Config::get('ssl:key'), 365, $configargs, $certs->getSerial());
+			Config::get('ssl:key'), 365, Config::get('sslConf'), $certs->getSerial());
 		$return = openssl_x509_export($cert, $output);
 
 		if (!$return)
@@ -190,6 +184,35 @@ class controller_user extends Controller {
 		
 		$this->view['valid'] = true;
 		$this->view['certificate'] = $output;
+	}
+	
+	public function link($arguments) {
+		if (!Session::isLoggedIn()) return Error::set('Please login.');
+		
+		$irc = new irc(ConnectionFactory::get('redis'));
+		$username = Session::getVar('username');
+		
+		$this->view['valid'] = true;
+		$this->view['pending'] = $nicks = $irc->getPending($username);
+		$this->view['nicks'] = $goodNicks = $irc->getNicks($username);
+		
+		if (!empty($arguments[0]) && $arguments[0] == 'add') {
+			if (!isset($nicks[$arguments[1]])) return Error::set('Invalid nick id.');
+			
+			$irc->addNick($username, $nicks[$arguments[1]]);
+			$this->view['pending'] = $irc->getPending($username);
+			$this->view['nicks'] = $irc->getNicks($username);
+		} else if (!empty($arguments[0]) && $arguments[0] == 'delP') {
+			if (!isset($nicks[$arguments[1]])) return Error::set('Invalid nick id.');
+			
+			$irc->delNick($username, $nicks[$arguments[1]]);
+			$this->view['pending'] = $irc->getPending($username);
+		} else if (!empty($arguments[0]) && $arguments[0] == 'delA') {
+			if (!isset($goodNicks[$arguments[1]])) return Error::set('Invalid nick id.');
+			
+			$irc->delAcceptedNick($username, $goodNicks[$arguments[1]]);
+			$this->view['nicks'] = $irc->getPending($username);
+		}
 	}
     
 }

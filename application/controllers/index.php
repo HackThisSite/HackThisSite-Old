@@ -8,8 +8,13 @@ class controller_index extends Controller {
     public function index($arguments) {
         $news = new news(ConnectionFactory::get('mongo'));
         $notices = new notices(ConnectionFactory::get('redis'));
+        
+        foreach ($notices->getAll() as $notice) {
+			Error::set($notice, true);
+		}
+		
         $this->view['news'] = $news->getNewPosts();
-        $this->view['notices'] = $notices->getAll();
+        
         Layout::set('title', 'Home');
         
         $apc = new APCIterator('user', '/user_.*/');
@@ -21,6 +26,9 @@ class controller_index extends Controller {
 			array_push($this->view['onlineUsers'], $current['value']);
 			$apc->next();
 		}
+		
+		$irc = new irc(ConnectionFactory::get('redis'));
+		$this->view['ircOnline'] = $irc->getOnline();
     }
     
 }

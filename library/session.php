@@ -30,9 +30,11 @@ class Session {
     }
     
     public static function write() {
-        foreach (self::$data as $key => $entry) {
-            $_SESSION[$key] = $entry;
-        }
+		$_SESSION = array_merge($_SESSION, self::$data);
+		
+		if (self::isLoggedIn()) {
+			apc_store('user_' . self::$data['username'], self::$data['username'], 300);
+		}
     }
     
     public static function destroy() {

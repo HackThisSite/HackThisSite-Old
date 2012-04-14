@@ -6,11 +6,21 @@ class controller_index extends Controller {
 		);
 	
     public function index($arguments) {
-        //$news = new news(ConnectionFactory::get('mongo'));
-        //$notices = new notices(ConnectionFactory::get('redis'));
-        $this->view['news'] = array();//$news->getNewPosts();
-        $this->view['notices'] = array();//$notices->getAll();
+        $news = new news(ConnectionFactory::get('mongo'));
+        $notices = new notices(ConnectionFactory::get('redis'));
+        $this->view['news'] = $news->getNewPosts();
+        $this->view['notices'] = $notices->getAll();
         Layout::set('title', 'Home');
+        
+        $apc = new APCIterator('user', '/user_.*/');
+        $this->view['onlineUsers'] = array();
+        
+        
+        while ($apc->valid()) {
+			$current = $apc->current();
+			array_push($this->view['onlineUsers'], $current['value']);
+			$apc->next();
+		}
     }
     
 }

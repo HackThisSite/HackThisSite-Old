@@ -1,6 +1,6 @@
 <?php
 return array(
-    "display:layout" => "main",
+    "display:layout" => "bootstrap",
     "display:leftnav" => array(
         "Challenges" => array(
             "Basic"       => "missions/basic", /*

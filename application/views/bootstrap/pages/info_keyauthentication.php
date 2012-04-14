@@ -24,9 +24,9 @@ given a certificate which you should save to the file <i>client.crt</i>.
 After that, you can generate the PKCS #12 file for your browser by running 
 the command:
 </p>
-<code>
+<pre class="prettyprint linenums">
 openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.p12
-</code>
+</pre>
 <p>Once that has finished, you can import the PKCS #12 file into your 
 browser and login to HackThisSite by either method of your choice.  
 HackThisSite can automatically identify you or you can login by typing 

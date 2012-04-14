@@ -3,36 +3,79 @@ if (!empty($valid) && $valid):
 ?>
 <div class="page-header"><h1>Edit User:  <?php echo $user['username']; ?></h1></div>
 
-<form action="<?php echo Url::format('/user/settings/save'); ?>" method="post">
+<form class="well form-horizontal" action="<?php echo Url::format('/user/settings/save'); ?>" method="post">
+<fieldset>
+	<legend>Account Information</legend>
 <?php if (CheckAcl::can('changeUsername')): ?>
-	<b>Username: </b><input type="text" name="username" value="<?php echo htmlentities($user['username'], ENT_QUOTES, '', false); ?>" /><br />
+	<div class="control-group">
+		<label class="control-label">Username:</label>
+		
+		<div class="controls">
+			<input type="text" name="username" value="<?php echo htmlentities($user['username'], ENT_QUOTES, '', false); ?>" />
+		</div>
+	</div>
 <?php endif; ?>
-    <b>Email:  </b><input type="text" name="email" value="<?php echo htmlentities($user['email'], ENT_QUOTES, '', false); ?>"/><br />
-    <b>Hide your email?  </b> <input type="checkbox" name="hideEmail" value="true"<?php echo ($user['hideEmail'] ? ' checked="checked"' : ''); ?> /><br />
+	
+	<div class="control-group">
+		<label class="control-label">Email:</label>
+		
+		<div class="controls">
+			<input type="text" name="email" value="<?php echo htmlentities($user['email'], ENT_QUOTES, '', false); ?>"/>
+		</div>
+	</div></fieldset>
+	
+	<div class="control-group">
+		<label class="control-label">Hide your email?</label>
+		
+		<div class="controls">
+			<input type="checkbox" name="hideEmail" value="true"<?php echo ($user['hideEmail'] ? ' checked="checked"' : ''); ?> />
+		</div>
+	</div>
 <?php if (CheckAcl::can('editAcl')): ?>
-    <b>Group:  </b><select name="group">
+	<div class="control-group">
+		<label class="control-label">Group:</label>
+		
+		<div class="controls">
+			<select name="group">
 <?php foreach (acl::$acls as $acl): ?>
-        <option value="<?php echo $acl; ?>"<?php echo ($acl == $user['group'] ? 'selected="selected"' : ''); ?>><?php echo ucwords($acl); ?></option>
+				<option value="<?php echo $acl; ?>"<?php echo ($acl == $user['group'] ? 'selected="selected"' : ''); ?>><?php echo ucwords($acl); ?></option>
 <?php endforeach; ?>
-    </select><br />
-    <?php endif; ?>
-    
-    <br />
-	<b><u>Change Password</u></b><br />
-	<b>Old Password:  </b><input type="text" name="oldpassword" /><br />
-	<b>New Password:  </b><input type="text" name="password" /><br />
+			</select>
+		</div>
+    </div>
+<?php endif; ?>
+</fieldset>
+<fieldset>    
+	<legend>Change Password</legend>
+	
+	<div class="control-group">
+		<label class="control-label">Old Password:</label>
+		
+		<div class="controls">
+			<input type="text" name="oldpassword" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">New Password:</label>
+		
+		<div class="controls">
+			<input type="text" name="password" />
+		</div>
+	</div>
+	
     <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+</fieldset>
 </form>
 
-<br /><hr /><br />
-<div class="page-header"><h3>Add a Certificate</u></h3></div>
-<form action="<?php echo Url::format('user/addkey'); ?>" method="post">
-	<textarea style="width: 100%" rows="12" name="csr">The contents of your CSR</textarea><br />
+<legend>Add a Certificate</legend>
+<form class="well forum-vertical" action="<?php echo Url::format('user/addkey'); ?>" method="post">
+	<textarea style="width: 100%" rows="12" name="csr" placeholder="The contents of your CSR"></textarea><br />
 	<input type="submit" value="Submit" class="btn btn-primary" />
 </form>
 <br />
 
-<div class="page-header"><h3>Certificates</h3></div>
+<legend>Certificates</legend>
 
 <?php if (!empty($user['certs'])): 
 ?>
@@ -72,20 +115,32 @@ foreach ($user['certs'] as $cert): ?>
 	<div class="alert alert-info">You have no certificates.</div>
 <?php endif; ?>
 <a href="<?php echo Url::format('pages/info/keyauthentication'); ?>">About</a><br />
+<br />
 
-<br /><hr />
-<div class="page-header"><h3>Security Settings</h3></div>
+<legend>Security Settings</legend>
 
-<form action="<?php echo Url::format('/user/settings/saveAuth'); ?>" method="post">
-	<input type="checkbox" name="passwordAuth" <?php if (in_array('password', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
-	Password authentication<br />
-	<input type="checkbox" name="certificateAuth" <?php if (in_array('certificate', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
-	Certificate authentication<br />
-	<input type="checkbox" name="certAndPassAuth" <?php if (in_array('cert+pass', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
-	Certificate and Password authentication<br />
-	<input type="checkbox" name="autoAuth" <?php if (in_array('autoauth', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
-	Automatically authenticate you on TLS.<br />
-	<input type="submit" value="Save" class="btn btn-primary" /><br />
+<form class="well forum-vertical" action="<?php echo Url::format('/user/settings/saveAuth'); ?>" method="post">
+	<label class="checkbox">
+		<input type="checkbox" name="passwordAuth" <?php if (in_array('password', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
+		Password authentication
+	</label>
+	
+	<label class="checkbox">
+		<input type="checkbox" name="certificateAuth" <?php if (in_array('certificate', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
+		Certificate authentication
+	</label>
+	
+	<label class="checkbox">
+		<input type="checkbox" name="certAndPassAuth" <?php if (in_array('cert+pass', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
+		Certificate and Password authentication
+	</label>
+	
+	<label class="checkbox">
+		<input type="checkbox" name="autoAuth" <?php if (in_array('autoauth', $user['auths'])): ?>checked="checked"<?php endif; ?> />&nbsp;
+		Automatically authenticate you on TLS.
+	</label><br />
+	
+	<input type="submit" value="Save" class="btn btn-primary" />&nbsp;
 	<a href="<?php echo Url::format('pages/info/keyauthentication#auths'); ?>">More info...</a><br />
 </form>
 

@@ -7,34 +7,51 @@ $commLib = new comments(ConnectionFactory::get('mongo'));
 $comments = $commLib->getForId($id, false, false, $page);
 
 if (empty($comments))
-	echo "No comments!";
-
+	echo '<div class="alert">No comments!</div>';
+if (!empty($comments))
+	echo '<legend>Comments</legend>';
+	
 foreach ($comments as $comment) {
 ?>
-<table border="1" width="90%">
-    <tr>
-        <td width="33%"><?php echo $comment['user']['username']; ?><br />
-        <?php echo Date::minuteFormat($comment['date']); ?></td>
-        <td><?php echo $comment['text']; ?></td>
-        <td width="5%">
-<?php if (CheckAcl::can('editAllComment') || (CheckAcl::can('editComment') && Session::getVar('username') == $comment['user']['username'])): ?>
-            <a href="<?php echo Url::format('/comment/edit/' . $comment['_id']); ?>">Edit</a>
+<table class="table table-bordered">
+	<tr>
+		<td style="width: 20%">
+			<a href="<?php echo Url::format('/user/view/' . $comment['user']['username']); ?>">
+				<?php echo $comment['user']['username']; ?>
+			</a><br />
+			<?php echo Date::minuteFormat($comment['date']); ?><br />
+			<center>
+<?php
+$edit = false;
+$delete = false;
+
+if (CheckAcl::can('editAllComment') || (CheckAcl::can('editComment') && Session::getVar('username') == $comment['user']['username']))
+	$edit = true;
+if (CheckAcl::can('deleteAllComment') || (CheckAcl::can('deleteComment') && Session::getVar('username') == $comment['user']['username']))
+	$delete = true;
+
+if ($edit): ?>
+				<a class="btn btn-primary" href="<?php echo Url::format('/comment/edit/' . $comment['_id']); ?>">Edit</a>&nbsp;
+<?php endif;
+if ($delete): ?>
+				<a class="btn btn-danger" href="<?php echo Url::format('/comment/delete/' . $comment['_id']); ?>">Delete</a>
 <?php endif; ?>
-<?php if (CheckAcl::can('deleteAllComment') || (CheckAcl::can('deleteComment') && Session::getVar('username') == $comment['user']['username'])): ?>
-            <a href="<?php echo Url::format('/comment/delete/' . $comment['_id']); ?>">Delete</a>
-<?php endif; ?>
-        </td>
-    </tr>
+			</center>
+		</td>
+		<td>
+			<p><?php echo $comment['text']; ?></p>
+		</td>
+	</tr>
 </table>
 <?php
 }
 
 if (CheckAcl::can('postComment')):
 ?>
-<h4><u>New Comment</u></h4>
-<form action="<?php echo Url::format('/comment/post/save'); ?>" method="post">
+<legend>New Comment</legend>
+<form class="well form-vertical" action="<?php echo Url::format('/comment/post/save'); ?>" method="post">
     <input type="hidden" name="contentId" value="<?php echo $id; ?>" />
-    <textarea name="text"></textarea><br />
-    <input type="submit" name="submit" value="Post Comment" />
+    <textarea name="text" rows="7" style="width: 100%"></textarea><br />
+    <input type="submit" class="btn btn-primary" value="Post Comment" />
 </form>
 <?php endif; ?>

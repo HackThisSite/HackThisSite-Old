@@ -39,7 +39,10 @@ class irc extends mongoBase {
 			$keys[] = 'nick2User_' . $nick;
 		}
 		
-		$usernames = array_filter($this->redis->mGet($keys));
+		$results = $this->redis->mGet($keys);
+		if (empty($results)) return array('usernames' => array(), 'unknown' => 0);
+		
+		$usernames = array_filter($results);
 		$unknown = count($keys) - count($usernames);
 		
 		return array('usernames' => $usernames, 'unknown' => $unknown);

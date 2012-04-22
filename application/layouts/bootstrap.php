@@ -4,7 +4,7 @@
 		<title>Hack This Site!<?php if (isset($title)): ?> | <?php echo $title; ?><?php endif; ?></title>
 
 		<!-- Le styles -->
-		<link href="<?php echo Url::format('themes/bootstrap/css/bootstrap.css', true); ?>" rel="stylesheet">
+		<link href="<?php echo Url::format('themes/bootstrap/css/bootstrap.min.css', true); ?>" rel="stylesheet">
 		<style type="text/css">
 		  body {
 			padding-top: 60px;
@@ -14,8 +14,8 @@
 			padding: 9px 0;
 		  }
 		</style>
-		<link href="<?php echo Url::format('themes/bootstrap/css/bootstrap-responsive.css', true); ?>" rel="stylesheet">
-
+		<link href="<?php echo Url::format('themes/bootstrap/css/bootstrap-responsive.min.css', true); ?>" rel="stylesheet">
+		
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
 		  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -105,5 +105,8 @@ if (Error::has() && !empty($errors)) {
 			</div>
 			<!-- End content -->
 		</div></div>
+		
+		<script src="<?php echo Url::format('themes/jquery.js', true); ?>"></script>
+		<script src="<?php echo Url::format('themes/bootstrap/js/bootstrap.min.js', true); ?>"></script>
 	</body>
 </html>

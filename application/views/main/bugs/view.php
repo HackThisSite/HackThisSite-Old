@@ -1,41 +1,62 @@
 <?php if (!empty($valid) && $valid): ?>
-<?php
-// Copied into index.php
-$colors = array(
-    '#ffa0a0',
-    '#ff50a8',
-    '#ffd850',
-    '#ffffb0',
-    '#c8c8ff',
-    '#cceedd',
-    '#e8e8e8',
-    '#C0C0C0',
-    '#cceedd'
-);
-?>
-<h3 style="margin: 0;padding: 0;"><u>View Bug</u></h3>
-<div style="margin: 0;padding: 0;float: right">
-    <form action="<?php echo Url::format('bugs/changeStatus'); ?>" method="post">
-        Change Status:  
-        <select name="status">
+
+<div class="page-header"><h1>View Bug</h1></div>
+
+<form class="form-inline well pull-right" action="<?php echo Url::format('bugs/changeStatus'); ?>" method="post">
+	<label>Change Status:</label>
+		
+	<select name="status">
 <?php foreach (bugs::$status as $status): ?>
-            <option value="<?php echo $status; ?>"><?php echo ucwords($status); ?></option>
+		<option value="<?php echo $status; ?>"><?php echo ucwords($status); ?></option>
 <?php endforeach; ?>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-            <option value="delete">Delete</option>
-        </select>
-        <input type="hidden" name="id" value="<?php echo $bug['_id']; ?>" />
-        <input type="submit" name="submit" value="Go" />
-    </form>
-</div>
-<center><table width="90%" border="1">
+		<option value="public">Public</option>
+		<option value="private">Private</option>
+		<option value="delete">Delete</option>
+	</select>
+	<input type="hidden" name="id" value="<?php echo $bug['_id']; ?>" />
+	<input type="submit" value="Go" class="btn" />
+</form>
+
+<span>
+<i title="Reporter" class="icon-user"></i>&nbsp;<?php echo $bug['reporter']['username']; ?><br />
+<i title="Dates" class="icon-calendar"></i>&nbsp;Submitted <?php echo Date::dayFormat($bug['created']); ?><br />
+<?php if ($bug['public']): ?>
+<i title="Public / Private" class="icon-ok-circle"></i>&nbsp;Public<br />
+<?php else: ?>
+<i title="Public / Private" class="icon-ban-circle"></i>&nbsp;Private<br />
+<?php endif; ?>
+<i title="Category" class="icon-folder-open"></i>&nbsp;<?php echo ucwords(bugs::$category[$bug['category']]); ?><br />
+<i title="Status" class="icon-signal"></i>&nbsp;<?php echo ucwords(bugs::$status[$bug['status']]); ?><br /><br />
+</span>
+
+<em>(Last updated <?php echo Date::dayFormat($bug['lastUpdate']); ?>)</em>
+<table class="table table-bordered">
+	<tbody>
+	<tr>
+		<th>Title</th>
+		<td><span><?php echo $bug['title']; ?></span></td>
+	</tr>
+	<tr>
+		<th>Description</th>
+		<td><p><?php echo BBCode::parse($bug['description'], '#'); ?></p></td>
+	</tr>
+	<tr>
+		<th>Steps to Reproduce</th>
+		<td><p><?php echo BBCode::parse($bug['reproduction'], '#'); ?></p></td>
+	</tr>
+	</tbody>
+</table>
+<!--
+<table class="table table-bordered">
+	<thead>
     <tr>
         <th>ID</th>
         <th>Category</th>
         <th>Date Submitted</th>
         <th>Last Update</th>
     </tr>
+    </thead>
+    <tbody>
     <tr>
         <td><?php echo Id::create($bug, 'bug'); ?></td>
         <td><?php echo ucwords(bugs::$category[$bug['category']]); ?></td>
@@ -66,7 +87,9 @@ $colors = array(
         <th>Steps to Reproduce</th>
         <td colspan="3"><?php echo wordwrap(BBCode::parse($bug['reproduction'], '#'), 150, "<br />\n", true); ?></td>
     </tr>
-</table></center>
-<br /><hr /><br />
+    </tbody>
+</table>
+-->
+<hr />
 <?php echo Partial::render('comment', array('id' => $bug['_id'], 'page' => 1)); ?>
 <?php endif; ?>

@@ -13,6 +13,8 @@ class controller_article extends Content {
     public function index($arguments) {
         $articles = new articles(ConnectionFactory::get('mongo'));
         $this->view['articles'] = $articles->getNewPosts();
+        
+        if (empty($this->view['articles'])) Error::set('There are no articles!');
     }
     
 	public function view($arguments) {

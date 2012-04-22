@@ -58,4 +58,4 @@ Linked Nicks
 	
 	Key: nick2User_(nick)
 	Type: string
-	Value: username
+	Value: (username);(registration time as unix timestamp)

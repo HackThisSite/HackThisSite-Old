@@ -35,6 +35,8 @@ class controller_bugs extends Content {
         $this->view = $bugs->getNew($filter, $page);
         $this->view['page'] = $page;
         $this->view['filter'] = $filter;
+        
+        if (empty($this->view['bugs'])) Error::set('No bugs were found!');
     }
     
     public function view($arguments) {
@@ -45,10 +47,11 @@ class controller_bugs extends Content {
             return Error::set('Invalid id.');
         if (!bugs::canView($this->view['bug']))
             return Error::set('You are not allowed to view this bug.');
-        
-        $this->view['bug']['username'] = $user['username'];
-        
+                
         $this->view['valid'] = true;
+        
+        if ($this->view['bug']['flagged'] == true && CheckAcl::can('unflagBug')) 
+			$bugs->alter($this->view['bug']['_id'], array('flagged' => false));
     }
     
     public function changeStatus($arguments) {

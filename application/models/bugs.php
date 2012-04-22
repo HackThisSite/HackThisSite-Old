@@ -36,7 +36,7 @@ class bugs extends baseModel {
     var $hasRevisions = false;
     
     public function getNew($filter = 'open', $page = 1) {
-        $pageLimit = 3;
+        $pageLimit = 15;
         
         $query = array(
             'type' => 'bug', 

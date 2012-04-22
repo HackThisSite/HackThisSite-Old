@@ -33,7 +33,7 @@
 <table class="table table-bordered">
 	<tbody>
 	<tr>
-		<th>Title</th>
+		<th style="width: 10%">Title</th>
 		<td><span><?php echo $bug['title']; ?></span></td>
 	</tr>
 	<tr>

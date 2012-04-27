@@ -3,7 +3,6 @@ class BBCode {
 	
 	static public function parse($data) {       
         $bbcodedata = array(
-            '' => array('type'=>BBCODE_TYPE_ROOT,  'childs'=>'!i'),
             'b' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<b>', 'close_tag' => '</b>'),
             'u' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<u>', 'close_tag' => '</u>'),
             'i' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<i>', 'close_tag' => '</i>'),
@@ -12,7 +11,9 @@ class BBCode {
             'li' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<li>', 'close_tag' => '</li>', 'parents' => 'list'),
             'url' => array('type' => BBCODE_TYPE_OPTARG, 'open_tag' => '<a href="{PARAM}">', 'close_tag' => '</a>', 'default_arg' => '{CONTENT}', 'param_handling' => 'self::cleanUrl'),
             'code' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<code>', 'close_tag' => '</code>'),
-            'h1' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<h3><u>', 'close_tag' => '</u></h3>')
+            'h1' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<h3><u>', 'close_tag' => '</u></h3>'),
+            'center' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<center>', 'close_tag' => '</center>'),
+            'img' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<img src="', 'close_tag' => '" />'),
             //'indexlink' => array('type' => BBCODE_TYPE_
             );
         

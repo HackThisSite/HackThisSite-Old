@@ -1,10 +1,11 @@
 <?php
 class lectures extends baseModel {
     
+    var $cdata = array('title', 'lecturer', 'description');
     var $hasSearch = false;
     var $hasRevisions = false;
     
-    public function get($id) {
+    public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         $record = $this->db->findOne(array(
             '_id' => new MongoId($id), 
             'type' => 'lecture', 
@@ -12,6 +13,7 @@ class lectures extends baseModel {
             ));
             
         if (empty($record)) return null;
+        if ($fixUTF8) $this->resolveUTF8($record);
         
         return $record;
     }
@@ -23,6 +25,12 @@ class lectures extends baseModel {
             ))
             ->sort(array('time' => -1));
         if ($records->count() == 0) return 'No upcoming lectures.';
+        $records = iterator_to_array($records);
+        
+        foreach ($records as $key => $record) {
+			$this->resolveUTF8($records[$key]);
+		}
+		
         return $records;
     }
     

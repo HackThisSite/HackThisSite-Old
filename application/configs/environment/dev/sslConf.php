@@ -1,5 +1,5 @@
 <?php
-return array(
+return array('sslConf' => array(
 	'config' => '/etc/ssl/openssl.cnf',
 	'digest_alg' => 'md5',
 	'x509_extensions' => 'v3_ca',
@@ -7,4 +7,4 @@ return array(
 	'private_key_bits' => 666,
 	'private_key_type' => OPENSSL_KEYTYPE_RSA,
 	'encrypt_key' => false,
-);
+));

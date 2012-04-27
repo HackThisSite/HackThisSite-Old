@@ -3,16 +3,18 @@ class comments extends baseModel {
     
     const PAGE_LIMIT = 10;
     
+    var $cdata = array('text');
     var $hasSearch = false;
     var $hasRevisions = false;
     var $baseQuery = array('type' => 'comment', 'ghosted' => false);
     
-    public function get($id, $idlib = false, $justOne = true) {
+    public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         // $justOne is going to be ignored since we're searching by id.
         $query = $this->baseQuery;$query['_id'] = $this->_toMongoId($id);
         $comment = $this->db->findOne($query);
         
         $this->resolveUser($comment['user']);
+        if ($fixUTF8) $this->resolveUTF8($comment);
         return $comment;
     }
     
@@ -26,6 +28,7 @@ class comments extends baseModel {
 
         foreach ($comments as $key => $comment) {
             $this->resolveUser($comments[$key]['user']);
+            $this->resolveUTF8($comments[$key]);
         }
         
         return ($justOne ? reset($comments) : $comments);
@@ -41,7 +44,7 @@ class comments extends baseModel {
             'type' => 'comment', 
             'contentId' => (string) $contentId, 
             'date' => time(),
-            'text' => $this->clean($text), 
+            'text' => $text, 
             'user' => $ref,
             'ghosted' => false,
             );

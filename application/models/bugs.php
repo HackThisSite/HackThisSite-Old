@@ -32,6 +32,7 @@ class bugs extends baseModel {
         'sysadmin' => array('status' => 7)
         );
         
+    var $cdata = array('title', 'description', 'reproduction');
     var $hasSearch = false;
     var $hasRevisions = false;
     
@@ -53,11 +54,12 @@ class bugs extends baseModel {
         $total = $results->count();
         $results = $results->sort($sort)->skip(($page - 1) * $pageLimit)->limit($pageLimit);
         $count = $results->count();
+        $rows = iterator_to_array($results);
         
-        // Not required atm, so leaving.
-        //$func = function($value) { $this->resolveUser($value['reporter']);return $reporter; };
-        $rows = iterator_to_array($results); //array_map($func, iterator_to_array($results));
-        
+        foreach ($rows as $key => $row) {
+			$this->resolveUTF8($rows[$key]);
+		}
+		
         $return = array(
             'total' => $total, 
             'count' => $count, 
@@ -67,7 +69,7 @@ class bugs extends baseModel {
         return $return;
     }
     
-    public function get($id, $idlib = true, $justOne = false) {
+    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -86,6 +88,7 @@ class bugs extends baseModel {
             
             foreach ($toReturn as $key => $entry) {
                 $this->resolveUser($toReturn[$key]['reporter']);
+                if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
             }
             
             return ($justOne ? reset($toReturn) : $toReturn);
@@ -99,6 +102,7 @@ class bugs extends baseModel {
                 'created' => $result['created']), 'bugs')) continue;
 
             $this->resolveUser($result['reporter']);
+            if ($fixUTF8) $this->resolveUTF8($result);
             
             if ($justOne) return $result;
             array_push($toReturn, $result);

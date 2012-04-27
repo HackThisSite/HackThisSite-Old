@@ -15,7 +15,6 @@
 		  }
 		</style>
 		<link href="<?php echo Url::format('themes/bootstrap/css/bootstrap-responsive.min.css', true); ?>" rel="stylesheet">
-		
 		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 		<!--[if lt IE 9]>
 		  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -41,9 +40,10 @@
 							<li><a href="<?php echo Url::format('/user/logout'); ?>">Logout</a></li>
 <?php endif; ?>
 						</ul>
+						
 <?php if (Session::isLoggedIn()): ?>
 						<p class="navbar-text pull-right">Logged in as 
-						<a href="<?php echo Url::format('/user/view/'); ?>">
+						<a href="<?php echo Url::format('/user/view/' . Session::getVar('username')); ?>">
 							<?php echo Session::getVar('username'); ?>
 						</a></p>
 <?php else: ?>
@@ -69,6 +69,13 @@
     <?php if (CheckAcl::can('postLectures')) : ?><li><a href="<?php echo Url::format('/lecture/post'); ?>">Post Lecture</a></li><?php endif; ?>
     <?php if (CheckAcl::can('manageNotice')) : ?><li><a href="<?php echo Url::format('/notice'); ?>">Manage Notices</a></li><?php endif; ?>
 <?php endif; ?>
+						<li class="nav-header">Search</li>
+						<li>
+							<form class="form-search" action="<?php echo Url::format('search'); ?>" method="post">
+								<input type="text" name="query" placeholder="Search" class="input-small search-query" />
+								<input type="submit" name="submit" value="Search" class="btn" />
+							</form>
+						</li>
 <?php foreach ($leftNav as $title => $section): ?>
 						<li class="nav-header"><?php echo $title; ?></li>
 <?php foreach ($section as $name => $location): ?>

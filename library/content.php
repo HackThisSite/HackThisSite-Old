@@ -99,6 +99,7 @@ class Content extends Controller {
 			$this->view['post'] = $model->get($arguments[0], false, true);
 			Error::set('Entry edited!', true);
             Log::write(LOG_INFO, 'Successfully edited ' . $this->name . ' ' . $arguments[0]);
+            $this->clearCache();
 		} else {
             Log::write(LOG_INFO, 'Editing ' . $this->name . ' ' . $arguments[0]);
         }

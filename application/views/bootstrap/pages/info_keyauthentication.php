@@ -1,7 +1,4 @@
-<center>
-	<h2><u>Using Certificate Authentication<br />
-	on HackThisSite</u></h2>
-</center>
+<div class="page-header"><h1>Using Certificate Authentication on HackThisSite</h1></div>
 
 <p>Certificate authentication allows you to login to your account faster 
 than ever, keeps your account secure better than any password system.  
@@ -13,7 +10,7 @@ Pacheco.</p>
 <p>
 First, users must generate a private key and certificate signing request.  
 On most Unix systems this can be done by:</p>
-<pre class="prettyprint linenums">
+<pre>
 openssl genrsa -out client.key 1024
 openssl req -new -key client.key -out client.csr
 </pre>
@@ -24,7 +21,7 @@ given a certificate which you should save to the file <i>client.crt</i>.
 After that, you can generate the PKCS #12 file for your browser by running 
 the command:
 </p>
-<pre class="prettyprint linenums">
+<pre>
 openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.p12
 </pre>
 <p>Once that has finished, you can import the PKCS #12 file into your 
@@ -33,4 +30,26 @@ HackThisSite can automatically identify you or you can login by typing
 your username and a blank password into the login form.</p><br />
 
 <a name="auths"></a>
-<u><h3>Authentication Methods</h3></u>
+<legend>Authentication Methods</legend>
+<p>In increasing order of security:</p>
+
+<ol>
+	<li><u>Password Authentication</u> - Typical method of authentication; 
+	user must enter a username and password in order to start a 
+	session.</li>
+	<li><u>Automatic Authentication</u> - You will be automatically 
+	authenticated if you are found to have a valid certificate.  
+	<em>Note:  This makes it impossible to logout!</em></li>
+	<li><u>Certificate Authentication</u> - Requires the user to have a 
+	valid certificate to use.  To login with this method, connect to the 
+	site over SSL with your PCKCS #12 file and click the login button.  
+	You will be automatically authenticated.</li>
+	<li><u>Certificate and Password Authentication</u> - This is a combination 
+	of the two methods above.  Instead of using a blank login like 
+	Certificate Authentication, the user needs to type in their username 
+	and password as well as have a valid certificate.</li>
+</ol>
+
+<p><strong>Important:  </strong>Should you ever loose access to your 
+account due to certificate errors, your account can be automatically 
+restored by going through the Password Recovery process.</p>

@@ -115,8 +115,8 @@ class controller_user extends Controller {
 	}
     
     public function login() {
-        if (!isset($_POST['username']) || !isset($_POST['password'])) 
-            return Error::set('Username and password are required.');
+		$username = (empty($_POST['username']) ? null : $_POST['username']);
+		$password = (empty($_POST['password']) ? null : $_POST['password']);
         
         $users = new users(ConnectionFactory::get('mongo'));
         $good = $users->authenticate($_POST['username'], $_POST['password']);
@@ -124,12 +124,12 @@ class controller_user extends Controller {
         if (!$good)
             return Error::set('Invalid username/password');
         
-        header('Location: ' . Config::get('other:baseUrl'));
+        header('Location: ' . Url::format('/'));
     }
     
     public function logout() {
         Session::destroy();
-        header('Location: ' . Config::get('other:baseUrl'));
+        header('Location: ' . Url::format('/'));
     }
     
     public function register($arguments) {
@@ -150,7 +150,7 @@ class controller_user extends Controller {
 			if (is_string($created)) return Error::set($created);
 			
 			$users->authenticate($_POST['username'], $_POST['password']);
-			header('Location: ' . Config::get('other:baseUrl'));
+			header('Location: ' . Url::format('/'));
         }
     }
     

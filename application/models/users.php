@@ -51,6 +51,7 @@ class users extends baseModel {
 	}
 	
 	public function validate($username, $password, $email, $hideEmail, $group, $creating = true) {
+		if (strpos($username, '\'') || strpos($username, '"')) return 'Invalid username.';
 		$passEmpty = false;
 		if (empty($password) && $creating) return 'Invalid password';
 		if (empty($password)) $passEmpty = true;
@@ -63,6 +64,7 @@ class users extends baseModel {
 		
 		// Error checking
 		if (empty($username) && $creating) return 'Invalid username.';
+		if (!preg_match('/^[A-Za-z0-9 _-]+$/', $username)) return 'Invalid username';
 		if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) 
 			return 'Invalid email.';
 		if ($group != null && !in_array($group, acl::$acls)) return 'Invalid group.';
@@ -124,7 +126,7 @@ class users extends baseModel {
 		$user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
 		if ($user == null) return 'Invalid user id.';
 		
-		if (count($user['certs']) >= 5) return 'You are only allowed 5 certificates.';
+		if (!empty($user['certs']) && count($user['certs']) >= 5) return 'You are only allowed 5 certificates.';
 		return true;
 	}
 	

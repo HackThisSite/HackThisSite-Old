@@ -1,9 +1,10 @@
 <?php
 class news extends baseModel {
 
+	var $cdata = array('title', 'department', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
-    
+	
     public function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(
@@ -17,12 +18,13 @@ class news extends baseModel {
 
          foreach ($posts as $key => $post) {
              $this->resolveUser($posts[$key]['user']);
+             $this->resolveUTF8($posts[$key]);
          }
          
          return $posts;
     }
 
-    public function get($id, $idlib = true, $justOne = false) {
+    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -41,6 +43,7 @@ class news extends baseModel {
             
             foreach ($toReturn as $key => $entry) {
                 $this->resolveUser($toReturn[$key]['user']);
+                if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
             }
             
             return ($justOne ? reset($toReturn) : $toReturn);
@@ -55,6 +58,7 @@ class news extends baseModel {
                 continue;
             
             $this->resolveUser($result['user']);
+            if ($fixUTF8) $this->resolveUTF8($result);
             
             if ($justOne) return $result;
             array_push($toReturn, $result);
@@ -68,7 +72,7 @@ class news extends baseModel {
         $func = function($value) { return trim($value); };
         
         $title = substr($this->clean($title), 0, 100);
-        $deparment = substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80);
+        $department = substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80);
         $body = substr($this->clean($text), 0, 5000);
         $tags = array_map($func, explode(',', $this->clean($tags)));
         

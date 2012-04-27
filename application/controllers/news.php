@@ -2,7 +2,7 @@
 class controller_news extends Content {
 
     public static $cache = array(
-		'view' => array('type' => 'v', 'key' => 'news/view_{REQ}', 'ttl' => 5)
+		'view' => array('type' => 'v', 'key' => 'news/view_{REQ}', 'ttl' => 50)
 		);
         
     var $name = 'news';

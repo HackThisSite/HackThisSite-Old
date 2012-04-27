@@ -1,6 +1,7 @@
 <?php
 class articles extends baseModel {
 
+	var $cdata = array('title', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
     
@@ -18,13 +19,14 @@ class articles extends baseModel {
          
          foreach ($posts as $post) {
             $this->resolveUser($post['user']);
+            $this->resolveUTF8($post);
             array_push($toReturn, $post);
         }
          
          return $toReturn;
     }
 
-    public function get($id, $idlib = true, $justOne = false) {
+    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -43,6 +45,7 @@ class articles extends baseModel {
             
             foreach ($toReturn as $key => $entry) {
                 $this->resolveUser($toReturn[$key]['user']);
+                if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
             }
             
             return ($justOne ? reset($toReturn) : $toReturn);
@@ -57,7 +60,7 @@ class articles extends baseModel {
                 continue;
             
             $this->resolveUser($result['user']);
-            
+            if ($fixUTF8) $this->resolveUTF8($result);
             if ($justOne) return $result;
             array_push($toReturn, $result);
         }
@@ -67,7 +70,12 @@ class articles extends baseModel {
     
     public function getNextUnapproved() {
         $record = $this->db->findOne(array('published' => false, 'ghosted' => false));
-        if (!empty($record)) $this->resolveUser($record['user']);
+        
+        if (!empty($record)) {
+			$this->resolveUser($record['user']);
+			$this->resolveUTF8($record);
+		}
+		
         return $record;
     }
 
@@ -94,6 +102,7 @@ class articles extends baseModel {
             'ghosted' => false, 
             'flaggable' => false
             );
+		
         if (!$creating) unset($entry['user'], $entry['date'], 
             $entry['commentable'], $entry['published'], $entry['flaggable']);
         

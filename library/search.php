@@ -64,7 +64,7 @@ class Search {
     }
     */
     
-    private static function curl($url, $request) {
+    public static function curl($url, $request) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request));

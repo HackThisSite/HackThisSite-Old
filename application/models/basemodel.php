@@ -31,7 +31,7 @@ class baseModel extends mongoBase {
         if (is_string($entry)) return $entry;
         
         if ($this->hasRevisions) {
-            $old = $this->get($id, false, true);
+            $old = $this->get($id, false, true, false);
             $revision = $this->generateRevision($entry, $old);
             $revision['contentId'] = (string) $id;
         }
@@ -63,11 +63,27 @@ class baseModel extends mongoBase {
     }
     
     public function resolveUser(&$user) {
-        if (is_string($user)) {
+        if (empty($user) || (isset($user['$id']) && !$user['$id'])) {
+			$user = array('username' => 'Anonymous');
+		} else if (is_string($user)) {
             $user = array('username' => $user);
         } else {
             $user = MongoDBRef::get($this->mongo, $user);
         }
     }
+	
+    public function resolveUTF8(&$entry) { // utf8_decode
+		foreach ($this->cdata as $key) {
+			if ($key[0] == '@') {
+				$key = substr($key, 1);
+				
+				foreach ($entry[$key] as $k => $v) {
+					$entry[$key][$k] = utf8_decode($entry[$key][$k]);
+				}
+			} else {
+				$entry[$key] = utf8_decode($entry[$key]);
+			}
+		}
+	}
     
 }

@@ -36,6 +36,7 @@ class Controller
     public $view = array();
     protected $parsedViewResult = '';
     protected $request;
+    protected $method;
     private $controllerState = array(
         'viewPath' => '',
         'viewClass' => '',
@@ -53,6 +54,7 @@ class Controller
         // initialize a controller object without implicitly calling
         // a controller method, this is done by returning immediately.
         $this->request = $request;
+        $this->method = $request[0];
         if ($silent) return;
 
         $this->processRequest();

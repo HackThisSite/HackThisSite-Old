@@ -7,7 +7,7 @@ if (!empty($news)) {
 				echo '<br/ ><hr /><br />';
 			}
 			
-			echo Partial::render('newsFull', $post);
+			echo Partial::render('newsShort', $post);
 			$first = false;
 		}
 	} else {

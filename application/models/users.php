@@ -200,6 +200,16 @@ class users extends baseModel {
 				))));
 	}
 	
+	public function setStatus($userId, $status) {
+		$this->db->update(array('_id' => $this->_toMongoId($userId)),
+			array('$set' => array('status' => (int) $status)));
+	}
+	
+	public function setGroup($userId, $group) {
+		$this->db->update(array('_id' => $this->_toMongoId($userId)),
+			array('$set' => array('group' => (string) $group)));
+	}
+	
 	
 	// AUTHENTICATION MECHANISMS
 	private function qualifyPassword($username, $password) {

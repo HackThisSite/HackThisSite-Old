@@ -26,7 +26,13 @@ class certs extends mongoBase {
 		return true;
 	}
 	
-
+	public function create($csr) {
+		$cert = openssl_csr_sign($csr, Config::get('ssl:certificate'), 
+			Config::get('ssl:key'), 365, Config::get('sslConf'), $this->getSerial());
+		openssl_x509_export($cert, $output);
+		
+		return $output
+	}
 	
 	public function get($certKey, $cut = true) {
 		$cert = file_get_contents(Config::get('certs:location') . $certKey . Config::get('certs:extension'));

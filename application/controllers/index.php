@@ -23,7 +23,7 @@ class controller_index extends Controller {
         
         while ($apc->valid()) {
 			$current = $apc->current();
-			array_push($this->view['onlineUsers'], $current['value']);
+			array_push($this->view['onlineUsers'], substr($current['key'], 5));
 			$apc->next();
 		}
 		

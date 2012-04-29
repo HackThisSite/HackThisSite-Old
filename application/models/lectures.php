@@ -12,7 +12,7 @@ class lectures extends baseModel {
             'ghosted' => false
             ));
             
-        if (empty($record)) return null;
+        if (empty($record)) return 'Invalid id.';
         if ($fixUTF8) $this->resolveUTF8($record);
         
         return $record;

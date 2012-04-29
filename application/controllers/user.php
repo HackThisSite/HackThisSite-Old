@@ -4,18 +4,13 @@ class controller_user extends Controller {
     public function view($arguments) {
         if (empty($arguments[0])) 
             return Error::set('Username is required.');
-        
-        if (empty($arguments[0])) {
-            $username = Session::getVar('username');
-        } else {
-            $username = $arguments[0];
-        }
+
+        $username = $arguments[0];
         
         $users = new users(ConnectionFactory::get('mongo'));
         $userInfo = $users->get($username);
         
-        if (empty($userInfo))
-            return Error::set('User not found.');
+        if (empty($userInfo)) return Error::set('User not found.');
         
         $this->view['valid'] = true;
         $this->view['username'] = $username;
@@ -30,11 +25,14 @@ class controller_user extends Controller {
         if (!Session::isLoggedIn())
             return Error::set('You are not logged in!');
         
-        $this->view['valid'] = true;
         $user = new users(ConnectionFactory::get('mongo'));
+        
+        $this->view['valid'] = true;
         $this->view['user'] = $user->get(Session::getVar('username'));
 		$this->view['secure'] = (!empty($_SERVER['SSL_CLIENT_RAW_CERT']) ? true : false);
-		if ($this->view['secure']) $this->view['clientSSLKey'] = certs::getKey($_SERVER['SSL_CLIENT_RAW_CERT']);
+		
+		if ($this->view['secure']) 
+			$this->view['clientSSLKey'] = certs::getKey($_SERVER['SSL_CLIENT_RAW_CERT']);
 		
         if (!empty($arguments[0]) && $arguments[0] == 'save') {
 			if (!empty($_POST['oldpassword']) && !empty($_POST['password'])) {
@@ -44,16 +42,13 @@ class controller_user extends Controller {
 					return Error::set('Previous password is invalid.');
 			}
 			
-			$params = array(
-				Session::getVar('_id'),
-				(!empty($_POST['username']) ? $_POST['username'] : null),
-				(!empty($_POST['password']) ? $_POST['password'] : null),
-				(!empty($_POST['email']) ? $_POST['email'] : null),
-				(!empty($_POST['hideEmail']) ? true : false),
-				null
-			);
+			$username = (!empty($_POST['username']) ? $_POST['username'] : null);
+			$password = (!empty($_POST['password']) ? $_POST['password'] : null);
+			$email = (!empty($_POST['email']) ? $_POST['email'] : null);
+			$hideEmail = (!empty($_POST['hideEmail']) ? true : false);
 			
-			$error = call_user_func_array(array($user, 'edit'), $params);
+			$error = $user->edit(Session::getVar('_id'), $username, 
+				$password, $email, $hideEmail, null);
             if (is_string($error)) return Error::set($error);
             
             $this->view['user'] = $user->get(Session::getVar('username'));
@@ -107,7 +102,6 @@ class controller_user extends Controller {
 		
 		if ($cert == null)
 			return Error::set('Invalid certificate hash.');
-		
 		if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
 			return Error::set('You are not allowed to view this certificate.');
 		
@@ -138,8 +132,7 @@ class controller_user extends Controller {
         $this->view['valid'] = true;
         
         if (!empty($arguments) && $arguments[0] == 'save') {
-            if (empty($_POST['username']) || empty($_POST['password']) || 
-                empty($_POST['email']))
+            if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']))
                 return Error::set('All forms are required.');
 			
 			$users = new users(ConnectionFactory::get('mongo'));
@@ -154,29 +147,21 @@ class controller_user extends Controller {
     }
     
     public function addkey($arguments) {
-        if (!Session::isLoggedIn())
-            return Error::set('Please login to add keys.');
-		if (empty($_POST['csr']))
-			return Error::set('No CSR found.');
+        if (!Session::isLoggedIn()) return Error::set('Please login to add keys.');
+		if (empty($_POST['csr'])) return Error::set('No CSR found.');
 		
 		$certs = new certs(ConnectionFactory::get('redis'));
+		$output = $certs->create($_POST['csr']);
 		
-		$cert = openssl_csr_sign($_POST['csr'], Config::get('ssl:certificate'), 
-			Config::get('ssl:key'), 365, Config::get('sslConf'), $certs->getSerial());
-		$return = openssl_x509_export($cert, $output);
-
-		if (!$return)
-			return Error::set('Invalid CSR.');
+		if (!$output) return Error::set('Invalid CSR.');
 		
 		$users = new users(ConnectionFactory::get('mongo'));
 		
 		$check = $certs->preAdd($output);
-		if (is_string($check))
-			return Error::set($check);
+		if (is_string($check))return Error::set($check);
 		
 		$check = $users->preAdd(Session::getVar('_id'), $certs->getKey($output));
-		if (is_string($check))
-			return Error::set($check);
+		if (is_string($check))return Error::set($check);
 		
 		$certs->add($output);
 		$users->addCert(Session::getVar('_id'), $certs->getKey($output));
@@ -231,7 +216,35 @@ class controller_user extends Controller {
 	
 	public function admin() {
 		if (!CheckAcl::can('adminUsers')) return Error::set('You are not allowed to admin users.');
+		if (empty($_POST['userId'])) return Error::set('No user id was found.');
 		
+		$user = new users(ConnectionFactory::get('mongo'));
+		$userInfo = $user->get($_POST['userId'], false, true);
+		
+		if (empty($_POST['status']) && $userInfo['status'] == $user::ACCT_LOCKED) {
+			$user->setStatus($_POST['userId'], $user::ACCT_OPEN);
+		} else if (!empty($_POST['status']) && $_POST['status'] == 'locked' && $userInfo['status'] == $user::ACCT_OPEN) {
+			$user->setStatus($_POST['userId'], $user::ACCT_LOCKED);
+		}
+		
+		if (empty($_POST['group']) || !in_array($_POST['group'], acl::$acls))
+			return Error::set('Invalid group.');
+		
+		if ($_POST['group'] != $userInfo['group']) {
+			$user->setGroup($_POST['userId'], $_POST['group']);
+		}
+		
+		header('Location: ' . Url::format('/user/view/' . $userInfo['username']));
+	}
+	
+	public function forceLogout() {
+		if (!CheckAcl::can('forceLogout')) return Error::set('You are not allowed to force logout a user.');
+		if (empty($_POST['username'])) return Error::set('No username was found.');
+		if (!apc_exists('user_' . $_POST['username'])) return Error::set('This user is already logged out.');
+		
+		Session::forceLogout($_POST['username'], apc_fetch('user_' . $_POST['username']));
+		
+		header('Location: ' . Url::format('/user/view/' . $_POST['username']));
 	}
     
 }

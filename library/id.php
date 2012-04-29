@@ -108,7 +108,7 @@ class Id {
 	}
     
     
-    private function gmp_convert($num, $base_a, $base_b) 
+    private static function gmp_convert($num, $base_a, $base_b) 
     {
         return gmp_strval ( gmp_init($num, $base_a), $base_b );
     }

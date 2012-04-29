@@ -83,6 +83,8 @@ class bugs extends baseModel {
         
         $results = $this->db->find($query);
         
+        if (empty($results)) return 'Invalid id.';
+        
         if (!$idlib) {
             $toReturn = iterator_to_array($results);
             

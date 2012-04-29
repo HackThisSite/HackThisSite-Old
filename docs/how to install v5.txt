@@ -11,9 +11,10 @@ apt-get install make php5 git nginx php-apc php5-fpm php-pear libpcre-dev
 apt-get install mongodb redis-server redis-doc
 
 git clone git://github.com/nicolasff/phpredis.git
+cd phpredis
 phpize
 ./configure
-make && makeinstall
+make && make install
 
 pecl install apc
 pecl install bbcode
@@ -27,6 +28,10 @@ add "extension=apc.so" to php.ini
 add "extension=bbcode.so" to php.ini
 add "extension=mongo.so" to php.ini
 add "extension=redis.so" to php.ini
+
+In php.ini:
+session.save_handler = redis
+session.save_path = "tcp://localhost:6379?weight=1&timeout=0.5
 
 note, we'll be using php-fpm so use THAT php.ini, also when you change shit do /etc/init.d/php5-fpm restart
 (this includes changing the config files of the site!!)

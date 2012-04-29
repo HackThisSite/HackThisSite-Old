@@ -25,7 +25,6 @@ class news extends baseModel {
     }
 
     public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
-		
         if ($idlib) {
             $idLib = new Id;
 
@@ -38,8 +37,7 @@ class news extends baseModel {
         }
 
         $results = $this->db->find($query);
-        var_export($results);
-        die;
+        
         if (empty($results)) return 'Invalid id.';
         
         if (!$idlib) {

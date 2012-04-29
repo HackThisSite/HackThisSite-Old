@@ -29,6 +29,8 @@ class comments extends baseModel {
             ->sort(array('date' => 1))
             ->limit(self::PAGE_LIMIT);
         
+        if (empty($comments)) return 'Invalid id.';
+        
         $comments = iterator_to_array($comments);
 
         foreach ($comments as $key => $comment) {

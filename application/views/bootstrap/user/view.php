@@ -2,6 +2,14 @@
 <h1 class="page-header" style="display: inline-block"><?php echo $user['username']; ?>'s Profile</h1>
 
 <div class="pull-right" style="display: inline-block">
+<?php if (CheckAcl::can('forceLogout')): ?>
+<form action="<?php echo Url::format('/user/forceLogout'); ?>" method="post" style="display: inline">
+	<input type="hidden" name="username" value="<?php echo $user['username']; ?>" />
+<?php if (apc_exists('user_' . $user['username'])): ?>
+	<input type="submit" value="Logout" class="btn btn-danger" />
+<?php endif; ?>
+</form>
+<?php endif; ?>
 <a class="thumbnail pull-right" style="display: inline-block">
 	<img style="display: inline-block" src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($user['email']))); ?>?s=120" />
 </a><br />

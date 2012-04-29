@@ -41,7 +41,7 @@ echo implode($array);
     </tr>
     </thead>
     <tbody>
-<?php foreach($bugs as $bug): if (!bugs::canView($bug)) continue;?>
+<?php foreach($bugs as $bug): if (!bugs::canView($bug)) continue; ?>
     <tr>
         <td><?php echo ($bug['flagged'] ? '<i class="icon-exclamation-sign"></i>' : '&nbsp;'); ?></td>
         <td><?php echo ucwords(bugs::$category[$bug['category']]); ?></td>

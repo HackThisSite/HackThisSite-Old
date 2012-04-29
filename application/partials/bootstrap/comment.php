@@ -19,8 +19,24 @@ foreach ($comments as $comment) {
 			<a href="<?php echo Url::format('/user/view/' . $comment['user']['username']); ?>">
 				<?php echo $comment['user']['username']; ?>
 			</a><br />
-			<?php echo Date::minuteFormat($comment['date']); ?><br />
-			<center>
+			
+			<a class="thumbnail" class="display: block">
+				<img src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($comment['user']['email']))); ?>" />
+			</a>
+			
+			<small title="<?php echo Date::minuteFormat($comment['date']); ?>">
+<?php
+if (time() - $comment['date'] <= 172800) { // Two days
+	echo Date::durationFormat(time() - $comment['date']) . ' ago';
+} else {
+	echo Date::dayFormat($comment['date']);
+}
+?>
+			</small><br />
+		</td>
+		<td>
+			<p>
+				<div class="pull-right">
 <?php
 $edit = false;
 $delete = false;
@@ -31,15 +47,14 @@ if (CheckAcl::can('deleteAllComment') || (CheckAcl::can('deleteComment') && Sess
 	$delete = true;
 
 if ($edit): ?>
-				<a class="btn btn-primary" href="<?php echo Url::format('/comment/edit/' . $comment['_id']); ?>">Edit</a>&nbsp;
+					<a class="btn btn-primary" href="<?php echo Url::format('/comment/edit/' . $comment['_id']); ?>">Edit</a>&nbsp;
 <?php endif;
 if ($delete): ?>
-				<a class="btn btn-danger" href="<?php echo Url::format('/comment/delete/' . $comment['_id']); ?>">Delete</a>
+					<a class="btn btn-danger" href="<?php echo Url::format('/comment/delete/' . $comment['_id']); ?>">Delete</a>
 <?php endif; ?>
-			</center>
-		</td>
-		<td>
-			<p><?php echo $comment['text']; ?></p>
+				</div>
+				<?php echo nl2br($comment['text']); ?>
+			</p>
 		</td>
 	</tr>
 </table>

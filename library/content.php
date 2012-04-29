@@ -76,11 +76,13 @@ class Content extends Controller {
 			return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
 		
 		$entry = $model->get($arguments[0], false, true);
-
+		
+		if (empty($entry))
+			return Error::set('Invalid id.');
+		if (is_string($entry))
+			return Error::set($entry);		
         if (method_exists($model, 'authChange') && !$model->authChange('edit', $entry))
 			return Error::set('You are not allowed to edit this ' . $this->name . '!');
-		if (is_string($entry))
-			return Error::set($entry);
 		
 		$this->view['valid'] = true;
 		$this->view['post'] = $entry;
@@ -99,7 +101,6 @@ class Content extends Controller {
 			$this->view['post'] = $model->get($arguments[0], false, true);
 			Error::set('Entry edited!', true);
             Log::write(LOG_INFO, 'Successfully edited ' . $this->name . ' ' . $arguments[0]);
-            $this->clearCache();
 		} else {
             Log::write(LOG_INFO, 'Editing ' . $this->name . ' ' . $arguments[0]);
         }

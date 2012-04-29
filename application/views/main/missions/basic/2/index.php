@@ -1,6 +1,6 @@
 <?php
 $handle = 'basic2';
-if (!empty($_POST['password']) && $_POST['password'] == '') {
+if (isset($_POST['password']) && $_POST['password'] == '') {
     echo Partial::render('missionDone', array(
 		'id' => $id, 
 		'handle' => $handle, 

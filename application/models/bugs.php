@@ -35,12 +35,12 @@ class bugs extends baseModel {
     var $cdata = array('title', 'description', 'reproduction');
     var $hasSearch = false;
     var $hasRevisions = false;
+    var $collection = 'bugs';
     
     public function getNew($filter = 'open', $page = 1) {
         $pageLimit = 15;
         
         $query = array(
-            'type' => 'bug', 
             'ghosted' => false
             );
            
@@ -73,12 +73,12 @@ class bugs extends baseModel {
         if ($idlib) {
             $idLib = new Id;
 
-            $query = array('type' => 'bug', 'ghosted' => false);
+            $query = array('ghosted' => false);
             $keys = $idLib->dissectKeys($id, 'bug');
             
             $query['created'] = (int) $keys['time'];
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'bug');
+            $query = array('_id' => $this->_toMongoId($id));
         }
         
         $results = $this->db->find($query);
@@ -124,7 +124,6 @@ class bugs extends baseModel {
         if ($public != false && $public != true) return 'Invalid public.';
         
         $entry = array(
-            'type' => 'bug',
             'title' => substr($title, 0, 100),
             'reporter' => MongoDBRef::create('users', Session::getVar('_id')),
             'category' => (int) $category,

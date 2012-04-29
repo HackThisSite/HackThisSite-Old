@@ -38,9 +38,10 @@ class certs extends mongoBase {
 	}
 	
 	public function check($cert) {
-		$info = file_get_contents(Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension'));
+		$file = Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension');
+		if (!file_exists($file)) return null;
+		$info = file_get_contents($file);
 
-		if ($info == false) return null;
 		return substr($info, 0, strpos($info, ':'));
 	}
 	

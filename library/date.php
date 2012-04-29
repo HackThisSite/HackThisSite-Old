@@ -25,8 +25,8 @@ class Date {
             'week' => 604800, 
             'day' => 86400,
             'hour' => 3600,
-            'minute' => 60,
-            'second' => 1);
+            'min' => 60,
+            'sec' => 1);
 
         foreach ($periods as $key => $value) {
             if ($difference >= $value) {

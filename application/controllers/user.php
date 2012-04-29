@@ -50,7 +50,7 @@ class controller_user extends Controller {
 				(!empty($_POST['password']) ? $_POST['password'] : null),
 				(!empty($_POST['email']) ? $_POST['email'] : null),
 				(!empty($_POST['hideEmail']) ? true : false),
-				(!empty($_POST['group']) ? $_POST['group'] : null)
+				null
 			);
 			
 			$error = call_user_func_array(array($user, 'edit'), $params);
@@ -120,10 +120,9 @@ class controller_user extends Controller {
         
         $users = new users(ConnectionFactory::get('mongo'));
         $good = $users->authenticate($_POST['username'], $_POST['password']);
-        
-        if (!$good)
-            return Error::set('Invalid username/password');
-        
+
+        if (is_string($good))
+			return Error::set($good);
         header('Location: ' . Url::format('/'));
     }
     
@@ -213,6 +212,26 @@ class controller_user extends Controller {
 			$irc->delAcceptedNick($username, $goodNicks[$arguments[1]]);
 			$this->view['nicks'] = $irc->getPending($username);
 		}
+	}
+	
+	public function notes() {
+		if (!CheckAcl::can('postNotes')) return Error::set('You are not allowed to post notes.');
+		if (empty($_POST['userId'])) return Error::set('No user id was found.');
+		if (empty($_POST['note'])) return Error::set('No note text was found.');
+		
+		$users = new users(ConnectionFactory::get('mongo'));
+		$return = $users->addNote($_POST['userId'], $_POST['note']);
+		
+		if (is_string($return)) return Error::set($return);
+		
+		Error::set('Note posted.', true);
+		
+		if (!empty($_SERVER['HTTP_REFERER'])) header('Location: ' . Url::format($_SERVER['HTTP_REFERER']));
+	}
+	
+	public function admin() {
+		if (!CheckAcl::can('adminUsers')) return Error::set('You are not allowed to admin users.');
+		
 	}
     
 }

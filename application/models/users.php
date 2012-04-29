@@ -4,8 +4,6 @@ class users extends baseModel {
 	const ACCT_OPEN = 1;
 	const ACCT_LOCKED = 2;
 	
-	const WARN_UNWARNED = 1;
-	
 	const DEFAULT_GROUP = 'admin';
 	
     var $hasSearch = false;
@@ -27,7 +25,7 @@ class users extends baseModel {
             $query = array('_id' => $this->_toMongoId($id));
         }
         
-        if ($justOne) return $this->resolveCerts($this->db->findOne($query));
+        if ($justOne) return $this->resolveDeps($this->db->findOne($query));
         $users = iterator_to_array($this->db->find($query));
         
         foreach ($users as $key => $user) { 
@@ -35,6 +33,22 @@ class users extends baseModel {
 		}
 		
 		return $users;
+	}
+	
+	private function resolveDeps($user) {
+		$user = $this->resolveCerts($user);
+		$user = $this->resolveNotes($user);
+		return $user;
+	}
+	
+	private function resolveNotes($user) {
+		if (empty($user['notes'])) return $user;
+		
+		foreach ($user['notes'] as $k => $note) {
+			$user['notes'][$k]['user'] = MongoDBRef::get($this->mongo, $user['notes'][$k]['user']);
+		}
+		
+		return $user;
 	}
 	
 	private function resolveCerts($user) {
@@ -80,13 +94,11 @@ class users extends baseModel {
 			'email' => $email,
 			'status' => self::ACCT_OPEN,
 			'hideEmail' => $hideEmail,
-			'warnLevel' => self::WARN_UNWARNED,
 			'group' => ($group == null ? self::DEFAULT_GROUP : $group),
 			'auths' => array('password')
 		);
 		if (!$creating && !CheckAcl::can('changeUsername')) unset($entry['username']);
 		if (!$creating && !CheckAcl::can('changeAcctStatus')) unset($entry['status']);
-		if (!$creating && !CheckAcl::can('changeWarnLevel')) unset($entry['warnLevel']);
 		if (!$creating && !CheckAcl::can('editAcl')) unset($entry['group']);
 		if (!$creating && $passEmpty) unset($entry['password']);
 		
@@ -114,12 +126,14 @@ class users extends baseModel {
 			$good = call_user_func(array($this, 'check' . $auth),
 				$username, $password);
 			if ($good != false) {
+				if ($good['status'] == self::ACCT_LOCKED) return 'User banned.';
+				
 				Session::setBatchVars($good);
 				return true;
 			}
 		}
 		
-		return false;
+		return 'Invalid username/password';
 	}
 	
 	public function preAdd($userId, $certKey) {
@@ -166,6 +180,24 @@ class users extends baseModel {
 			array('$set' => array('password' => $this->hash($password, $userInfo['username']))));
 		
 		return $password;
+	}
+	
+	public function addNote($userId, $note) {
+		$user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
+		
+		if (!$user) return 'Invalid user id.';
+		
+		$note = $this->clean($note);
+		
+		if (empty($note)) return 'Invalid note.';
+		
+		$this->db->update(array('_id' => $this->_toMongoId($userId)), 
+		array('$push' => array(
+			'notes' => array(
+				'user' => MongoDBRef::create('users', Session::getVar('_id')),
+				'date' => time(),
+				'text' => substr($note, 0, 160)
+				))));
 	}
 	
 	

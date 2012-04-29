@@ -4,11 +4,11 @@ class news extends baseModel {
 	var $cdata = array('title', 'department', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
+	var $collection = 'news';
 	
     public function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(
-                'type' => 'news',
                 'shortNews' => false,
                 'ghosted' => false
             )
@@ -25,18 +25,22 @@ class news extends baseModel {
     }
 
     public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+		
         if ($idlib) {
             $idLib = new Id;
 
-            $query = array('type' => 'news', 'ghosted' => false);
+            $query = array('ghosted' => false);
             $keys = $idLib->dissectKeys($id, 'news');
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'news');
+            $query = array('_id' => $this->_toMongoId($id));
         }
 
         $results = $this->db->find($query);
+        var_export($results);
+        die;
+        if (empty($results)) return 'Invalid id.';
         
         if (!$idlib) {
             $toReturn = iterator_to_array($results);
@@ -79,8 +83,7 @@ class news extends baseModel {
         if (empty($title)) return 'Invalid title.';
         if (empty($body)) return 'Invalid body.';
         
-        $entry = array(
-            'type' => 'news', 
+        $entry = array( 
             'title' => $title, 
             'department' => $department, 
             'body' => $body, 

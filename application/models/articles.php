@@ -4,11 +4,11 @@ class articles extends baseModel {
 	var $cdata = array('title', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
+    var $collection = 'articles';
     
     public function getNewPosts() {
         $posts = $this->db->find(
             array(
-                'type' => 'article',
                 'ghosted' => false,
                 'published' => true
             )
@@ -30,12 +30,12 @@ class articles extends baseModel {
         if ($idlib) {
             $idLib = new Id;
 
-            $query = array('type' => 'article', 'ghosted' => false, 'published' => true);
+            $query = array('ghosted' => false, 'published' => true);
             $keys = $idLib->dissectKeys($id, 'news');
 
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'type' => 'article', 'published' => true, 'ghosted' => false);
+            $query = array('_id' => $this->_toMongoId($id), 'published' => true, 'ghosted' => false);
         }
 
         $results = $this->db->find($query);
@@ -90,8 +90,7 @@ class articles extends baseModel {
         if (empty($title)) return 'Invalid title.';
         if (empty($body)) return 'Invalid body.';
         
-        $entry = array(
-            'type' => 'article', 
+        $entry = array( 
             'title' => $title, 
             'body' => $body, 
             'tags' => $tags,

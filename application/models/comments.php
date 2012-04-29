@@ -6,12 +6,16 @@ class comments extends baseModel {
     var $cdata = array('text');
     var $hasSearch = false;
     var $hasRevisions = false;
-    var $baseQuery = array('type' => 'comment', 'ghosted' => false);
+    var $baseQuery = array('ghosted' => false);
+    var $commentableCollections = array('articles', 'bugs', 'lectures', 'news', 'users');
+    var $collection = 'comments';
     
     public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         // $justOne is going to be ignored since we're searching by id.
         $query = $this->baseQuery;$query['_id'] = $this->_toMongoId($id);
         $comment = $this->db->findOne($query);
+        
+        if (empty($comment)) return 'Invalid id.';
         
         $this->resolveUser($comment['user']);
         if ($fixUTF8) $this->resolveUTF8($comment);
@@ -22,6 +26,7 @@ class comments extends baseModel {
         $query = $this->baseQuery;$query['contentId'] = $this->clean($id);
         $comments = $this->db->find($query)
             ->skip(($page - 1) * self::PAGE_LIMIT)
+            ->sort(array('date' => 1))
             ->limit(self::PAGE_LIMIT);
         
         $comments = iterator_to_array($comments);
@@ -35,13 +40,25 @@ class comments extends baseModel {
     }
     
     public function validate($contentId, $text, $creating = true) {
+		$valid = false;
+		foreach ($this->commentableCollections as $collection) {
+			$ref = MongoDBRef::create($collection, $this->_toMongoId($contentId));
+			$result = MongoDBRef::get($this->mongo, $ref);
+			
+			if ($result != null) {
+				$valid = true;
+				break;
+			}
+		}
+		
+		if (!$valid) return 'Invalid content id.';
+		
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
-        $text = substr($this->clean($text), 0, 1000);
+        $text = substr($this->clean(preg_replace('/\s{6,}/', "\n\n", preg_replace('/[[:blank:]]+/', ' ', $text))), 0, 1000);
         
         if (empty($text)) return 'Invalid comment.';
         
         $entry = array(
-            'type' => 'comment', 
             'contentId' => (string) $contentId, 
             'date' => time(),
             'text' => $text, 

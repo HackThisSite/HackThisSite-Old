@@ -57,7 +57,7 @@
 		</div>
 		<!-- End header -->
 		
-		<div class="container-fluid"><div class="row-fluid">
+		<div class="container"><div class="row">
 			<!-- Start navigation -->
 			<div class="span3">
 				<div class="well sidebar-nav">
@@ -72,8 +72,7 @@
 						<li class="nav-header">Search</li>
 						<li>
 							<form class="form-search" action="<?php echo Url::format('search'); ?>" method="post">
-								<input type="text" name="query" placeholder="Search" class="input-small search-query" />
-								<input type="submit" name="submit" value="Search" class="btn" />
+								<input type="text" name="query" placeholder="Search" class="input-medium search-query" />
 							</form>
 						</li>
 <?php foreach ($leftNav as $title => $section): ?>

@@ -4,11 +4,11 @@ class lectures extends baseModel {
     var $cdata = array('title', 'lecturer', 'description');
     var $hasSearch = false;
     var $hasRevisions = false;
+    var $collection = 'lectures';
     
     public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         $record = $this->db->findOne(array(
             '_id' => new MongoId($id), 
-            'type' => 'lecture', 
             'ghosted' => false
             ));
             
@@ -48,7 +48,6 @@ class lectures extends baseModel {
         if (empty($duration)) return 'I can\'t understand the duration you chose.';
         
         $entry = array(
-            'type' => 'lecture', 
             'title' => $title, 
             'lecturer' => $lecturer, 
             'description' => $description,

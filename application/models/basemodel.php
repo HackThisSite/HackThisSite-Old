@@ -10,7 +10,7 @@ class baseModel extends mongoBase {
     public function __construct($mongo) {
         $db       = Config::get(self::KEY_DB);
         $this->mongo = $mongo->$db;
-        $this->db = $mongo->$db->content;
+        $this->db = $mongo->$db->{$this->collection};
     }
     
     public function create() {

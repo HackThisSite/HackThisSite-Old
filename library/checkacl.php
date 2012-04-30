@@ -1,4 +1,9 @@
 <?php
+/**
+ * Access Control List (ACL) validation.
+ * 
+ * @package Library
+ */
 class CheckAcl {
     
     private static $populated = false;
@@ -9,6 +14,13 @@ class CheckAcl {
         self::$populated = true;
     }
     
+    /**
+     * Check ACLs to determine if a user has a certain permission.
+     * 
+     * @param string $name Name of the permission to check for.
+     * 
+     * @return bool True if the user does have the permission in $name.
+     */
     public static function can($name) {
 		return true;
         if (!self::$populated) self::_populate();

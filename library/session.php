@@ -1,34 +1,75 @@
 <?php
+/**
+ * Session management
+ * 
+ * @package Library
+ */
 class Session {
     
     private static $data = array();
     
+    /**
+     * Start a new session.
+     * 
+     * @param string $id Session id to use.
+     */
     public static function init($id = null) {
         session_start();
         if ($id !== null) session_id($id);
         self::$data = $_SESSION;
     }
     
+    /**
+     * Check if the user is logged in.
+     * 
+     * @return bool True if user is logged in.
+     */
     public static function isLoggedIn() {
         return !empty(self::$data['username']);
     }
     
+    /**
+     * Set a variable in the session.
+     * 
+     * @param string $name Key to save under.
+     * @param mixed $value Value of the variable.
+     */
     public static function setVar($name, $value) {
         return self::$data[$name] = $value;
     }
     
+    /**
+     * Set an array of variables.
+     * 
+     * @param array $values Associative array of session variables.
+     */
     public static function setBatchVars($values) {
         return self::$data = array_merge(self::$data, $values);
     }
     
+    /**
+     * Get a variable from the session.
+     * 
+     * @param string $name Name of the variable.
+     * 
+     * @return mixed The variable.
+     */
     public static function getVar($name) {
         return (!empty(self::$data[$name]) ? self::$data[$name] : false);
     }
     
+    /**
+     * Get all of the variables in the session.
+     * 
+     * @return array Associative array.
+     */
     public static function getAll() {
         return self::$data;
     }
     
+    /**
+     * Write session data
+     */
     public static function write() {
 		$_SESSION = array_merge($_SESSION, self::$data);
 		
@@ -37,6 +78,9 @@ class Session {
 		}
     }
     
+    /**
+     * Destroy the current session (logout).
+     */
     public static function destroy() {
 		if (!empty(self::$data['username'])) apc_delete('user_' . self::$data['username']);
         self::$data = array();
@@ -51,12 +95,14 @@ class Session {
         session_destroy();
     }
     
-    public static function getId() {
-		return session_id();
-	}
-    
+    /**
+     * Force logout another user.
+     * 
+     * @param string $username Username of user.
+     * @param string $sid Session id of user.
+     */
     public static function forceLogout($username, $sid) {
-		if ($sid == self::getId()) {
+		if ($sid == session_id()) {
 			$current = true;
 			$data = self::$data;
 		} else {

@@ -1,6 +1,19 @@
 <?php
+/**
+ * Id creation, parsing, and validation.
+ * 
+ * @package Library
+ */
 class Id {
 	
+	/**
+	 * Id creation
+	 * 
+	 * @param array $data The array to create an id out of.
+	 * @param string $type Type of id being created.
+	 * 
+	 * @return string The content's id.
+	 */
 	static public function create($data, $type) {
 		switch ($type) {
 			case 'news':
@@ -28,6 +41,18 @@ class Id {
 		return false;
 	}
 	
+	/**
+	 * Dissect information from an id.
+	 * 
+	 * Used to dissect keys from an id that can be used to find it in a 
+	 * database.
+	 * 
+	 * @param string $hash The id being used.
+	 * @param string $type The type of id being used.
+	 * 
+	 * @return array Array of data that can be used in a query for the 
+	 * original content.
+	 */
 	static public function dissectKeys($hash, $type) {
 		switch ($type) {
 			case 'news':
@@ -84,6 +109,17 @@ class Id {
 		return false;
 	}
 	
+	/**
+	 * Id validation
+	 * 
+	 * Used for validating a piece of content directly maps to a given id.
+	 * 
+	 * @param string $hash Id to test against.
+	 * @param array $data Content to test with.
+	 * @param string $type Type of content/id being used.
+	 * 
+	 * @return bool True if the given content directly maps to the given id.
+	 */
 	static public function validateHash($hash, $data, $type) {
 		switch ($type) {
 			case 'news':
@@ -108,9 +144,8 @@ class Id {
 	}
     
     
-    private static function gmp_convert($num, $base_a, $base_b) 
-    {
-        return gmp_strval ( gmp_init($num, $base_a), $base_b );
+    private static function gmp_convert($num, $baseA, $baseB) {
+        return gmp_strval(gmp_init($num, $baseA), $baseB);
     }
 	
 }

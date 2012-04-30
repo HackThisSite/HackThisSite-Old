@@ -1,8 +1,20 @@
 <?php
+/**
+ * Functions to assist in the execution of missions.
+ * 
+ * @package Library
+ */
 class Mission {
     
     static $missions;
     
+    /**
+     * Generate a new password for a mission or return the current one.
+     * 
+     * @param string $handle The name the mission goes by.
+     * 
+     * @return string Password for the mission.
+     */
     static public function generatePassword($handle) {
         if (($var = Session::getVar('mission-' . $handle . '_password')) != false)
             return $var;
@@ -12,6 +24,12 @@ class Mission {
         return $password;
     }
     
+    /**
+     * Mark a mission as finished and destroy the old password.
+     * 
+     * @param string $handle The name the mission goes by.
+     * @param string $id MongoDB id of the mission.
+     */
     static public function finishMission($handle, $id) {
         self::destroyPassword($handle);
         
@@ -21,10 +39,22 @@ class Mission {
         }
     }
     
+    /**
+     * Destroy the password for a mission.
+     * 
+     * @param string $handle The name the mission goes by.
+     */
     static public function destroyPassword($handle) {
         Session::setVar('mission-' . $handle . '_password', false);
     }
     
+    /**
+     * Determine if a user has finished a mission.
+     * 
+     * @param string $id Mission id.
+     * 
+     * @return bool True if the user has completed the mission before.
+     */
     static public function hasDone($id) {
         if (!Session::isLoggedIn())
             return false;

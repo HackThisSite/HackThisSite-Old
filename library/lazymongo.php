@@ -1,4 +1,9 @@
 <?php
+/**
+ * Forces the lazy loading of a MongoDB connection.
+ * 
+ * @package Library
+ */
 class LazyMongo {
 	
 	private $conn;
@@ -6,6 +11,12 @@ class LazyMongo {
 	private $options;
 	private $connected = false;
 	
+	/**
+	 * Creates a new LazyMongo instance.
+	 * 
+	 * @param string $connString MongoDB connection information.
+	 * @param array $options MongoDB connection options.
+	 */
 	public function __construct($connString, $options) {
 		$this->connString = $connString;
 		$this->options = $options;

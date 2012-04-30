@@ -42,19 +42,19 @@ class comments extends baseModel {
     }
     
     public function validate($contentId, $text, $creating = true) {
-		$valid = false;
-		foreach ($this->commentableCollections as $collection) {
-			$ref = MongoDBRef::create($collection, $this->_toMongoId($contentId));
-			$result = MongoDBRef::get($this->mongo, $ref);
-			
-			if ($result != null) {
-				$valid = true;
-				break;
-			}
-		}
-		
-		if (!$valid) return 'Invalid content id.';
-		
+        $valid = false;
+        foreach ($this->commentableCollections as $collection) {
+            $ref = MongoDBRef::create($collection, $this->_toMongoId($contentId));
+            $result = MongoDBRef::get($this->mongo, $ref);
+            
+            if ($result != null) {
+                $valid = true;
+                break;
+            }
+        }
+        
+        if (!$valid) return 'Invalid content id.';
+        
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $text = substr($this->clean(preg_replace('/\s{6,}/', "\n\n", preg_replace('/[[:blank:]]+/', ' ', $text))), 0, 1000);
         

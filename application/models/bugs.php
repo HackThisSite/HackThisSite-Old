@@ -57,9 +57,9 @@ class bugs extends baseModel {
         $rows = iterator_to_array($results);
         
         foreach ($rows as $key => $row) {
-			$this->resolveUTF8($rows[$key]);
-		}
-		
+            $this->resolveUTF8($rows[$key]);
+        }
+        
         $return = array(
             'total' => $total, 
             'count' => $count, 

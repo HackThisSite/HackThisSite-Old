@@ -71,18 +71,18 @@ class Session {
      * Write session data
      */
     public static function write() {
-		$_SESSION = array_merge($_SESSION, self::$data);
-		
-		if (self::isLoggedIn()) {
-			apc_store('user_' . self::$data['username'], session_id(), 300);
-		}
+        $_SESSION = array_merge($_SESSION, self::$data);
+        
+        if (self::isLoggedIn()) {
+            apc_store('user_' . self::$data['username'], session_id(), 300);
+        }
     }
     
     /**
      * Destroy the current session (logout).
      */
     public static function destroy() {
-		if (!empty(self::$data['username'])) apc_delete('user_' . self::$data['username']);
+        if (!empty(self::$data['username'])) apc_delete('user_' . self::$data['username']);
         self::$data = array();
         
         if (ini_get("session.use_cookies")) {
@@ -102,23 +102,23 @@ class Session {
      * @param string $sid Session id of user.
      */
     public static function forceLogout($username, $sid) {
-		if ($sid == session_id()) {
-			$current = true;
-			$data = self::$data;
-		} else {
-			$current = false;
-			$session = new redisSession(ConnectionFactory::get('redis'));
-			$data = $session->get($sid);
-		}
-		
-		if (!empty($data['username'])) { // User is logged in
-			if ($current) { // Current user
-				self::destroy();
-			} else { // Not current user
-				$session->destroy($sid);
-			}
-		}
-		
-		apc_delete('user_' . $username);
-	}
+        if ($sid == session_id()) {
+            $current = true;
+            $data = self::$data;
+        } else {
+            $current = false;
+            $session = new redisSession(ConnectionFactory::get('redis'));
+            $data = $session->get($sid);
+        }
+        
+        if (!empty($data['username'])) { // User is logged in
+            if ($current) { // Current user
+                self::destroy();
+            } else { // Not current user
+                $session->destroy($sid);
+            }
+        }
+        
+        apc_delete('user_' . $username);
+    }
 }

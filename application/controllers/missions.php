@@ -35,33 +35,33 @@ class controller_missions extends Controller {
             $this->view['id'] = $mission['_id'];
             
             if (substr($this->view['uri'], -4) == '.php') {
-				$uri = substr($this->view['uri'], 0, -4);
-				$path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
-					$type . '/' . intval($arguments[0]) . '/' . 
-					basename($this->view['uri']);
-				if (file_exists($path)) {
-					
-				}
-			}
-			
-			try {
-				if (substr($this->view['uri'], -4) != '.php')
-					throw new Exception();
-				
-				$uri = substr($this->view['uri'], 0, -4);
-				$path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
-					$type . '/' . intval($arguments[0]) . '/' . basename($this->view['uri']);
-				
-				if (!file_exists($path))
-					throw new Exception();
-				
-				$this->setView('missions/' . $type . '/' . 
-					intval($arguments[0]) . '/' . $uri);
-					
-			} catch(Exception $e) {
-				$this->setView('missions/' . $type . '/' . 
-					intval($arguments[0]) . '/index');
-			}
+                $uri = substr($this->view['uri'], 0, -4);
+                $path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
+                    $type . '/' . intval($arguments[0]) . '/' . 
+                    basename($this->view['uri']);
+                if (file_exists($path)) {
+                    
+                }
+            }
+            
+            try {
+                if (substr($this->view['uri'], -4) != '.php')
+                    throw new Exception();
+                
+                $uri = substr($this->view['uri'], 0, -4);
+                $path = dirname(dirname(__FILE__)) . '/views/main/missions/' . 
+                    $type . '/' . intval($arguments[0]) . '/' . basename($this->view['uri']);
+                
+                if (!file_exists($path))
+                    throw new Exception();
+                
+                $this->setView('missions/' . $type . '/' . 
+                    intval($arguments[0]) . '/' . $uri);
+                    
+            } catch(Exception $e) {
+                $this->setView('missions/' . $type . '/' . 
+                    intval($arguments[0]) . '/index');
+            }
         } else { // Just show a listing of possible missions.
             $this->view['valid'] = true;
             $this->view['missions'] = $missions->getMissionsByType($type);
@@ -75,6 +75,6 @@ class controller_missions extends Controller {
         if ((!empty($arguments[0]) && $arguments[0] == '3' && $arguments[1] == 'password.php') ||
         (!empty($arguments[0]) && $arguments[0] == '4' && $arguments[1] == 'level4.php') || 
         (!empty($arguments[0]) && $arguments[0] == '5' && $arguments[1] == 'level5.php'))
-			Layout::cut();
+            Layout::cut();
     }
 }

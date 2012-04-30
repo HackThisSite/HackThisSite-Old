@@ -6,10 +6,10 @@ class controller_article extends Content {
     var $db = 'mongo';
     var $permission = 'Article';
     var $createForms = array('title', 'text', '?tags');
-	var $location = 'article';
+    var $location = 'article';
     var $hasRevisions = true;
     var $diffdFields = array('title', 'body', '$tags');
-	
+    
     public function index($arguments) {
         $articles = new articles(ConnectionFactory::get('mongo'));
         $this->view['articles'] = $articles->getNewPosts();
@@ -17,16 +17,16 @@ class controller_article extends Content {
         if (empty($this->view['articles'])) Error::set('There are no articles!');
     }
     
-	public function view($arguments) {
-		@$id = implode('/', $arguments);
-		if (empty($id)) return Error::set('Invalid id.');
-		$articlesModel = new articles(ConnectionFactory::get('mongo'));
-		$article = $articlesModel->get($id);
-		
-		if (empty($article)) return Error::set('Invalid id.');
-		
-		$this->view['article'] = $article;
-		$this->view['multiple'] = (count($article) > 1);
+    public function view($arguments) {
+        @$id = implode('/', $arguments);
+        if (empty($id)) return Error::set('Invalid id.');
+        $articlesModel = new articles(ConnectionFactory::get('mongo'));
+        $article = $articlesModel->get($id);
+        
+        if (empty($article)) return Error::set('Invalid id.');
+        
+        $this->view['article'] = $article;
+        $this->view['multiple'] = (count($article) > 1);
         
         if ($this->view['multiple'] == true) return;
         
@@ -40,7 +40,7 @@ class controller_article extends Content {
             if (empty($fetched)) continue;
             array_push($this->view['mlt'], $fetched);
         }
-	}
+    }
     
     public function approve($arguments) {
         if (!CheckAcl::can('approveArticles'))

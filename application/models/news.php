@@ -1,11 +1,11 @@
 <?php
 class news extends baseModel {
 
-	var $cdata = array('title', 'department', 'body', '@tags');
+    var $cdata = array('title', 'department', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
-	var $collection = 'news';
-	
+    var $collection = 'news';
+    
     public function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(

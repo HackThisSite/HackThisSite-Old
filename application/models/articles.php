@@ -1,7 +1,7 @@
 <?php
 class articles extends baseModel {
 
-	var $cdata = array('title', 'body', '@tags');
+    var $cdata = array('title', 'body', '@tags');
     var $hasSearch = true;
     var $hasRevisions = true;
     var $collection = 'articles';
@@ -74,10 +74,10 @@ class articles extends baseModel {
         $record = $this->db->findOne(array('published' => false, 'ghosted' => false));
         
         if (!empty($record)) {
-			$this->resolveUser($record['user']);
-			$this->resolveUTF8($record);
-		}
-		
+            $this->resolveUser($record['user']);
+            $this->resolveUTF8($record);
+        }
+        
         return $record;
     }
 
@@ -103,7 +103,7 @@ class articles extends baseModel {
             'ghosted' => false, 
             'flaggable' => false
             );
-		
+        
         if (!$creating) unset($entry['user'], $entry['date'], 
             $entry['commentable'], $entry['published'], $entry['flaggable']);
         

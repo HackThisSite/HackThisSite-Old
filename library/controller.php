@@ -45,7 +45,7 @@ class Controller
 
     // class wide error messages
     const E_404 = "404";
-	
+    
     public function __construct($request, $viewData = 0, $silent = 0)
     {
         if (is_array($viewData)) $this->view = $viewData;
@@ -61,15 +61,15 @@ class Controller
         
         
         $data = $this->getCache($request[0], $this->request);
-		if ($data !== false) {
-			if ($data['type'] == 'v') {
-				apc_add($data['key'], (string) $this->parsedViewResult, $data['ttl']);
-			} else if ($data['type'] == 'c') {
-				apc_add($data['key'], $this->view, $data['ttl']);
-			}
+        if ($data !== false) {
+            if ($data['type'] == 'v') {
+                apc_add($data['key'], (string) $this->parsedViewResult, $data['ttl']);
+            } else if ($data['type'] == 'c') {
+                apc_add($data['key'], $this->view, $data['ttl']);
+            }
             apc_add($data['key'] . '_layout', Layout::$data, $data['ttyl']);
-		}
-		
+        }
+        
     }
 
     public function processRequest()
@@ -86,7 +86,7 @@ class Controller
         {
             $this->driver = 'traditional';
         }
-				
+                
         // If no method was specified default to index
         $method = (isset($this->request[0])) ?
                                              array_shift($this->request)

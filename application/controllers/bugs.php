@@ -51,7 +51,7 @@ class controller_bugs extends Content {
         $this->view['valid'] = true;
         
         if ($this->view['bug']['flagged'] == true && CheckAcl::can('unflagBug')) 
-			$bugs->alter($this->view['bug']['_id'], array('flagged' => false));
+            $bugs->alter($this->view['bug']['_id'], array('flagged' => false));
     }
     
     public function changeStatus($arguments) {

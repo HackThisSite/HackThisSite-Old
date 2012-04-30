@@ -7,8 +7,8 @@ class Layout
 
     private static $layout  = "";
     public static $data = array();
-	private static $template = true;
-	
+    private static $template = true;
+    
     /**
      * Used to set layout parameters
      * @param key $key
@@ -64,16 +64,16 @@ class Layout
                    . self::$layout
                    . self::LAYOUT_EXTENSION
                    ;
-		} else {
-			echo $content;
-		}
+        } else {
+            echo $content;
+        }
 
         return ob_get_clean();
     }
     
     public static function cut() {
-		self::$template = false;
-	}
+        self::$template = false;
+    }
 
     /**
      * Typical string conversion

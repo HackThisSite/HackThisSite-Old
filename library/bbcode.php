@@ -5,15 +5,15 @@
  * @package Library
  */
 class BBCode {
-	
-	/**
-	 * Parse BBCode into HTML.
-	 * 
-	 * @param string $data BBCode string to be converted to HTML.
-	 * 
-	 * @return string HTML representation of $data.
-	 */
-	static public function parse($data) {       
+    
+    /**
+     * Parse BBCode into HTML.
+     * 
+     * @param string $data BBCode string to be converted to HTML.
+     * 
+     * @return string HTML representation of $data.
+     */
+    static public function parse($data) {       
         $bbcodedata = array(
             'b' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<b>', 'close_tag' => '</b>'),
             'u' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<u>', 'close_tag' => '</u>'),
@@ -31,11 +31,11 @@ class BBCode {
         
         $bbcode = bbcode_create($bbcodedata);
         return "<div align=\"left\">" . str_replace(array('<ul><br />', '</li><br />'), array('<ul>', '</li>'), nl2br(bbcode_parse($bbcode, $data))) . "</div>";
-	 }
+     }
      
      static private function cleanUrl($content, $arg) {
          if (!filter_var($arg, FILTER_VALIDATE_URL)) return '/';
          return filter_var($arg, FILTER_SANITIZE_URL);
      }
-	 
+     
 }

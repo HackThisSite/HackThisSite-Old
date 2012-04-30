@@ -17,10 +17,10 @@ class Url {
      * @param bool $static True if the static server should be used.
      */
     public static function format($url, $static = false) {
-		if (!self::$populated) self::populate();
-		if (substr($url, 0, 4) == 'http')
-			return $url;
-		
+        if (!self::$populated) self::populate();
+        if (substr($url, 0, 4) == 'http')
+            return $url;
+        
         $base = ($static ? self::$static : self::$base);
         $base = (!empty($_SERVER['SSL_CLIENT_RAW_CERT']) ? str_replace('http://', 'https://', $base) : $base);
 
@@ -28,8 +28,8 @@ class Url {
     }
     
     private static function populate() {
-		self::$populated = true;
-		self::$base = Config::get('other:baseUrl');
-		self::$static = Config::get('other:staticUrl');
-	}
+        self::$populated = true;
+        self::$base = Config::get('other:baseUrl');
+        self::$static = Config::get('other:staticUrl');
+    }
 }

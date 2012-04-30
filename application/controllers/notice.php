@@ -6,7 +6,7 @@ class controller_notice extends Content {
     var $db = 'redis';
     var $permission = 'Notice';
     var $createForms = array('text');
-	var $location = 'notice';
+    var $location = 'notice';
     var $hasRevisions = false;
     
     public function index() {

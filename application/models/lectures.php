@@ -28,9 +28,9 @@ class lectures extends baseModel {
         $records = iterator_to_array($records);
         
         foreach ($records as $key => $record) {
-			$this->resolveUTF8($records[$key]);
-		}
-		
+            $this->resolveUTF8($records[$key]);
+        }
+        
         return $records;
     }
     

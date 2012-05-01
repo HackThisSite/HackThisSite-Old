@@ -81,19 +81,22 @@ class articles extends baseModel {
         return $record;
     }
 
-    public function validate($title, $text, $tags, $creating = true) {
+    public function validate($title, $description, $text, $tags, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $func = function($value) { return trim($value); };
         
         $title = substr($this->clean($title), 0, 100);
+        $description = substr($this->clean($description), 0, 500);
         $body = substr($this->clean($text), 0, 3500);
         $tags = array_map($func, explode(',', $this->clean($tags)));
         
         if (empty($title)) return 'Invalid title.';
+        if (empty($description)) return 'Invalid description';
         if (empty($body)) return 'Invalid body.';
         
         $entry = array( 
-            'title' => $title, 
+            'title' => $title,
+            'description' => $description, 
             'body' => $body, 
             'tags' => $tags,
             'user' => $ref, 

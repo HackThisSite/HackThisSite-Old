@@ -5,10 +5,10 @@ class controller_article extends Content {
     var $model = 'articles';
     var $db = 'mongo';
     var $permission = 'Article';
-    var $createForms = array('title', 'text', '?tags');
+    var $createForms = array('title', 'description', 'text', '?tags');
     var $location = 'article';
     var $hasRevisions = true;
-    var $diffdFields = array('title', 'body', '$tags');
+    var $diffdFields = array('title', 'description', 'body', '$tags');
     
     public function index($arguments) {
         $articles = new articles(ConnectionFactory::get('mongo'));

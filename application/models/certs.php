@@ -31,7 +31,7 @@ class certs extends mongoBase {
             Config::get('ssl:key'), 365, Config::get('sslConf'), $this->getSerial());
         openssl_x509_export($cert, $output);
         
-        return $output
+        return $output;
     }
     
     public function get($certKey, $cut = true) {

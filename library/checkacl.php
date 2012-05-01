@@ -22,7 +22,7 @@ class CheckAcl {
      * @return bool True if the user does have the permission in $name.
      */
     public static function can($name) {
-        return true;
+        return Session::isLoggedIn();
         if (!self::$populated) self::_populate();
         $group = Session::getVar('group');
         

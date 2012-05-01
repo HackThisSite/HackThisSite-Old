@@ -29,7 +29,7 @@ class LazyRedis {
         $this->conn->pconnect($this->ip, $this->port);
         
         if (!empty(Config::get('redis:passwordFile'))) {
-            $this->conn->auth(file_get_contents(Config::get('redis:passwordFile')));
+            $this->conn->auth(trim(file_get_contents(Config::get('redis:passwordFile'))));
         }
     }
     

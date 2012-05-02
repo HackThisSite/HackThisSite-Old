@@ -90,7 +90,6 @@ class news extends baseModel {
             'date' => time(), 
             'shortNews' => (bool) $shortNews, 
             'commentable' => (bool) $commentable, 
-            'flaggable' => false, 
             'ghosted' => false
             );
         if (!$creating) unset($entry['user'], $entry['date'], $entry['flaggable']);

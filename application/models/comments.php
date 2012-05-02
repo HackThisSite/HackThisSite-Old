@@ -68,7 +68,7 @@ class comments extends baseModel {
             'ghosted' => false,
             );
         if (!$creating) unset($entry['reporter'], $entry['status'], 
-            $entry['created'], $entry['commentable'], $entry['flagged']);
+            $entry['created'], $entry['commentable']);
 
         return $entry;
     }

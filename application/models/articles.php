@@ -87,7 +87,7 @@ class articles extends baseModel {
         
         $title = substr($this->clean($title), 0, 100);
         $description = substr($this->clean($description), 0, 500);
-        $body = substr($this->clean($text), 0, 3500);
+        $body = substr($this->clean($text), 0, 7000);
         $tags = array_map($func, explode(',', $this->clean($tags)));
         
         if (empty($title)) return 'Invalid title.';

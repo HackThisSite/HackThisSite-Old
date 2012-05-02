@@ -28,7 +28,7 @@ class Id {
                 $time = $data['_id']->getTimestamp();
                 $number = $data['_id']->getInc();
                 
-                $id = self::gmp_convert($time, 10, 62) . '-' . self::gmp_convert($number, 10, 62);
+                $id = $time . '-' . $number; //self::gmp_convert($time, 10, 62) . '-' . self::gmp_convert($number, 10, 62);
                 
                 return $id;
                 break;
@@ -95,7 +95,7 @@ class Id {
             case 'bug':
                 $toReturn = array();
                 $data = explode('-', $hash);
-                $toReturn['time'] = self::gmp_convert($data[0], 62, 10);
+                $toReturn['time'] = $data[0]; //self::gmp_convert($data[0], 62, 10);
                 
                 return $toReturn;
                 break;
@@ -129,8 +129,8 @@ class Id {
                 
             case 'bugs':
                 $hash = explode('-', $hash);
-                $time = self::gmp_convert($hash[0], 62, 10);
-                $last = self::gmp_convert($hash[1], 62, 10);
+                $time = $hash[0]; //self::gmp_convert($hash[0], 62, 10);
+                $last = $hash[1]; //self::gmp_convert($hash[1], 62, 10);
                 
                 return ($time == $data['_id']->getTimestamp() && $last == $data['_id']->getInc());
                 break;

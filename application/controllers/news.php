@@ -23,23 +23,21 @@ class controller_news extends Content {
         if (empty($news)) return Error::set('Invalid id.');
         
         $this->view['news'] = $news;
-        $this->view['multiple'] = (count($news) > 1);
+        $this->view['multiple'] = (count($this->view['news']) > 1);
         
+        if (empty($this->view['news'])) Error::set('Invalid id.');
         if (!$this->view['multiple']) Layout::set('title', $this->view['news'][0]['title']);
-        /*
         if ($this->view['multiple'] == true) return;
 
         $mlt = Search::mlt($this->view['news'][0]['_id'], 'news', 'title,body,tags');
         $this->view['mlt'] = array();
 
         foreach ($mlt['hits']['hits'] as $post) {
-            $fetched = $newsModel->get($post['_id'], true, false);
-            $fetched = reset($fetched);
+            $fetched = $newsModel->get($post['_id'], false, true);
             
             if (empty($fetched)) continue;
             array_push($this->view['mlt'], $fetched);
         }
-        */
     }
     
 }

@@ -59,17 +59,20 @@ class baseModel extends mongoBase {
     private function searchIndex($id, $args, $append) {
         if ($append) $args[] = false;
         $entry = call_user_func_array(array($this, 'validate'), $args);
+        $entry['type'] = $this->type;
         Search::index((string) $id, $entry);
     }
     
     public function resolveUser(&$user) {
-        if (empty($user) || (isset($user['$id']) && !$user['$id'])) {
+        if (isset($user['$id']) && !$user['$id']) {
             $user = array('username' => 'Anonymous');
         } else if (is_string($user)) {
             $user = array('username' => $user);
         } else {
             $user = MongoDBRef::get($this->mongo, $user);
         }
+        
+        if (empty($user)) $user = array('username' => 'Unknown');
     }
     
     public function resolveUTF8(&$entry) { // utf8_decode

@@ -5,14 +5,23 @@ class controller_article extends Content {
     var $model = 'articles';
     var $db = 'mongo';
     var $permission = 'Article';
-    var $createForms = array('title', 'description', 'text', '?tags');
+    var $createForms = array('title', 'category', 'description', 'text', '?tags');
     var $location = 'article';
     var $hasRevisions = true;
-    var $diffdFields = array('title', 'description', 'body', '$tags');
+    var $diffdFields = array('title', 'category' ,'description', 'body', '$tags');
     
     public function index($arguments) {
         $articles = new articles(ConnectionFactory::get('mongo'));
-        $this->view['articles'] = $articles->getNewPosts();
+        
+        $category = 'new';
+        $page = 1;
+        
+        if (!empty($arguments[0])) $category = $arguments[0];
+        if (!empty($arguments[1])) $page = $arguments[1];
+        
+        $this->view = $articles->getNewPosts($category, $page);
+        
+        Layout::set('title', 'Articles');
         
         if (empty($this->view['articles'])) Error::set('There are no articles!');
     }
@@ -28,15 +37,16 @@ class controller_article extends Content {
         $this->view['article'] = $article;
         $this->view['multiple'] = (count($article) > 1);
         
-        if ($this->view['multiple'] == true) return;
+        if (!$this->view['multiple']) {
+            Layout::set('title', $this->view['article'][0]['title']);
+        } else return;
         
         $mlt = Search::mlt($this->view['article'][0]['_id'], 'article', 'title,body,tags');
         $this->view['mlt'] = array();
 
         foreach ($mlt['hits']['hits'] as $article) {
-            $fetched = $articlesModel->get($article['_id'], true, false);
-            $fetched = reset($fetched);
-            
+            $fetched = $articlesModel->get($article['_id'], false, true);
+
             if (empty($fetched)) continue;
             array_push($this->view['mlt'], $fetched);
         }
@@ -45,6 +55,8 @@ class controller_article extends Content {
     public function approve($arguments) {
         if (!CheckAcl::can('approveArticles'))
             return Error::set('You can not approve articles!');
+        
+        Layout::set('title', 'Unapproved Articles');
         
         $articles = new articles(ConnectionFactory::get('mongo'));
         $unapproved = $articles->getNextUnapproved();
@@ -68,6 +80,19 @@ class controller_article extends Content {
         }
         
         $this->view['article'] = $unapproved;
+    }
+    
+    public function vote() {
+        if (!CheckAcl::can('voteOnArticles')) 
+            return Error::set('You can not vote on articles.');
+        if (empty($_POST['vote']) || empty($_POST['articleId']))
+            return Error::set('Vote or article id not found.');
+        
+        $articles = new articles(ConnectionFactory::get('mongo'));
+        $result = $articles->castVote($_POST['articleId'], $_POST['vote']);
+        
+        if (is_string($result)) return Error::set($result);
+        Error::set('Vote cast!', true);
     }
     
 }

@@ -19,6 +19,14 @@ class controller_user extends Controller {
         $irc = new irc(ConnectionFactory::get('redis'));
         $this->view['onIrc'] = $irc->isOnline($username);
         $this->view['onSite'] = apc_exists('user_' . $username);
+        
+        $articles = new articles(ConnectionFactory::get('mongo'));
+        $lectures = new lectures(ConnectionFactory::get('mongo'));
+        
+        $this->view['articles'] = $articles->getForUser($this->view['user']['_id']);
+        $this->view['lectures'] = $lectures->getForUser($username);
+        
+        Layout::set('title', $username . '\'s profile');
     }
     
     public function settings($arguments) {
@@ -67,6 +75,8 @@ class controller_user extends Controller {
             if (is_string($return)) return Error::set($return);
             $this->view['user'] = $user->get(Session::getVar('username'));
         }
+        
+        Layout::set('title', 'Settings');
     }
     
     public function rmCert() {
@@ -113,10 +123,11 @@ class controller_user extends Controller {
         $password = (empty($_POST['password']) ? null : $_POST['password']);
         
         $users = new users(ConnectionFactory::get('mongo'));
-        $good = $users->authenticate($_POST['username'], $_POST['password']);
-
-        if (is_string($good))
-            return Error::set($good);
+        $good = $users->authenticate($username, $password);
+        
+        if (!isset($_POST['username']) || !isset($_POST['password'])) return;
+        if (is_string($good)) return Error::set($good);
+        
         header('Location: ' . Url::format('/'));
     }
     

@@ -11,6 +11,7 @@ class controller_lost extends Controller {
     public function index() {
         if (Session::isLoggedIn()) return Error::set(self::ERR_LOGGED_IN);
         $this->view['valid'] = true;
+        Layout::set('title', 'Account Recovery');
     }
     
     public function access() {

@@ -2,6 +2,8 @@
 class controller_search extends Controller {
     
     public function index($arguments) {
+        Layout::set('title', 'Search');
+        
         if (empty($_POST['query']))
             return Error::set('No search query found.');
         
@@ -10,7 +12,7 @@ class controller_search extends Controller {
         
         if ($results['hits']['total'] == 0)
             return Error::set('No results found.');
-        
+
         $this->view['results'] = array();
         
         $news = new news(ConnectionFactory::get('mongo'));
@@ -26,20 +28,23 @@ class controller_search extends Controller {
                 case 'news':
                     $post = $news->get($result['_id'], false, true);
                     if (empty($post)) continue;
+                    $post['type'] = 'news';
                     
                     array_push($this->view['results'], $post);
                     break;
                 
                 case 'article':
-                    $article = $articles->get($result['_id'], true, false);
+                    $article = $articles->get($result['_id'], false, true);
                     if (empty($article)) continue;
+                    $article['type'] = 'article';
                     
                     array_push($this->view['results'], $article);
                     break;
                 
                 case 'lecture':
-                    $lecture = (array) $lectures->get($result['_id']);
+                    $lecture = $lectures->get($result['_id'], false, true);
                     if (empty($lecture)) continue;
+                    $lecture['type'] = 'lecture';
                     
                     array_push($this->view['results'], $lecture);
                     break;

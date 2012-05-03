@@ -15,6 +15,7 @@ class controller_notice extends Content {
         $notices = new notices(ConnectionFactory::get('redis'));
         $this->view['valid'] = true;
         $this->view['notices'] = $notices->getAll();
+        Layout::set('title', 'Manage Notices');
     }
     
 }

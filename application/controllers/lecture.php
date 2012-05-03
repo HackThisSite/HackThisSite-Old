@@ -16,6 +16,7 @@ class controller_lecture extends Content {
             return Error::set($this->view['lectures']);
         
         $this->view['valid'] = true;
+        Layout::set('title', 'Lectures');
     }
     
 }

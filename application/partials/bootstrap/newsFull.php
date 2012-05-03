@@ -17,4 +17,13 @@
 	</small>
 	
 	<p><?php echo BBCode::parse($body); ?></p>
+    
+<?php if (!empty($mlt)): ?>
+    <p><h4>More Like This:</h4>
+<?php
+foreach ($mlt as $fetched) {
+    echo '<a href="' . Url::format('news/view/' . Id::create($fetched, 'news')) . '">' . $fetched['title'] . '</a><br />';
+}
+?></p>
+<?php endif; ?>
 </div>

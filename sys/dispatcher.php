@@ -97,6 +97,8 @@ class lazyLoader
         $newName = substr($name, 11);
         $file = "{$this->root}application/controllers/{$newName}.php";
         
+        if (!file_exists($file)) return false;
+        
         $this->cache[$name] = $file;
         require $file;
     }
@@ -156,8 +158,8 @@ class lazyLoader
     }
     
     public function __destruct() {
-		if (!empty($this->cache))
-			apc_store('lazyLoader_cache', $this->cache);
+		if (!empty($this->cache) && $this->cache != apc_fetch('lazyLoader_cache'))
+			apc_add('lazyLoader_cache', $this->cache);
 	}
 }
 

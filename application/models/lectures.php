@@ -5,6 +5,7 @@ class lectures extends baseModel {
     var $hasSearch = false;
     var $hasRevisions = false;
     var $collection = 'lectures';
+    var $type = 'lecture';
     
     public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         $record = $this->db->findOne(array(
@@ -32,6 +33,15 @@ class lectures extends baseModel {
         }
         
         return $records;
+    }
+    
+    public function getForUser($username) {
+        $query = array(
+            'lecturer' => $username,
+            'ghosted' => false
+        );
+        
+        return iterator_to_array($this->db->find($query));
     }
     
     public function validate($title, $lecturer, $description, $time, $duration, $creating = true) {

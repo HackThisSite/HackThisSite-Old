@@ -1,6 +1,5 @@
 <?php if (!empty($valid) && $valid): ?>
 <h1 class="page-header" style="display: inline-block"><?php echo $user['username']; ?>'s Profile</h1>
-
 <div class="pull-right" style="display: inline-block">
 <?php if (CheckAcl::can('forceLogout')): ?>
 <form action="<?php echo Url::format('/user/forceLogout'); ?>" method="post" style="display: inline">
@@ -60,18 +59,20 @@ echo ($user['hideEmail'] ? '(Email Hidden)' : htmlentities($user['email'], ENT_Q
 			<h3>Articles</h3>
 <?php if (empty($articles)): ?>
 			<em>No articles written.</em>
-<?php else: ?>
-
-<?php endif; ?>
+<?php else: 
+foreach ($articles as $article): ?>
+            <a href="<?php echo Url::format('/article/view/' . Id::create($article, 'news')); ?>"><?php echo $article['title']; ?></a><br />
+<?php endforeach; endif; ?>
 		</div></div>
 		
 		<div class="span4"><div class="well">
 			<h3>Lectures</h3>
 <?php if (empty($lectures)): ?>
 			<em>No lectures given.</em>
-<?php else: ?>
-
-<?php endif; ?>
+<?php else: 
+foreach ($lectures as $lecture): ?>
+            <?php echo $lecture['title']; ?> on <?php echo Date::dayFormat($lecture['time']); ?> for <?php echo Date::durationFormat($lecture['duration']); ?>.<br />
+<?php endforeach; endif; ?>
 		</div></div>
 	</div>
 </div>

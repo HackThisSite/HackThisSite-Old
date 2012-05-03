@@ -48,6 +48,7 @@ class Content extends Controller {
             return Error::set('You are not allowed to post ' . $this->pluralize($this->name) . '!');
 
         $this->view['valid'] = true;
+        Layout::set('title', 'Post ' . ucwords($this->name));
         
         if (!empty($arguments[0]) && $arguments[0] == 'save') {
             if (($forms = $this->validatePost($arguments)) == false)
@@ -86,6 +87,7 @@ class Content extends Controller {
         
         $this->view['valid'] = true;
         $this->view['post'] = $entry;
+        Layout::set('title', 'Edit ' . ucwords($this->name));
         
         if (!empty($arguments[1]) && $arguments[1] == 'save') {
             if (($forms = $this->validatePost($arguments)) == false)
@@ -150,6 +152,8 @@ class Content extends Controller {
             return Error::set('Invalid id.');
         if (is_string($current))
             return Error::set($current);
+        
+        Layout::set('title', ucwords($this->name) . ' Revisions');
         
         $revisions = new revisions(ConnectionFactory::get('mongo'));
         

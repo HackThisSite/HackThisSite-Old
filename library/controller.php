@@ -101,6 +101,7 @@ class Controller
         $controller = substr(get_class($this), 11);
         
         if (!method_exists($this, $name)) {
+            $this->nil($arguments);
             $this->setView('nil');
         } else {
             // Set the implicit view
@@ -177,5 +178,5 @@ class Controller
         return (string)$this->parsedViewResult;
     }
     
-    private function nil() {}
+    //private function nil() {}
 }

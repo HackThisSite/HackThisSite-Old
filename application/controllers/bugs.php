@@ -36,6 +36,7 @@ class controller_bugs extends Content {
         $this->view['page'] = $page;
         $this->view['filter'] = $filter;
         
+        Layout::set('title', 'Bugs');
         if (empty($this->view['bugs'])) Error::set('No bugs were found!');
     }
     
@@ -49,7 +50,7 @@ class controller_bugs extends Content {
             return Error::set('You are not allowed to view this bug.');
                 
         $this->view['valid'] = true;
-        
+        Layout::set('title', $this->view['bug']['title']);
         if ($this->view['bug']['flagged'] == true && CheckAcl::can('unflagBug')) 
             $bugs->alter($this->view['bug']['_id'], array('flagged' => false));
     }

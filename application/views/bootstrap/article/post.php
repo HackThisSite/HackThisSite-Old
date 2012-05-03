@@ -3,6 +3,12 @@
 
 <form class="form-vertical well" action="<?php echo Url::format('/article/post/save'); ?>" method="post">
     <label>Title:  </label> <input type="text" name="title" /><br />
+    <label>Category:  </label>
+    <select name="category">
+<?php foreach (articles::$categories as $short => $category): ?>
+        <option value="<?php echo $short; ?>"><?php echo $category; ?></option>
+<?php endforeach; ?>
+    </select>
     <label>Description:</label>
     <textarea rows="5" style="width: 100%" name="description"></textarea><br />
     <label>Text:  </label>

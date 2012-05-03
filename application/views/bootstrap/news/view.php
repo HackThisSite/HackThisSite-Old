@@ -1,14 +1,8 @@
 <?php
 if (!empty($news)) {
 	if ($multiple) {
-		$first = true;
 		foreach ($news as $post) {
-			if (!$first) {
-				echo '<br/ ><hr /><br />';
-			}
-			
 			echo Partial::render('newsShort', $post);
-			$first = false;
 		}
 	} else {
         $news[0]['mlt'] = $mlt;

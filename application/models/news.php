@@ -5,15 +5,18 @@ class news extends baseModel {
     var $hasSearch = true;
     var $hasRevisions = true;
     var $collection = 'news';
+    var $type = 'news';
+    
+    const PER_PAGE = 10;
     
     public function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(
-                'shortNews' => false,
+                'shortNews' => $shortNews,
                 'ghosted' => false
             )
         )->sort(array('date' => -1))
-         ->limit(10);
+         ->limit(($shortNews ? 5 : 10));
          $posts = iterator_to_array($posts);
 
          foreach ($posts as $key => $post) {
@@ -24,7 +27,7 @@ class news extends baseModel {
          return $posts;
     }
 
-    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -36,7 +39,7 @@ class news extends baseModel {
             $query = array('_id' => $this->_toMongoId($id));
         }
 
-        $results = $this->db->find($query);
+        $results = $this->db->find($query)->limit($limit)->sort(array('date' => -1));
         
         if (empty($results)) return 'Invalid id.';
         

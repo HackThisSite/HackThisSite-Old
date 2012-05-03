@@ -1,7 +1,7 @@
 <?php if (!empty($valid) && $valid): ?>
-<form action="<?php echo Url::format('/lost/access'); ?>" method="post">
-	<b>What's your username?</b><br />
+<form class="form-inline" action="<?php echo Url::format('/lost/access'); ?>" method="post">
+	<label>Your username:</label>
 	<input type="text" name="username" />&nbsp;
-	<input type="submit" value="Go" />
+	<input type="submit" value="Go" class="btn btn-primary" />
 </form>
 <?php endif; ?>

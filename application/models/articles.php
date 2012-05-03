@@ -5,15 +5,40 @@ class articles extends baseModel {
     var $hasSearch = true;
     var $hasRevisions = true;
     var $collection = 'articles';
+    var $type = 'article';
+    static $categories = array(
+        'web-hacking' => 'Web Hacking',
+        'programming' => 'Programming',
+        'os-specific' => 'OS Specific',
+        'protecting-yourself' => 'Protecting Yourself',
+        'political-activism' => 'Political Activism',
+        'hts-tuts' => 'HTS Tutorials',
+        'ethics' => 'Ethics',
+        'other' => 'Other',
+        'reverse-engineering' => 'Reverse Engineering'
+    );
     
-    public function getNewPosts() {
-        $posts = $this->db->find(
-            array(
-                'ghosted' => false,
-                'published' => true
-            )
-        )->sort(array('date' => -1))
-         ->limit(10);
+    const PER_PAGE = 10;
+    
+    public function getNewPosts($category = 'new', $page = 1, $limit = self::PER_PAGE) {
+        $query = array(
+            'ghosted' => false,
+            'published' => true
+        );
+        
+        if (empty(self::$categories[$category])) $category = 'new';
+        
+        if ($category != 'new') {
+            $query['category'] = $category;
+        }
+        
+        $page = (int) $page;
+        if ($page < 1) $page = 1;
+        
+        $posts = $this->db->find($query)
+            ->sort(array('date' => -1));
+        $total = $posts->count();
+        $posts->limit($limit)->skip(($page - 1) * self::PER_PAGE);
          
          $toReturn = array();
          
@@ -23,7 +48,13 @@ class articles extends baseModel {
             array_push($toReturn, $post);
         }
          
-         return $toReturn;
+         return array(
+            'total' => $total, 
+            'page' => $page, 
+            'articles' => $toReturn,
+            'categories' => self::$categories,
+            'currCategory' => $category
+        );
     }
 
     public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
@@ -61,6 +92,7 @@ class articles extends baseModel {
                 'title' => $result['title']), 'news'))
                 continue;
             
+            $result['rating'] = $this->getScore($result['_id']);
             $this->resolveUser($result['user']);
             if ($fixUTF8) $this->resolveUTF8($result);
             if ($justOne) return $result;
@@ -68,6 +100,48 @@ class articles extends baseModel {
         }
 
         return $toReturn;
+    }
+    
+    public function getScore($articleId) {
+        $data = $this->mongo->articleVotes->findOne(array(
+            'articleId' => (string) $articleId));
+
+        return round($data['total'] / $data['count']);
+    }
+    
+    public function castVote($articleId, $vote) {
+        if ($vote < 1 || $vote > 10) return 'Invalid vote.';
+        $data = $this->mongo->articleVoters->findOne(array(
+            'userId' => (string) Session::getVar('_id'),
+            'articleId' => (string) $articleId));
+        if (!empty($data)) return 'You have already voted on this!';
+        
+        $data = $this->get($articleId, false, true);
+        if (empty($data)) return 'Invalid article id.';
+        
+        $data = $this->mongo->articleVotes->findOne(array('articleId' => (string) $articleId));
+        
+        if (empty($data)) {
+            $this->mongo->articleVotes->insert(array('articleId' => (string) $articleId, 
+                'total' => (int) $vote, 'count' => 1));
+        } else {
+            $this->mongo->articleVotes->update(array('articleId' => (string) $articleId),
+                array('$inc' => array('total' => (int) $vote, 'count' => 1)));
+        }
+        $this->mongo->articleVoters->insert(array('articleId' => (string) $articleId,
+            'userId' => (string) Session::getVar('_id'), 'vote' => (int) $vote));
+    }
+    
+    public function getForUser($userId) {
+        $ref = MongoDBRef::create('users', $userId);
+        
+        $query = array(
+            'user' => $ref,
+            'ghosted' => false, 
+            'published' => true
+        );
+        
+        return iterator_to_array($this->db->find($query));
     }
     
     public function getNextUnapproved() {
@@ -81,7 +155,7 @@ class articles extends baseModel {
         return $record;
     }
 
-    public function validate($title, $description, $text, $tags, $creating = true) {
+    public function validate($title, $category, $description, $text, $tags, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $func = function($value) { return trim($value); };
         
@@ -93,9 +167,11 @@ class articles extends baseModel {
         if (empty($title)) return 'Invalid title.';
         if (empty($description)) return 'Invalid description';
         if (empty($body)) return 'Invalid body.';
+        if (empty(self::$categories[$category])) return 'Invalid category.';
         
         $entry = array( 
             'title' => $title,
+            'category' => $category,
             'description' => $description, 
             'body' => $body, 
             'tags' => $tags,
@@ -104,11 +180,10 @@ class articles extends baseModel {
             'commentable' => true, 
             'published' => false, 
             'ghosted' => false, 
-            'flaggable' => false
             );
         
         if (!$creating) unset($entry['user'], $entry['date'], 
-            $entry['commentable'], $entry['published'], $entry['flaggable']);
+            $entry['commentable'], $entry['published']);
         
         return $entry;
     }
@@ -132,5 +207,9 @@ class articles extends baseModel {
     public function approve($id) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('published' => true)));
         return true;
+    }
+    
+    public static function categories() {
+        return self::$categories;
     }
 }

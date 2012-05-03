@@ -9,6 +9,7 @@ class comments extends baseModel {
     var $baseQuery = array('ghosted' => false);
     var $commentableCollections = array('articles', 'bugs', 'lectures', 'news', 'users');
     var $collection = 'comments';
+    var $type = 'comment';
     
     public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         // $justOne is going to be ignored since we're searching by id.

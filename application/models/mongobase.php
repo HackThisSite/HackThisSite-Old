@@ -8,6 +8,6 @@ class mongoBase
     }
     
     public function clean($string) {
-        return htmlentities(utf8_encode(trim((string) $string)), ENT_QUOTES, '', false);
+        return utf8_encode(htmlentities(trim((string) $string), ENT_QUOTES, '', false));
     }
 }

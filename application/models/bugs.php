@@ -36,6 +36,7 @@ class bugs extends baseModel {
     var $hasSearch = false;
     var $hasRevisions = false;
     var $collection = 'bugs';
+    var $type = 'bug';
     
     public function getNew($filter = 'open', $page = 1) {
         $pageLimit = 15;

@@ -86,6 +86,14 @@ class users extends baseModel {
         if ($creating) {
             $user = $this->get($username);
             if (!empty($user)) return 'Username taken.';
+            
+            $user = $this->mongo->unimportedUsers->findOne(array(
+                'username' => $this->clean($username)
+                ));
+            
+            if (!empty($user)) 
+                return 'Username is reserved.  If this is you, try to 
+reclaim your account instead.';
         }
         
         $entry = array(

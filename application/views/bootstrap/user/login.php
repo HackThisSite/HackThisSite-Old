@@ -3,5 +3,7 @@
     Password: <input type="text" name="password" /><br />
     <input type="submit" class="btn btn-primary" value="Login" />&nbsp;
     <a href="<?php echo Url::format('/user/register'); ?>" class="btn">Register</a><br />
-    <a href="<?php echo Url::format('/lost'); ?>">Lost your password?</a>
+    <a href="<?php echo Url::format('/lost'); ?>">Lost your password?</a><br />
+    <br />
+    <a class="btn btn-info" href="<?php echo Url::format('/reclaim'); ?>">Reclaim Your Account</a>
 </form></center>

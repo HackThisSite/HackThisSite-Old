@@ -15,7 +15,8 @@ class articles extends baseModel {
         'hts-tuts' => 'HTS Tutorials',
         'ethics' => 'Ethics',
         'other' => 'Other',
-        'reverse-engineering' => 'Reverse Engineering'
+        'reverse-engineering' => 'Reverse Engineering',
+        'uncategorized' => 'Uncategorized',
     );
     
     const PER_PAGE = 10;

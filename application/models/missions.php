@@ -1,4 +1,9 @@
 <?php
+/**
+ * Missions
+ * 
+ * @package Model
+ */
 class missions extends mongoBase {
     
     var $db;

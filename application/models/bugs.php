@@ -1,4 +1,9 @@
 <?php
+/**
+ * Bugs
+ * 
+ * @package Model
+ */
 class bugs extends baseModel {
     
     static $category = array(
@@ -38,7 +43,15 @@ class bugs extends baseModel {
     var $collection = 'bugs';
     var $type = 'bug';
     
-    public function getNew($filter = 'open', $page = 1) {
+    /**
+     * Gets new bugs.
+     * 
+     * @param string $filter Status to show.
+     * @param int $page The page to get.
+     * 
+     * @return array The new bugs.
+     */
+    protected function getNew($filter = 'open', $page = 1) {
         $pageLimit = 15;
         
         $query = array(
@@ -70,7 +83,17 @@ class bugs extends baseModel {
         return $return;
     }
     
-    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+    /**
+     * Gets a bug.
+     * 
+     * @param string $id Bug id.
+     * @param bool $idlib True if the Id library should be used (False for MongoIds)
+     * @param bool $justOne True if only one entry should be returned.
+     * @param bool $fixUTF8 True if UTF8 should be decoded.
+     * 
+     * @return mixed The bug/bugs as an array, or an error string.
+     */
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -114,6 +137,7 @@ class bugs extends baseModel {
         return $toReturn;
     }
     
+    // Content management magic.
     public function validate($title, $category, $description, $reproduction, $public, $creating = true) {
         $title = $this->clean($title);
         $description = $this->clean($description);
@@ -146,6 +170,12 @@ class bugs extends baseModel {
         return $entry;
     }
     
+    /**
+     * Alter a bug
+     * 
+     * @param string $id The bug id.
+     * @param array $diff The diff to apply.
+     */
     public function alter($id, $diff) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array(
             '$set' => $diff));
@@ -153,6 +183,7 @@ class bugs extends baseModel {
         return true;
     }
 
+    // Content management magic.
     static public function canView($bug) {
         if ($bug['public'] == true) return true;
         if ((Session::isLoggedIn() && 

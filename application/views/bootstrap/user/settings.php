@@ -31,19 +31,6 @@ if (!empty($valid) && $valid):
 			<input type="checkbox" name="hideEmail" value="true"<?php echo ($user['hideEmail'] ? ' checked="checked"' : ''); ?> />
 		</div>
 	</div>
-<?php if (CheckAcl::can('editAcl')): ?>
-	<div class="control-group">
-		<label class="control-label">Group:</label>
-		
-		<div class="controls">
-			<select name="group">
-<?php foreach (acl::$acls as $acl): ?>
-				<option value="<?php echo $acl; ?>"<?php echo ($acl == $user['group'] ? 'selected="selected"' : ''); ?>><?php echo ucwords($acl); ?></option>
-<?php endforeach; ?>
-			</select>
-		</div>
-    </div>
-<?php endif; ?>
 </fieldset>
 <fieldset>    
 	<legend>Change Password</legend>

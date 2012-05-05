@@ -1,9 +1,9 @@
 <?php
 class controller_news extends Content {
 
-    public static $cache = array(
-        'view' => array('type' => 'v', 'key' => 'news/view_{REQ}', 'ttl' => 5)
-        );
+    //public static $cache = array(
+    //    'view' => array('type' => 'v', 'key' => 'news/view_{REQ}_{SI}', 'ttl' => 5)
+    //    );
         
     var $name = 'news';
     var $model = 'news';

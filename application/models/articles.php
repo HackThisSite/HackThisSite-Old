@@ -1,4 +1,9 @@
 <?php
+/**
+ * Articles
+ * 
+ * @package Model
+ */
 class articles extends baseModel {
 
     var $cdata = array('title', 'body', '@tags');
@@ -21,7 +26,16 @@ class articles extends baseModel {
     
     const PER_PAGE = 10;
     
-    public function getNewPosts($category = 'new', $page = 1, $limit = self::PER_PAGE) {
+    /**
+     * Gets new articles.
+     * 
+     * @param string $category Article category.
+     * @param int $page Page number.
+     * @param int $limit Limit of entries per page.
+     * 
+     * @return array New articles.
+     */
+    protected function getNewPosts($category = 'new', $page = 1, $limit = self::PER_PAGE) {
         $query = array(
             'ghosted' => false,
             'published' => true
@@ -58,7 +72,17 @@ class articles extends baseModel {
         );
     }
 
-    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+    /**
+     * Get an article(s).
+     * 
+     * @param string $id Article id.
+     * @param bool $idlib True if the Id library should be used (False for MongoIds)
+     * @param bool $justOne True if only one entry should be returned.
+     * @param bool $fixUTF8 True if UTF8 should be decoded.
+     * 
+     * @return mixed The article/articles as an array, or an error string.
+     */
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -103,13 +127,28 @@ class articles extends baseModel {
         return $toReturn;
     }
     
-    public function getScore($articleId) {
+    /**
+     * Get an articles rating.
+     * 
+     * @param string $articleId The article's id.
+     * 
+     * @return int The articles score, 1-10.
+     */
+    protected function getScore($articleId) {
         $data = $this->mongo->articleVotes->findOne(array(
             'articleId' => (string) $articleId));
 
         return round($data['total'] / $data['count']);
     }
     
+    /**
+     * Casts a vote on an article.
+     * 
+     * @param string $articleId The article's id.
+     * @param int $vote The vote, 1-10.
+     * 
+     * @return mixed Null if successful, or an error string.
+     */
     public function castVote($articleId, $vote) {
         if ($vote < 1 || $vote > 10) return 'Invalid vote.';
         $data = $this->mongo->articleVoters->findOne(array(
@@ -133,7 +172,14 @@ class articles extends baseModel {
             'userId' => (string) Session::getVar('_id'), 'vote' => (int) $vote));
     }
     
-    public function getForUser($userId) {
+    /**
+     * Gets articles a user has posted.
+     * 
+     * @param string $userId The user's id.
+     * 
+     * @return array Articles the user has written.
+     */
+    protected function getForUser($userId) {
         $ref = MongoDBRef::create('users', $userId);
         
         $query = array(
@@ -145,6 +191,11 @@ class articles extends baseModel {
         return iterator_to_array($this->db->find($query));
     }
     
+    /**
+     * Gets the new unapproved article.
+     * 
+     * @return mixed Null if no more, or the next article.
+     */
     public function getNextUnapproved() {
         $record = $this->db->findOne(array('published' => false, 'ghosted' => false));
         
@@ -156,6 +207,7 @@ class articles extends baseModel {
         return $record;
     }
 
+    // Content management magic.
     public function validate($title, $category, $description, $text, $tags, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $func = function($value) { return trim($value); };
@@ -189,6 +241,7 @@ class articles extends baseModel {
         return $entry;
     }
     
+    // Content management magic.
     public function generateRevision($update, $old) {
         $titleFD = new FineDiff($update['title'], $old['title']);
         $bodyFD = new FineDiff($update['body'], $old['body']);
@@ -205,12 +258,14 @@ class articles extends baseModel {
         return $revision;
     }
 
+    /**
+     * Marks an article as approved.
+     * 
+     * @param string $id The article id.
+     */
     public function approve($id) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('published' => true)));
         return true;
     }
     
-    public static function categories() {
-        return self::$categories;
-    }
 }

@@ -22,7 +22,7 @@ class Url {
             return $url;
         
         $base = ($static ? self::$static : self::$base);
-        $base = (!empty($_SERVER['SSL_CLIENT_RAW_CERT']) ? str_replace('http://', 'https://', $base) : $base);
+        $base = (isset($_SERVER['SSL_CLIENT_RAW_CERT']) ? 'https' . $base : 'http' . $base);
 
         return ($base[strlen($base) - 1] == '/' && $url[0] == '/' ? substr($base, 0, -1) : $base) . $url;
     }

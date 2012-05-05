@@ -1,4 +1,9 @@
 <?php
+/**
+ * Reclaims
+ * 
+ * @package Model
+ */
 class reclaims extends mongoBase {
     
     var $groups = array(
@@ -10,16 +15,36 @@ class reclaims extends mongoBase {
     private $mongo;
     private $db;
     
+    /**
+     * Create a new instance.
+     * 
+     * @param resource $connection A MongoDB connection.
+     */
     public function __construct($connection) {
         $db = Config::get('mongo:db');
         $this->mongo = $connection->$db;
         $this->db = $connection->$db->unimportedUsers;
     }
     
-    public function get($username) {
+    /**
+     * Get data on an unimported user.
+     * 
+     * @param string $username The username to look for.
+     * 
+     * @return array The user information as an array.
+     */
+    protected function get($username) {
         return $this->db->findOne(array('username' => $this->clean($username)));
     }
     
+    /**
+     * Authenticate a user with v3 mechanisms.
+     * 
+     * @param string $username The username to use.
+     * @param string $password The password to use.
+     * 
+     * @return bool True if the user is authed.
+     */
     public function authenticate($username, $password) {
         $data = $this->get($username);
         if (empty($data)) return false;
@@ -27,7 +52,7 @@ class reclaims extends mongoBase {
         return $this->checkPassword($username, $password, $data['password']);
     }
     
-    function checkPassword($username, $password, $hash) {
+    private function checkPassword($username, $password, $hash) {
         $hashtype = substr($hash, 0, strpos($hash, '}')+1);
         $hashclean = (strpos($hash, '}') ? substr($hash, strpos($hash, '}')+1) : $hash);
 
@@ -48,6 +73,12 @@ class reclaims extends mongoBase {
         }
     }
     
+    /**
+     * Import an account.
+     * 
+     * @param string $username The username to use.
+     * @param string $password The password to use.
+     */
     public function import($username, $password) {
         $data = $this->get($username);
         $this->db->remove(array('username' => $this->clean($username)));

@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Quotes
+ * 
+ * @package Model
+ */
 class quotes extends mongoBase
 {
     const KEY_ID    = "_id";

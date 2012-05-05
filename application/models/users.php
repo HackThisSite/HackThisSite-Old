@@ -1,4 +1,9 @@
 <?php
+/**
+ * Users
+ * 
+ * @package Model
+ */
 class users extends baseModel {
     
     const ACCT_OPEN = 1;
@@ -9,13 +14,27 @@ class users extends baseModel {
     var $hasSearch = false;
     var $hasRevisions = false;
     
+    /**
+     * Creates a new instance.
+     * 
+     * @param resource $mongo A MongoDB connection.
+     */
     public function __construct($mongo) {
         $db       = Config::get(self::KEY_DB);
         $this->mongo = $mongo->$db;
         $this->db = $mongo->$db->users;
     }
     
-    public function get($id, $idlib = true, $justOne = true) {
+    /**
+     * Get a user by id.
+     * 
+     * @param string $id The user id.
+     * @param bool $idlib If the id library should be used.
+     * @param bool $justOne If only one entry should be returned.
+     * 
+     * @return array The user found as an array.
+     */
+    protected function get($id, $idlib = true, $justOne = true) {
         if ($idlib) {
             $idLib = new Id;
             $keys = $idLib->dissectKeys($id, 'user');
@@ -64,6 +83,7 @@ class users extends baseModel {
         return $user;
     }
     
+    // Content management magic.
     public function validate($username, $password, $email, $hideEmail, $group, $creating = true) {
         if (strpos($username, '\'') || strpos($username, '"')) return 'Invalid username.';
         $passEmpty = false;
@@ -120,6 +140,14 @@ reclaim your account instead.';
         return $entry;
     }
     
+    /**
+     * Authenticate a user.
+     * 
+     * @param string $username The username to use.
+     * @param string $password The password to use.
+     * 
+     * @return mixed True on success, or error string.
+     */
     public function authenticate($username, $password) {
         $auths = array('Password', 'Certificate', 'CAP');
         $applicable = array();
@@ -144,6 +172,14 @@ reclaim your account instead.';
         return 'Invalid username/password';
     }
     
+    /**
+     * Preliminary checks for adding a certificate.
+     * 
+     * @param string $userId The user's id.
+     * @param string $certKey The key of the user's certificate.
+     * 
+     * @return mixed True on success, or an error string.
+     */
     public function preAdd($userId, $certKey) {
         $user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
         if ($user == null) return 'Invalid user id.';
@@ -152,18 +188,39 @@ reclaim your account instead.';
         return true;
     }
     
+    /**
+     * Add a certificate.
+     * 
+     * @param string $userId The user's id.
+     * @param string $certKey The key of the user's certificate.
+     */
     public function addCert($userId, $certKey) {
         $this->db->update(array('_id' => $this->_toMongoId($userId)), 
             array('$push' => array('certs' => $certKey)));
         return true;
     }
     
+    /**
+     * Remove a certificate.
+     * 
+     * @param string $userId The user's id.
+     * @param string $certKey The key of the user's certificate.
+     */
     public function removeCert($userId, $certKey) {
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$pull' => array('certs' => $certKey)));
         return true;
     }
     
+    /**
+     * Change a user's authentication
+     * 
+     * @param string $userId The user's id.
+     * @param bool $password True for password auth.
+     * @param bool $certificate True for certificate auth.
+     * @param bool $certAndPass True for certificate and password auth.
+     * @param bool $autoauth True to enable AutoAuth.
+     */
     public function changeAuth($userId, $password, $certificate, $certAndPass, $autoauth) {
         $auths = array();
         if ($password) array_push($auths, 'password');
@@ -176,10 +233,25 @@ reclaim your account instead.';
             array('$set' => array('auths' => $auths)));
     }
     
+    /**
+     * Hash a user's password.
+     * 
+     * @param string $password The password to use.
+     * @param string $username The username to use.
+     * 
+     * @return string The hashed password.
+     */
     public function hash($password, $username) {
         return crypt($password, $username);
     }
     
+    /**
+     * Reset a user's password.
+     * 
+     * @param string $userId The user's id.
+     * 
+     * @return string The user's new password.
+     */
     public function resetPassword($userId) {
         $password = hash('crc32', rand());
 
@@ -190,6 +262,14 @@ reclaim your account instead.';
         return $password;
     }
     
+    /**
+     * Add a note to a user's profile.
+     * 
+     * @param string $userId The user's id.
+     * @param string $note The note.
+     * 
+     * @return mixed Null on success, or an error string.
+     */
     public function addNote($userId, $note) {
         $user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
         
@@ -208,11 +288,23 @@ reclaim your account instead.';
                 ))));
     }
     
+    /**
+     * Set a user's status.
+     * 
+     * @param string $userId The user's id.
+     * @param int $status The user's new status.
+     */
     public function setStatus($userId, $status) {
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('status' => (int) $status)));
     }
     
+    /**
+     * Set a user's group.
+     * 
+     * @param string $userId The user's id.
+     * @param string $group The user's new group.
+     */
     public function setGroup($userId, $group) {
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('group' => (string) $group)));

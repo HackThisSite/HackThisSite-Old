@@ -1,4 +1,9 @@
 <?php
+/**
+ * Base Model
+ * 
+ * @package Model
+ */
 class baseModel extends mongoBase {
 
     const KEY_SERVER = "mongo:server";
@@ -7,12 +12,22 @@ class baseModel extends mongoBase {
     var $db;
     var $mongo;
     
+    /**
+     * Creates a new base model instance.
+     * 
+     * @param resource $mongo A MongoDB connection.
+     */
     public function __construct($mongo) {
         $db       = Config::get(self::KEY_DB);
         $this->mongo = $mongo->$db;
         $this->db = $mongo->$db->{$this->collection};
     }
     
+    /**
+     * Create a new piece of content.
+     * 
+     * @return resource MongoDB id of the new content, or error string.
+     */
     public function create() {
         $entry = call_user_func_array(array($this, 'validate'), func_get_args());
         if (is_string($entry)) return $entry;
@@ -22,6 +37,11 @@ class baseModel extends mongoBase {
         return $entry['_id'];
     }
     
+    /**
+     * Edits a piece of content.
+     * 
+     * @return mixed Error string, or true if successful.
+     */
     public function edit() {
         $args = func_get_args();
         $id = array_shift($args);
@@ -46,7 +66,12 @@ class baseModel extends mongoBase {
         return true;
     }
     
-    public function delete($id) { // Insecure
+    /**
+     * Delets a piece of content.
+     * 
+     * @param string $id The MongoDB id of the content.
+     */
+    public function delete($id) { 
         $entry = $this->db->findOne(array('_id' => $this->_toMongoId($id)));
         if (empty($entry))
             return self::ERROR_NONEXISTANT;
@@ -63,6 +88,11 @@ class baseModel extends mongoBase {
         Search::index((string) $id, $entry);
     }
     
+    /**
+     * Resolves user references.
+     * 
+     * @param array &$user User reference.
+     */
     public function resolveUser(&$user) {
         if (isset($user['$id']) && !$user['$id']) {
             $user = array('username' => 'Anonymous');
@@ -75,6 +105,11 @@ class baseModel extends mongoBase {
         if (empty($user)) $user = array('username' => 'Unknown');
     }
     
+    /**
+     * Resolves encoded UTF-8.
+     * 
+     * @param array &$entry The piece of encoded content.
+     */
     public function resolveUTF8(&$entry) { // utf8_decode
         foreach ($this->cdata as $key) {
             if ($key[0] == '@') {

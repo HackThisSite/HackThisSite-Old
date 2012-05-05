@@ -1,4 +1,9 @@
 <?php
+/**
+ * Lectures
+ * 
+ * @package Model
+ */
 class lectures extends baseModel {
     
     var $cdata = array('title', 'lecturer', 'description');
@@ -7,7 +12,17 @@ class lectures extends baseModel {
     var $collection = 'lectures';
     var $type = 'lecture';
     
-    public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
+    /**
+     * Get a lecture.
+     * 
+     * @param string $id The lecture id.
+     * @param bool $idlib True if the Id library should be used (False for MongoIds)
+     * @param bool $justOne True if only one entry should be returned.
+     * @param bool $fixUTF8 True if UTF8 should be decoded.
+     * 
+     * @return mixed The lecture as an array, or an error string.
+     */
+    protected function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         $record = $this->db->findOne(array(
             '_id' => new MongoId($id), 
             'ghosted' => false
@@ -19,7 +34,12 @@ class lectures extends baseModel {
         return $record;
     }
     
-    public function getNew() {
+    /**
+     * Get new lectures.
+     * 
+     * @return mixed The new lectures as an array, or an error string.
+     */
+    protected function getNew() {
         $records = $this->db->find(array(
             'time' => array('$gte' => time()), 
             'ghosted' => false
@@ -35,7 +55,14 @@ class lectures extends baseModel {
         return $records;
     }
     
-    public function getForUser($username) {
+    /**
+     * Get lectures a user has given.
+     * 
+     * @param string $username The username to use.
+     * 
+     * @return array The lectures this user have given.
+     */
+    protected function getForUser($username) {
         $query = array(
             'lecturer' => $username,
             'ghosted' => false
@@ -44,6 +71,7 @@ class lectures extends baseModel {
         return iterator_to_array($this->db->find($query));
     }
     
+    // Content management magic.
     public function validate($title, $lecturer, $description, $time, $duration, $creating = true) {
         $title = substr($this->clean($title), 0, 100);
         $lecturer = substr($this->clean($lecturer), 0, 80);

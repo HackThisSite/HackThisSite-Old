@@ -1,4 +1,9 @@
 <?php
+/**
+ * News
+ * 
+ * @package Model
+ */
 class news extends baseModel {
 
     var $cdata = array('title', 'department', 'body', '@tags');
@@ -8,8 +13,15 @@ class news extends baseModel {
     var $type = 'news';
     
     const PER_PAGE = 10;
-    
-    public function getNewPosts($shortNews = false) {
+
+    /**
+     * Get new news posts.
+     * 
+     * @param bool $shortNews True if you're getting short news.
+     * 
+     * @return array The new news posts as an array.
+     */
+    protected function getNewPosts($shortNews = false) {
         $posts = $this->db->find(
             array(
                 'shortNews' => $shortNews,
@@ -27,7 +39,17 @@ class news extends baseModel {
          return $posts;
     }
 
-    public function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
+    /**
+     * Get a news post.
+     * 
+     * @param string $id The news id.
+     * @param bool $idlib True if the Id library should be used (False for MongoIds)
+     * @param bool $justOne True if only one entry should be returned.
+     * @param bool $fixUTF8 True if UTF8 should be decoded.
+     * 
+     * @return mixed The news post as an array, or an error string.
+     */
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
         if ($idlib) {
             $idLib = new Id;
 
@@ -72,6 +94,7 @@ class news extends baseModel {
         return $toReturn;
     }
 
+    // Content management magic.
     public function validate($title, $department, $text, $tags, $shortNews, $commentable, $creating = true) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $func = function($value) { return trim($value); };
@@ -100,6 +123,7 @@ class news extends baseModel {
         return $entry;
     }
 
+    // Content management magic.
     public function generateRevision($update, $old) {
         $titleFD = new FineDiff($update['title'], $old['title']);
         $departmentFD = new FineDiff($update['department'], $old['department']);

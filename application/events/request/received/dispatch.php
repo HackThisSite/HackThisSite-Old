@@ -43,9 +43,6 @@ class events_request_received_dispatch
             $controller = "controller_nil";
         if (!method_exists($controller, $request[0]))
             $controller = "controller_nil";
-
-		if (self::dispatchCache($controller, $request)) 
-			return;
         
 		$class = new $controller($request);
         
@@ -54,18 +51,4 @@ class events_request_received_dispatch
         
     }
     
-    static private function dispatchCache($controller, $request) {
-        $params = $request;array_shift($params);
-		if (!$data = $controller::getCache($request[0], $params)) return false;
-		if (!apc_exists($data['key'])) return false;
-		$content = apc_fetch($data['key']);
-        
-		if ($data['type'] == 'v') {
-			Layout::set('content', $content);
-		} else if ($data['type'] == 'c') {
-			
-		}
-        Layout::$data = array_merge(Layout::$data, apc_fetch($data['key'] . '_layout'));
-		return true;
-	}
 }

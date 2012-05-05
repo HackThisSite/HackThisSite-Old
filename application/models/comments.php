@@ -1,4 +1,9 @@
 <?php
+/**
+ * Comments
+ * 
+ * @package Model
+ */
 class comments extends baseModel {
     
     const PAGE_LIMIT = 10;
@@ -11,7 +16,17 @@ class comments extends baseModel {
     var $collection = 'comments';
     var $type = 'comment';
     
-    public function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
+    /**
+     * Gets a comment
+     * 
+     * @param string $id The comment id.
+     * @param bool $idlib True if the Id library should be used (False for MongoIds)
+     * @param bool $justOne True if only one entry should be returned.
+     * @param bool $fixUTF8 True if UTF8 should be decoded.
+     * 
+     * @return mixed The comment as an array, or an error string.
+     */
+    protected function get($id, $idlib = false, $justOne = true, $fixUTF8 = true) {
         // $justOne is going to be ignored since we're searching by id.
         $query = $this->baseQuery;$query['_id'] = $this->_toMongoId($id);
         $comment = $this->db->findOne($query);
@@ -23,7 +38,17 @@ class comments extends baseModel {
         return $comment;
     }
     
-    public function getForId($id, $idlib = false, $justOne = true, $page = 1) {
+    /**
+     * Get comments for a content id.
+     * 
+     * @param string $id The content id to use.
+     * @param bool $idlib If the Id library should be used.
+     * @param bool $justOne If only one entry should be returned.
+     * @param int $page The page to get comments for.
+     * 
+     * @return mixed The comment/comments as an array, or an error string.
+     */
+    protected function getForId($id, $idlib = false, $justOne = true, $page = 1) {
         $query = $this->baseQuery;$query['contentId'] = $this->clean($id);
         $comments = $this->db->find($query)
             ->skip(($page - 1) * self::PAGE_LIMIT)
@@ -42,6 +67,7 @@ class comments extends baseModel {
         return ($justOne ? reset($comments) : $comments);
     }
     
+    // Content management magic.
     public function validate($contentId, $text, $creating = true) {
         $valid = false;
         foreach ($this->commentableCollections as $collection) {
@@ -74,6 +100,7 @@ class comments extends baseModel {
         return $entry;
     }
     
+    // Content management magic.
     public function authChange($type, $comment) {
         return (CheckAcl::can($type . 'AllComment') || (CheckAcl::can($type . 'Comment') && 
             Session::getVar('username') == $comment['user']['username']));

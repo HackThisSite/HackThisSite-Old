@@ -1,15 +1,12 @@
 <?php
 class controller_index extends Controller {
     
-    //public static $cache = array(
-    //    'index' => array('type' => 'v', 'key' => 'index_{SI}', 'ttl' => 5)
-    //    );
-    
     public function index($arguments) {
         $news = new news(ConnectionFactory::get('mongo'));
         $articles = new articles(ConnectionFactory::get('mongo'));
         $notices = new notices(ConnectionFactory::get('redis'));
         $irc = new irc(ConnectionFactory::get('redis'));
+        $quotes = new quotes(ConnectionFactory::get('mongo'));
         
         // Set all site-wide notices.
         foreach ($notices->getAll() as $notice) {
@@ -21,6 +18,7 @@ class controller_index extends Controller {
         $this->view['shortNews'] = $news->getNewPosts(true);
         $this->view['newArticles'] = $articles->getNewPosts('new', 1, 5);
         $this->view['ircOnline'] = $irc->getOnline();
+        $this->view['randomQuote'] = $quotes->getRandom();
         
         // Get online users.
         $apc = new APCIterator('user', '/user_.*/');

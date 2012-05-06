@@ -1,3 +1,4 @@
+<center><blockquote><?php echo $randomQuote; ?></blockquote></center>
 <div class="row">
     <div class="span3"><div class="well">
         <h4>Short News</h4>

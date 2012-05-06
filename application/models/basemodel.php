@@ -34,7 +34,7 @@ class baseModel extends mongoBase {
         
         $this->db->insert($entry);
         if ($this->hasSearch) $this->searchIndex($entry['_id'], func_get_args(), true);
-        return $entry['_id'];
+        return $entry;
     }
     
     /**

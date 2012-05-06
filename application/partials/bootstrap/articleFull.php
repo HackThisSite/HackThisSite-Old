@@ -33,7 +33,11 @@ foreach ($mlt as $fetched) {
 <?php endif; ?>
 <?php if ($published): ?>
     <p style="margin-top: 20px"><br />
+<?php if ($rating == 0): ?>
+        <em>No ratings yet!</em>
+<?php else: ?>
         <em>Average rating of:  <?php echo $rating; ?></em>
+<?php endif; ?>
 <?php if (CheckAcl::can('voteOnArticles')): ?>
         <form class="form-inline" action="<?php echo Url::format('/article/vote/'); ?>" method="post">
             <select name="vote" class="input-mini">

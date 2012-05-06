@@ -4,7 +4,7 @@
  * 
  * @package Library
  */
-class Id {
+class Id extends Cache {
     
     /**
      * Id creation
@@ -14,7 +14,7 @@ class Id {
      * 
      * @return string The content's id.
      */
-    static public function create($data, $type) {
+    protected static function create($data, $type) {
         switch ($type) {
             case 'news':
                 $string = trim(strtolower($data['title']));
@@ -36,6 +36,10 @@ class Id {
             case 'user':
                 return $data['username'];
                 break;
+            
+            case 'article':
+                return Id::create($data, 'news');
+                break;
         }
         
         return false;
@@ -53,7 +57,7 @@ class Id {
      * @return array Array of data that can be used in a query for the 
      * original content.
      */
-    static public function dissectKeys($hash, $type) {
+    protected static function dissectKeys($hash, $type) {
         switch ($type) {
             case 'news':
                 $sections = explode('/', $hash);
@@ -103,6 +107,10 @@ class Id {
             case 'user':
                 return array('username' => $hash);
                 break;
+            
+            case 'article':
+                return Id::dissetKeys($hash, 'news');
+                break;
                 
         }
         
@@ -120,7 +128,7 @@ class Id {
      * 
      * @return bool True if the given content directly maps to the given id.
      */
-    static public function validateHash($hash, $data, $type) {
+    protected static function validateHash($hash, $data, $type) {
         switch ($type) {
             case 'news':
                 $realHash = self::create($data, $type);
@@ -137,6 +145,10 @@ class Id {
                 
             case 'user':
                 return ($hash == $data['username']);
+                break;
+            
+            case 'article':
+                return Id::validateHash($hash, $data, 'news');
                 break;
         }
         

@@ -146,7 +146,7 @@ reclaim your account instead.';
      * @param string $username The username to use.
      * @param string $password The password to use.
      * 
-     * @return mixed True on success, or error string.
+     * @return mixed User data on success, or error string.
      */
     public function authenticate($username, $password) {
         $auths = array('Password', 'Certificate', 'CAP');
@@ -165,7 +165,7 @@ reclaim your account instead.';
                 if ($good['status'] == self::ACCT_LOCKED) return 'User banned.';
                 
                 Session::setBatchVars($good);
-                return true;
+                return $good;
             }
         }
         

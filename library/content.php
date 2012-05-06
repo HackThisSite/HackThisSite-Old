@@ -62,9 +62,8 @@ class Content extends Controller {
             
             $this->view['valid'] = false;
             Error::set(ucwords($this->name) . ' posted!', true);
-            Log::write(LOG_INFO, 'Posted a ' . $this->name);
-        } else {
-            Log::write(LOG_INFO, 'Composing a ' . $this->name);
+            Log::activity('Created:  ' . $this->name, 
+                '/' . substr(get_called_class(), 11) . '/view/' . Id::create($info, $this->name));
         }
     }
     
@@ -102,9 +101,8 @@ class Content extends Controller {
             
             $this->view['post'] = $model->get($arguments[0], false, true);
             Error::set('Entry edited!', true);
-            Log::write(LOG_INFO, 'Successfully edited ' . $this->name . ' ' . $arguments[0]);
-        } else {
-            Log::write(LOG_INFO, 'Editing ' . $this->name . ' ' . $arguments[0]);
+            Log::activity('Edited:  ' . $this->name,
+                '/' . substr(get_called_class(), 11) . '/view/' . Id::create($this->view['post'], $this->name));
         }
     }
     
@@ -115,8 +113,6 @@ class Content extends Controller {
             return Error::set('No ' . $this->name . ' id was found!');
         if (!method_exists($model, 'authChange') && !CheckAcl::can('delete' . $this->permission))
             return Error::set('You are not allowed to delete ' . $this->pluralize($this->name) . '!');
-        
-        Log::write(LOG_INFO, 'Attempting to delete ' . $this->name . ' ' . $arguments[0]);
         
         if (method_exists($model, 'authChange')) {
             $entry = $model->get($arguments[0], false, true);
@@ -134,7 +130,7 @@ class Content extends Controller {
         if (!isset($this->dnr) || (isset($this->dnr) && !$this->dnr))
             header('Location: ' . Url::format($this->location));
             
-        Log::write(LOG_INFO, 'Successfully deleted ' . $this->name . ' ' . $arguments[0]);
+        Log::activity('Deleted:  ' . $this->name . ' (' . $arguments[0] . ')', null);
     }
     
     public function revisions($arguments) {
@@ -184,6 +180,9 @@ class Content extends Controller {
             
             $current = $model->get($arguments[0], false, true);
             $this->view['current'] = $current;
+            
+            Log::activity('Reverted:  ' . $this->name,
+                '/' . substr(get_called_class(), 11) . '/view/' . Id::create($current, $this->name));
         }
         return true;
     }

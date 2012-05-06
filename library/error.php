@@ -20,10 +20,10 @@ class Error {
      */
     public static function set($error, $notice = false) {
         if ($notice) {
-            Log::write(LOG_NOTICE, $error);
+            Log::error(LOG_NOTICE, $error);
             array_push(self::$notices, $error);
         } else {
-            Log::write(LOG_ERR, $error);
+            Log::error(LOG_ERR, $error);
             array_push(self::$errors, $error);
         }
         

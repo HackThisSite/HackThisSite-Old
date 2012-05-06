@@ -4,7 +4,7 @@
  * 
  * @package Library
  */
-class BBCode {
+class BBCode extends Cache {
     
     /**
      * Parse BBCode into HTML.
@@ -13,10 +13,7 @@ class BBCode {
      * 
      * @return string HTML representation of $data.
      */
-    static public function parse($data) {
-        if (apc_exists($key = 'bbcode_' . md5($data)))
-            return apc_fetch($key);
-        
+    protected static function parse($data) {
         $bbcodedata = array(
             'b' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<b>', 'close_tag' => '</b>'),
             'u' => array('type' => BBCODE_TYPE_NOARG, 'open_tag' => '<u>', 'close_tag' => '</u>'),
@@ -39,7 +36,6 @@ class BBCode {
         $bbcode = bbcode_create($bbcodedata);
         $return = "<div align=\"left\">" . str_replace(array('<ul><br />', '</li><br />'), array('<ul>', '</li>'), bbcode_parse($bbcode, nl2br($data))) . "</div>";
         
-        apc_store($key, $return, 5);
         return $return;
      }
      

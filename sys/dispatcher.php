@@ -182,5 +182,5 @@ $observer = Observer::singleton(
 $observer->trigger("request/received");
 
 $observer->trigger("request/ended");
-
+Log::general();
 

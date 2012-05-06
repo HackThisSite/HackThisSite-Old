@@ -58,18 +58,6 @@ class Controller
         if ($silent) return;
 
         $this->processRequest();
-        
-        
-        $data = $this->getCache($request[0], $this->request);
-        if ($data !== false) {
-            if ($data['type'] == 'v') {
-                apc_add($data['key'], (string) $this->parsedViewResult, $data['ttl']);
-            } else if ($data['type'] == 'c') {
-                apc_add($data['key'], $this->view, $data['ttl']);
-            }
-            apc_add($data['key'] . '_layout', Layout::$data, $data['ttyl']);
-        }
-        
     }
 
     public function processRequest()
@@ -99,6 +87,8 @@ class Controller
     public function __call($name, $arguments)
     {
         $controller = substr(get_class($this), 11);
+        Log::$request = $controller . '/' . $name;
+        Log::$arguments = $arguments;
         
         if (!method_exists($this, $name)) {
             $this->nil($arguments);

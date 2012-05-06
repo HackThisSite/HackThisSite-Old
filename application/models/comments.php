@@ -67,6 +67,17 @@ class comments extends baseModel {
         return ($justOne ? reset($comments) : $comments);
     }
     
+    /**
+     * Gets the number of comments for a piece of content.
+     * 
+     * @param string $contentId The content id.
+     * 
+     * @return int The number of comments.
+     */
+    protected function getCount($contentId) {
+        return (int) $this->db->count(array('contentId' => (string) $contentId));
+    }
+    
     // Content management magic.
     public function validate($contentId, $text, $creating = true) {
         $valid = false;

@@ -13,4 +13,10 @@
 	<a class="btn btn-primary" href="<?php echo Url::format('news/view/' . Id::create(array('date' => $date, 'title' => $title), 'news')); ?>">
 		Read More
 	</a>
+
+<?php if ($commentable): ?>
+    <em><?php echo $comments; ?> comments</em>
+<?php else: ?>
+    <em>Comments disabled</em>
+<?php endif; ?>
 </div>

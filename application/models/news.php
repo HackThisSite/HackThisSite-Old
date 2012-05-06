@@ -31,9 +31,12 @@ class news extends baseModel {
          ->limit(($shortNews ? 5 : 10));
          $posts = iterator_to_array($posts);
 
+        $comments = new comments(ConnectionFactory::get('mongo'));
+        
          foreach ($posts as $key => $post) {
              $this->resolveUser($posts[$key]['user']);
              $this->resolveUTF8($posts[$key]);
+             $posts[$key]['comments'] = $comments->getCount($post['_id']);
          }
          
          return $posts;
@@ -64,6 +67,7 @@ class news extends baseModel {
         $results = $this->db->find($query)->limit($limit)->sort(array('date' => -1));
         
         if (empty($results)) return 'Invalid id.';
+        $comments = new comments(ConnectionFactory::get('mongo'));
         
         if (!$idlib) {
             $toReturn = iterator_to_array($results);
@@ -71,6 +75,7 @@ class news extends baseModel {
             foreach ($toReturn as $key => $entry) {
                 $this->resolveUser($toReturn[$key]['user']);
                 if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
+                $toReturn[$key]['comments'] = $comments->getCount($entry['_id']);
             }
             
             return ($justOne ? reset($toReturn) : $toReturn);
@@ -86,6 +91,7 @@ class news extends baseModel {
             
             $this->resolveUser($result['user']);
             if ($fixUTF8) $this->resolveUTF8($result);
+            $result['comments'] = $comments->getCount($result['_id']);
             
             if ($justOne) return $result;
             array_push($toReturn, $result);

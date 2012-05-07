@@ -135,10 +135,12 @@ class articles extends baseModel {
      * @return int The articles score, 1-10.
      */
     protected function getScore($articleId) {
-        $data = $this->mongo->articleVotes->findOne(array(
-            'articleId' => (string) $articleId));
+        $likes = $this->mongo->articleVotes->count(array(
+            'contentId' => (string) $articleId, 'liked' => true));
+        $dislikes = $this->mongo->articleVotes->count(array(
+            'contentId' => (string) $articleId, 'liked' => false));
 
-        return round($data['total'] / $data['count']);
+        return array('likes' => $likes, 'dislikes' => $dislikes);
     }
     
     /**
@@ -150,26 +152,25 @@ class articles extends baseModel {
      * @return mixed Null if successful, or an error string.
      */
     public function castVote($articleId, $vote) {
-        if ($vote < 1 || $vote > 10) return 'Invalid vote.';
-        $data = $this->mongo->articleVoters->findOne(array(
-            'userId' => (string) Session::getVar('_id'),
-            'articleId' => (string) $articleId));
-        if (!empty($data)) return 'You have already voted on this!';
+        $articleId = (string) $articleId;
+        $vote = (string) $vote;
         
+        if ($vote != 'like' && $vote != 'dislike') return 'Invalid vote.';
         $data = $this->get($articleId, false, true);
         if (empty($data)) return 'Invalid article id.';
         
-        $data = $this->mongo->articleVotes->findOne(array('articleId' => (string) $articleId));
+        $data = $this->mongo->articleVotes
+            ->count(array('contentId' => $articleId, 'userId' => (string) Session::getVar('_id')));
+        if ($data != 0) return 'You\'re already voted on this!';
         
-        if (empty($data)) {
-            $this->mongo->articleVotes->insert(array('articleId' => (string) $articleId, 
-                'total' => (int) $vote, 'count' => 1));
-        } else {
-            $this->mongo->articleVotes->update(array('articleId' => (string) $articleId),
-                array('$inc' => array('total' => (int) $vote, 'count' => 1)));
-        }
-        $this->mongo->articleVoters->insert(array('articleId' => (string) $articleId,
-            'userId' => (string) Session::getVar('_id'), 'vote' => (int) $vote));
+        $entry = array(
+            'contentId' => $articleId,
+            'userId' => (string) Session::getVar('_id'),
+            'liked' => ($vote == 'like')
+        );
+        
+        $this->mongo->articleVotes->insert($entry);
+        return true;
     }
     
     /**

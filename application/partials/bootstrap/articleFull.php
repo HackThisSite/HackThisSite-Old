@@ -35,26 +35,30 @@ foreach ($mlt as $fetched) {
     <p style="margin-top: 20px"><br />
 <?php if ($rating == 0): ?>
         <em>No ratings yet!</em>
-<?php else: ?>
-        <em>Average rating of:  <?php echo $rating; ?></em>
-<?php endif; ?>
+<?php else:
+$html = array();
+
+if ($rating['likes'] != 0)
+    $html[] = $rating['likes'] . ' like' . ($rating['likes'] == 1 ? '' : 's');
+if ($rating['dislikes'] != 0)
+    $html[] = $rating['dislikes'] . ' dislike' . ($rating['dislikes'] == 1 ? '' : 's');
+
+$html = implode(', ', $html);
+if (empty($html))
+    $html = 'No votes!';
+endif; ?>
+        <em><?php echo $html; ?></em>
 <?php if (CheckAcl::can('voteOnArticles')): ?>
-        <form class="form-inline" action="<?php echo Url::format('/article/vote/'); ?>" method="post">
-            <select name="vote" class="input-mini">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-            </select>
-            <input type="hidden" name="articleId" value="<?php echo $_id; ?>" />
-            <input type="submit" value="Go" class="btn btn-success" />
-        </form>
+        <a href="<?php echo Url::format('/article/vote/' . $_id . '/like'); ?>" 
+        class="btn btn-small">
+            <i class="icon-plus"></i>
+            Like
+        </a>&nbsp;
+        <a href="<?php echo Url::format('/article/vote/' . $_id . '/dislike'); ?>" 
+        class="btn btn-inverse btn-small">
+            <i class="icon-minus icon-white"></i>
+            Dislike
+        </a>
 <?php endif; ?>
     </p>
 <?php endif; ?>

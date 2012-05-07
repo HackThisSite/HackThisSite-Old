@@ -82,14 +82,14 @@ class controller_article extends Content {
         $this->view['article'] = $unapproved;
     }
     
-    public function vote() {
+    public function vote($arguments) {
         if (!CheckAcl::can('voteOnArticles')) 
             return Error::set('You can not vote on articles.');
-        if (empty($_POST['vote']) || empty($_POST['articleId']))
+        if (empty($arguments[0]) || empty($arguments[1]))
             return Error::set('Vote or article id not found.');
         
         $articles = new articles(ConnectionFactory::get('mongo'));
-        $result = $articles->castVote($_POST['articleId'], $_POST['vote']);
+        $result = $articles->castVote($arguments[0], $arguments[1]);
         
         if (is_string($result)) return Error::set($result);
         Error::set('Vote cast!', true);

@@ -9,7 +9,7 @@ class Cache {
             return apc_fetch($key);
         
         $return = call_user_func_array(array($this, $name), $arguments);
-        apc_store($key, $return, 5);
+        apc_store($key, $return, 10);
         return $return;
     }
     
@@ -18,7 +18,7 @@ class Cache {
             return apc_fetch($key);
 
         $return = call_user_func_array('static::' . $name, $arguments);
-        apc_store($key, $return, 5);
+        apc_store($key, $return, 10);
         return $return;
     }
     

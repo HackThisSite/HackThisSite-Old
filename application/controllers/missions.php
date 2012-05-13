@@ -72,9 +72,10 @@ class controller_missions extends Controller {
     public function basic($arguments) {
         $this->baseMission('basic', $arguments);
         
-        if ((!empty($arguments[0]) && $arguments[0] == '3' && $arguments[1] == 'password.php') ||
-        (!empty($arguments[0]) && $arguments[0] == '4' && $arguments[1] == 'level4.php') || 
-        (!empty($arguments[0]) && $arguments[0] == '5' && $arguments[1] == 'level5.php'))
+        if (empty($arguments[0])) return;
+        if (($arguments[0] == '3' && $arguments[1] == 'password.php') ||
+        ($arguments[0] == '4' && $arguments[1] == 'level4.php') || 
+        ($arguments[0] == '5' && $arguments[1] == 'level5.php'))
             Layout::cut();
     }
 }

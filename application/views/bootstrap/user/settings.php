@@ -4,7 +4,8 @@ if (!empty($valid) && $valid):
 <div class="page-header"><h1>Edit User:  <?php echo $user['username']; ?></h1></div>
 <small>
     <a href="<?php echo Url::format('/user/link'); ?>">Manage IRC Credentials</a>&nbsp;-&nbsp;
-    <a href="<?php echo Url::format('/user/logs'); ?>">View Account Activity</a>
+    <a href="<?php echo Url::format('/user/logs'); ?>">View Account Activity</a>&nbsp;-&nbsp;
+    <a href="<?php echo Url::format('/user/connections'); ?>">Manage Your Connections</a>
 </small>
 <form class="well form-horizontal" action="<?php echo Url::format('/user/settings/save'); ?>" method="post">
 <fieldset>

@@ -13,6 +13,5 @@ class events_request_received_startup
         // later we'll pull the default layout from the config and then check
         // it against user preference.
         Layout::selectLayout(Config::get(self::CONFIG_LAYOUT));
-        $end = microtime(true);
     }
 }

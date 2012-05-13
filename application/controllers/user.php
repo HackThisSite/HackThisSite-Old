@@ -270,4 +270,15 @@ class controller_user extends Controller {
         $this->view['activity'] = $logs->getActivity(Session::getVar('_id'));
     }
     
+    public function connections() {
+        if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
+        $user = new users(ConnectionFactory::get('mongo'));
+        $userInfo = $user->get(Session::getVar('_id'), false, true);
+        
+        if (empty($userInfo['connections'])) 
+            return Error::set('You have no connections!');
+        
+        $this->view['valid'] = true;
+    }
+    
 }

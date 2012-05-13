@@ -82,6 +82,13 @@
 <?php endforeach;endforeach; ?>
 					</ul>
 				</div>
+                
+                <h4>
+                    <img src="<?php echo Url::format('/twitter.png', true); ?>" />&nbsp;
+                    HackThisSite Twitter
+                </h4>
+                
+                <p><?php echo implode('<hr />', $tweets); ?></p>
 			</div>
 			<!-- End navigation -->
 			

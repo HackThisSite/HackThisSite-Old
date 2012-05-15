@@ -17,7 +17,7 @@ class Log {
      * Creates all resources needed.
      */
     public static function initiate() {
-        self::$logModel = new logs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
+        self::$logModel = new logs(ConnectionFactory::get('redis'));
         
         openlog('hts', LOG_ODELAY, LOG_USER);
         self::$opened = true;
@@ -35,8 +35,8 @@ class Log {
         if (!self::$opened) self::initiate();
         
         $logHeader = (!Session::isLoggedIn() ? 'Guest' : 'User ' . Session::getVar('username')) . 
-            ' (' . microtime() . '):  ';
-        return syslog($priority, $logHeader . $message);
+            ' (' . microtime(true) . '):  ';
+        return self::$logModel->error($logHeader . $message);
     }
     
     /**

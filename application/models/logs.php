@@ -1,12 +1,32 @@
 <?php
 class logs extends mongoBase {
     
-    private $mongo;
     private $redis;
     
-    public function __construct($mongo, $redis) {
-        $this->mongo = $mongo->{Config::get('mongo:db')};
+    private $error = array();
+    private $activity = array();
+    private $general = array();
+    
+    public function __construct($redis) {
         $this->redis = $redis;
+    }
+    
+    public function __destruct() {
+        $multi = $this->redis->multi();
+        
+        foreach ($this->error as $errorLog) {
+            $multi->publish('log_error', $errorLog);
+        }
+        
+        foreach ($this->activity as $activityLog) {
+            $multi->publish('log_activity', $activityLog);
+        }
+        
+        foreach ($this->general as $generalLog) {
+            $multi->publish('log_general', $generalLog);
+        }
+        
+        $multi->exec();
     }
     
     public function login($userId) {
@@ -20,6 +40,10 @@ class logs extends mongoBase {
         $this->redis->lTrim($key, 0, 4);
     }
     
+    public function error($message) {
+        array_push($this->error, $message);
+    }
+    
     public function activity($message, $reference) {
         if (($id = Session::getVar('_id')) == false)
             $id = null;
@@ -31,11 +55,10 @@ class logs extends mongoBase {
             'time' => time()
         );
         
-        $this->mongo->activity->insert($entry);
+        array_push($this->activity, serialize($entry));
     }
     
     public function general() {
-        $start = microtime(true);
         if (($id = Session::getVar('_id')) == false)
             $id = null;
         
@@ -59,7 +82,7 @@ class logs extends mongoBase {
             'loadTime' => (microtime(true) - Log::$start)
         );
 
-        $this->mongo->logs->insert($entry);
+        array_push($this->general, serialize($entry));
     }
     
     protected function getLogins($userId) {

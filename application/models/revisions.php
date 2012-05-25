@@ -31,14 +31,14 @@ class revisions extends mongoBase {
      * 
      * @return array The revisions.
      */
-    protected function getForId($id) {
+    public function getForId($id) {
         $data = $this->db->find(array('contentId' => (string) $id))
             ->sort(array('_id' => -1));
         return iterator_to_array($data);
     }
 
     // Document later.
-    protected function getById($id, $for, $diffdFields) {
+    public function getById($id, $for, $diffdFields) {
         $data = $this->db->find(array(
             '_id' => array('$gte' => $this->_toMongoId((string) $id))))->sort(array('_id' => -1));
         $data = iterator_to_array($data);

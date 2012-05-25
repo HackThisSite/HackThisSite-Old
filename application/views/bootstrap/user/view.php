@@ -115,6 +115,26 @@ foreach ($lectures as $lecture): ?>
 <?php endif; ?>
 	</div>
 </div>
+<?php if (CheckAcl::can('banUsers')): ?>
+<hr />
+<div class="row">
+    <div class="span4 offset5">
+        <form class="form-inline" style="float: right" action="<?php echo Url::format('/user/ban/'); ?>" method="post">
+            <input type="hidden" name="userId" value="<?php echo $user['_id']; ?>" />
+            
+            <label class="checkbox">
+                <input type="checkbox" name="slowban" value="true" />
+                Slow banned
+            </label>&nbsp;&nbsp;
+            <label class="checkbox">
+                <input type="checkbox" name="errorban" value="true" />
+                Error banned
+            </label>&nbsp;&nbsp;
+            <input type="submit" value="Punish" class="btn btn-danger" />
+        </form>
+    </div>
+</div>
+<?php endif; ?>
 <?php endif; ?>
 
 <hr />

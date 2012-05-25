@@ -31,6 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *   Thetan ( Joseph Moniz )
 **/
 
+// Set error handlers
+error_reporting(E_ALL);
+function errorHandler($errno, $errstr, $errfile, $errline) {
+    $error = 'Error #' . $errno . ':  ' . $errstr . ' in ' . $errfile . 
+        ' on line ' . $errline;
+    Log::error($error);
+    
+    if (Config::get('system:environment') == 'dev') {
+        echo $error;
+    } else {
+        echo 'Sorry, an error has occured.';
+    }
+    die;
+}
+set_error_handler("errorHandler");
+
 // add our library path to the include path
 set_include_path(
     get_include_path() .
@@ -164,6 +180,7 @@ class lazyLoader
 }
 
 lazyLoader::initialize();
+Log::$start = microtime(true);
 
 $observer = Observer::singleton(
     array(
@@ -182,5 +199,5 @@ $observer = Observer::singleton(
 $observer->trigger("request/received");
 
 $observer->trigger("request/ended");
-Log::general();
+//Log::general();
 

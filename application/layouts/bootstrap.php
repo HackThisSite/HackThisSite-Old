@@ -68,6 +68,7 @@
     <?php if (CheckAcl::can('approveArticles')): ?><li><a href="<?php echo Url::format('/article/approve'); ?>">Approve Articles</a></li><?php endif; ?>
     <?php if (CheckAcl::can('postLectures')) : ?><li><a href="<?php echo Url::format('/lecture/post'); ?>">Post Lecture</a></li><?php endif; ?>
     <?php if (CheckAcl::can('manageNotice')) : ?><li><a href="<?php echo Url::format('/notice'); ?>">Manage Notices</a></li><?php endif; ?>
+    <?php if (CheckAcl::can('viewStats')) : ?><li><a href="<?php echo Url::format('/stats'); ?>">View Stats</a></li><?php endif; ?>
 <?php endif; ?>
 						<li class="nav-header">Search</li>
 						<li>

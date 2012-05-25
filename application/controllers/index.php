@@ -21,12 +21,12 @@ class controller_index extends Controller {
         $this->view['randomQuote'] = $quotes->getRandom();
         
         // Get online users.
-        $apc = new APCIterator('user', '/user_.*/');
+        $apc = new APCIterator('user', '/' . Cache::PREFIX . 'user_.*/');
         $this->view['onlineUsers'] = array();
         
         while ($apc->valid()) {
             $current = $apc->current();
-            array_push($this->view['onlineUsers'], substr($current['key'], 5));
+            array_push($this->view['onlineUsers'], substr($current['key'], strlen(Cache::PREFIX) + 5));
             $apc->next();
         }
         

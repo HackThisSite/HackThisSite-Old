@@ -92,7 +92,7 @@ class certs extends mongoBase {
      * 
      * @return string The user id that corresponds to this certificate.
      */
-    public function check($cert) {
+    protected function check($cert) {
         $file = Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension');
         if (!file_exists($file)) return null;
         $info = file_get_contents($file);
@@ -107,7 +107,7 @@ class certs extends mongoBase {
      * 
      * @return string The certificate key.
      */
-    public static function getKey($cert) {
+    protected static function getKey($cert) {
         return self::PREFIX . hash(self::HASH, trim($cert));
     }
     

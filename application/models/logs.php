@@ -7,8 +7,12 @@ class logs extends mongoBase {
     private $activity = array();
     private $general = array();
     
-    public function __construct($redis) {
+    public function __construct($redis, $mongo = null) {
         $this->redis = $redis;
+        $this->mongo = $mongo;
+        
+        if ($this->mongo != null) 
+            $this->mongo = $this->mongo->{Config::get('mongo:db')};
     }
     
     public function __destruct() {

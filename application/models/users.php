@@ -195,6 +195,7 @@ reclaim your account instead.';
      * @param string $certKey The key of the user's certificate.
      */
     public function addCert($userId, $certKey) {
+        self::ApcPurge($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)), 
             array('$push' => array('certs' => $certKey)));
         return true;
@@ -207,6 +208,7 @@ reclaim your account instead.';
      * @param string $certKey The key of the user's certificate.
      */
     public function removeCert($userId, $certKey) {
+        self::ApcPurge($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$pull' => array('certs' => $certKey)));
         return true;
@@ -222,6 +224,8 @@ reclaim your account instead.';
      * @param bool $autoauth True to enable AutoAuth.
      */
     public function changeAuth($userId, $password, $certificate, $certAndPass, $autoauth) {
+        self::ApcPurge($userId);
+        
         $auths = array();
         if ($password) array_push($auths, 'password');
         if ($certificate) array_push($auths, 'certificate');
@@ -253,6 +257,7 @@ reclaim your account instead.';
      * @return string The user's new password.
      */
     public function resetPassword($userId) {
+        self::ApcPurge($userId);
         $password = hash('crc32', rand());
 
         $userInfo = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
@@ -271,6 +276,7 @@ reclaim your account instead.';
      * @return mixed Null on success, or an error string.
      */
     public function addNote($userId, $note) {
+        self::ApcPurge($userId);
         $user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
         
         if (!$user) return 'Invalid user id.';
@@ -295,6 +301,7 @@ reclaim your account instead.';
      * @param int $status The user's new status.
      */
     public function setStatus($userId, $status) {
+        self::ApcPurge($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('status' => (int) $status)));
     }
@@ -306,6 +313,7 @@ reclaim your account instead.';
      * @param string $group The user's new group.
      */
     public function setGroup($userId, $group) {
+        self::ApcPurge($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('group' => (string) $group)));
     }

@@ -18,8 +18,6 @@ class Log {
      */
     public static function initiate() {
         self::$logModel = new logs(ConnectionFactory::get('redis'));
-        
-        openlog('hts', LOG_ODELAY, LOG_USER);
         self::$opened = true;
     }
     
@@ -31,7 +29,7 @@ class Log {
      * 
      * @return bool True on success.
      */
-    public static function error($priority, $message) {
+    public static function error($message) {
         if (!self::$opened) self::initiate();
         
         $logHeader = (!Session::isLoggedIn() ? 'Guest' : 'User ' . Session::getVar('username')) . 

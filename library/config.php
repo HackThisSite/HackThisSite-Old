@@ -30,7 +30,7 @@ class Config
     {
         if (!self::$_isLoaded) self::_preloadConfigIfNotLoaded();
         if (isset(self::$_localized[$key])) { return self::$_localized[$key]; }
-        return self::$_localized[$key] = apc_fetch(self::PREFIX . $key);
+        return self::$_localized[$key] = apc_fetch(Cache::PREFIX . self::PREFIX . $key);
     }
 
     /*
@@ -42,7 +42,7 @@ class Config
     {
         if (!self::$_isLoaded) self::_preloadConfigIfNotLoaded();
         $this->_localized[$key] = $value;
-        apc_store(self::PREFIX . $key, $value);
+        apc_store(Cache::PREFIX . self::PREFIX . $key, $value);
     }
 
     static private function _preloadConfigIfNotLoaded()
@@ -51,7 +51,7 @@ class Config
         if (self::$_isLoaded) { return; }
 
         $isLoadedKey = "_" . self::PREFIX . "is_loaded";
-        if (apc_fetch($isLoadedKey) !== false)
+        if (apc_fetch(Cache::PREFIX . $isLoadedKey) !== false)
         {
             // yay, we already loaded the config, return to what we were doing.
             self::$_isLoaded = true;
@@ -86,7 +86,7 @@ class Config
         // populate the shared memory cache with the final config state.
         foreach($finalConf as $key => $value)
         {
-            apc_store(self::PREFIX . $key, $value);
+            apc_store(Cache::PREFIX . self::PREFIX . $key, $value);
         }
 
         // set the flag indicating that the shared memory cache has been
@@ -95,7 +95,7 @@ class Config
         {
             $isLoadedKey = "_" . self::PREFIX . "is_loaded";
         }
-        apc_store($isLoadedKey, true);
+        apc_store(Cache::PREFIX . $isLoadedKey, true);
     }
 
     /*

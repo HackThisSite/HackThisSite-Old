@@ -63,6 +63,7 @@ class baseModel extends mongoBase {
         if ($this->hasRevisions) $this->mongo->revisions->insert($revision);
         
         if ($this->hasSearch) $this->searchIndex($id, $args, false);
+        self::ApcPurge($id);
         return true;
     }
     
@@ -77,6 +78,7 @@ class baseModel extends mongoBase {
             return self::ERROR_NONEXISTANT;
         
         if ($this->hasSearch) Search::delete($id);
+        self::ApcPurge($id);
         return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }

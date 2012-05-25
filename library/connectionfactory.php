@@ -18,7 +18,7 @@ class ConnectionFactory
         }
         else
         {
-            $cacheKey = self::CACHE_PREFIX . $type;
+            $cacheKey = Cache::PREFIX . self::CACHE_PREFIX . $type;
             $path     = apc_fetch($cacheKey);
             if ($path === null) {
                 return false;

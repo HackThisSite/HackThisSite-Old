@@ -92,5 +92,6 @@ class reclaims extends mongoBase {
         
         $this->mongo->news->update(array('user' => $oldRef), array('$set' => array('user' => $newRef)));
         $this->mongo->articles->update(array('user' => $oldRef), array('$set' => array('user' => $newRef)));
+        self::ApcPurge($data['_id']);
     }
 }

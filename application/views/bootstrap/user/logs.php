@@ -7,7 +7,7 @@
 
 <dl>
 <?php foreach ($logins as $login): ?>
-    <dt>You logged in on: <?php echo Date::minuteFormat($login['time']); ?></dt>
+    <dt>Logged in on: <?php echo Date::minuteFormat($login['time']); ?></dt>
     <dd>
         <em>(<?php echo Date::durationFormat(time() - $login['time']); ?> ago)</em><br />
         <em>I.P. Address:</em>  <?php echo $login['ipAddress']; ?><br />

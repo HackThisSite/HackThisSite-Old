@@ -128,8 +128,7 @@ class controller_user extends Controller {
         if (!isset($_POST['username']) || !isset($_POST['password'])) return;
         if (is_string($good)) return Error::set($good);
         
-        $logs = new logs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
-        $logs->login($good['_id']);
+        Log::login($good['_id']);
         
         header('Location: ' . Url::format('/'));
     }
@@ -265,7 +264,7 @@ class controller_user extends Controller {
         if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
         $this->view['valid'] = true;
         
-        $logs = new logs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
+        $logs = new logs(ConnectionFactory::get('redis'), ConnectionFactory::get('mongo'));
         $this->view['logins'] = $logs->getLogins(Session::getVar('_id'));
         $this->view['activity'] = $logs->getActivity(Session::getVar('_id'));
     }

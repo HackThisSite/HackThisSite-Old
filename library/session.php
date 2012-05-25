@@ -4,7 +4,7 @@
  * 
  * @package Library
  */
-class Session {
+class Session extends Cache {
     
     private static $data = array();
     
@@ -74,7 +74,8 @@ class Session {
         $_SESSION = array_merge($_SESSION, self::$data);
         
         if (self::isLoggedIn()) {
-            apc_store('user_' . self::$data['username'], session_id(), 300);
+            $key = 'user_' . self::$data['username'];
+            self::ApcAdd($key, session_id(), 300, $key);
         }
     }
     
@@ -82,7 +83,7 @@ class Session {
      * Destroy the current session (logout).
      */
     public static function destroy() {
-        if (!empty(self::$data['username'])) apc_delete('user_' . self::$data['username']);
+        if (!empty(self::$data['username'])) self::ApcPurge('user_' . self::$data['username']);
         self::$data = array();
         
         if (ini_get("session.use_cookies")) {
@@ -119,6 +120,6 @@ class Session {
             }
         }
         
-        apc_delete('user_' . $username);
+        self::ApcPurge('user_' . $username);
     }
 }

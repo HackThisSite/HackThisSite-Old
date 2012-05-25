@@ -21,7 +21,7 @@ foreach ($comments as $comment) {
 			</a><br />
 			
 			<a class="thumbnail" class="display: block">
-				<img src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($comment['user']['email']))); ?>" />
+				<img src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim((empty($comment['user']['email']) ? 'guest@hts.org' : $comment['user']['email'])))); ?>" />
 			</a>
 			
 			<small title="<?php echo Date::minuteFormat($comment['date']); ?>">

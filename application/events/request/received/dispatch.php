@@ -40,9 +40,7 @@ class events_request_received_dispatch
         }
 		
         if (!class_exists($controller))
-            $controller = "controller_nil";
-        if (!method_exists($controller, $request[0]))
-            $controller = "controller_nil";
+            $controller = "Controller";
         
 		$class = new $controller($request);
         

@@ -76,40 +76,39 @@ class Controller
         }
                 
         // If no method was specified default to index
-        $method = (isset($this->request[0])) ?
-                                             array_shift($this->request)
-                                             : 'index';
+        $this->method = (isset($this->request[0]) ? 
+            array_shift($this->request) : 'index');
         
-        $this->__call($method, $this->request);
-    }
-
-    // A wrapper to call controller methods
-    public function __call($name, $arguments)
-    {
-        $controller = substr(get_class($this), 11);
-        Log::$request = $controller . '/' . $name;
-        Log::$arguments = $arguments;
+        $this->call($this->method, $this->request);
         
-        if (!method_exists($this, $name)) {
-            $this->nil($arguments);
-            $this->setView('nil');
-        } else {
-            // Set the implicit view
-            $this->setView($controller . '/' . $name);
-            
-            // Call the actual function.
-            $this->$name($arguments);
-        }
-
         // Load and parse view
         $this->parsedViewResult = new View(
             $this->controllerState['view'],
             $this->view,
             $this->driver
         );
+    }
 
-        return $this->parsedViewResult;
-
+    // A wrapper to call controller methods
+    public function call($name, $arguments)
+    {
+        $controller = substr(get_class($this), 11);
+        Log::$request = $controller . '/' . $name;
+        Log::$arguments = $arguments;
+        
+        if ($name == 'nil' || !method_exists($this, $name)) {
+            $this->nil();
+        } else {
+            // Set the implicit view
+            $this->setView($controller . '/' . str_replace('_', '/', $name));
+            
+            // Call the actual function.
+            $this->$name($arguments);
+        }
+    }
+    
+    public function __call($name, $arguments) {
+        $this->nil();
     }
 
     // A method to call static controller methods
@@ -154,13 +153,15 @@ class Controller
         return $this->driver;
     }
     
-    public static function getCache($method, $request) {
-        $class = get_called_class();
-        if (!property_exists($class, 'cache') || empty($class::$cache[$method])) return false;
-        $search = array('{SI}', '{REQ}');
-        $replace = array(session_id(), implode('/', $request));
+    public function subController() {
+        $this->method .= '_' . (isset($this->request[0]) ? 
+            array_shift($this->request) : 'index');
         
-        return str_replace($search, $replace, $class::$cache[$method]);
+        if (!method_exists($this, $this->method)) {
+            $this->nil();
+        } else {
+            $this->call($this->method, $this->request);
+        }
     }
     
     public function __toString()
@@ -168,5 +169,9 @@ class Controller
         return (string)$this->parsedViewResult;
     }
     
-    //private function nil() {}
+    private function nil() {
+        $this->setView('nil');
+        Layout::set('title', 'Not Found');
+    }
+    
 }

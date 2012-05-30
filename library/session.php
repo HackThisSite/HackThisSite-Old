@@ -74,7 +74,7 @@ class Session extends Cache {
         $_SESSION = array_merge($_SESSION, self::$data);
         
         if (self::isLoggedIn()) {
-            $key = 'user_' . self::$data['username'];
+            $key = 'Session_user_' . self::$data['username'];
             self::ApcAdd($key, session_id(), 300, $key);
         }
     }
@@ -83,7 +83,7 @@ class Session extends Cache {
      * Destroy the current session (logout).
      */
     public static function destroy() {
-        if (!empty(self::$data['username'])) self::ApcPurge('user_' . self::$data['username']);
+        if (self::isLoggedIn()) self::ApcPurge('user_' . self::$data['username']);
         self::$data = array();
         
         if (ini_get("session.use_cookies")) {
@@ -94,6 +94,16 @@ class Session extends Cache {
             );
         }
         session_destroy();
+    }
+    
+    public static function setExternalVars($sid, $data) {
+        apc_add(Cache::PREFIX . 'sessionReq_' . $sid, 
+            $data, 1860);
+        // The logic behind 1860:  If they have a heartbeat enabled, this 
+        // should be cleared within 5 minutes if they're online.  If they 
+        // don't have a heartbeat enabled, and they're inactive for 30 
+        // minutes, they're not going to be logged in anyways.  (31m for 
+        // error margins)
     }
     
     /**
@@ -121,5 +131,9 @@ class Session extends Cache {
         }
         
         self::ApcPurge('user_' . $username);
+    }
+    
+    public static function getId() {
+        return session_id();
     }
 }

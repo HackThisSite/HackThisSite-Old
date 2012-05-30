@@ -2,9 +2,9 @@
 <h1 class="page-header" style="display: inline-block"><?php echo $user['username']; ?>'s Profile</h1>
 <div class="pull-right" style="display: inline-block">
 <?php if (CheckAcl::can('forceLogout')): ?>
-<form action="<?php echo Url::format('/user/forceLogout'); ?>" method="post" style="display: inline">
+<form action="<?php echo Url::format('/user/admin/kick'); ?>" method="post" style="display: inline">
 	<input type="hidden" name="username" value="<?php echo $user['username']; ?>" />
-<?php if (apc_exists('user_' . $user['username'])): ?>
+<?php if ($onSite): ?>
 	<input type="submit" value="Logout" class="btn btn-danger" />
 <?php endif; ?>
 </form>
@@ -107,7 +107,7 @@ foreach ($lectures as $lecture): ?>
 <?php endforeach; endif; ?>
 		</div>
 <?php if (CheckAcl::can('postNotes')): ?>
-		<form class="form-search" action="<?php echo Url::format('/user/notes/'); ?>" method="post">
+		<form class="form-search" action="<?php echo Url::format('/user/admin/note/'); ?>" method="post">
 			<input type="hidden" name="userId" value="<?php echo $user['_id']; ?>" />
 			<input class="span6" type="text" name="note" placeholder="Something here to help you keep track of who is who." />
 			<input type="submit" value="Save" class="btn btn-primary" />
@@ -119,15 +119,15 @@ foreach ($lectures as $lecture): ?>
 <hr />
 <div class="row">
     <div class="span4 offset5">
-        <form class="form-inline" style="float: right" action="<?php echo Url::format('/user/ban/'); ?>" method="post">
+        <form class="form-inline" style="float: right" action="<?php echo Url::format('/user/admin/ban/'); ?>" method="post">
             <input type="hidden" name="userId" value="<?php echo $user['_id']; ?>" />
             
             <label class="checkbox">
-                <input type="checkbox" name="slowban" value="true" />
+                <input type="checkbox" name="slowban" value="true"<?php echo (!empty($user['bans']) && $user['bans']['slowBan'] ? ' checked="checked"' : ''); ?> />
                 Slow banned
             </label>&nbsp;&nbsp;
             <label class="checkbox">
-                <input type="checkbox" name="errorban" value="true" />
+                <input type="checkbox" name="errorban" value="true"<?php echo (!empty($user['bans']) && $user['bans']['errorBan'] ? ' checked="checked"' : ''); ?> />
                 Error banned
             </label>&nbsp;&nbsp;
             <input type="submit" value="Punish" class="btn btn-danger" />

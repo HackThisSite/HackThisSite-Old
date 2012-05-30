@@ -54,6 +54,7 @@ class users extends baseModel {
         return $users;
     }
     
+    
     private function resolveDeps($user) {
         $user = $this->resolveCerts($user);
         $user = $this->resolveNotes($user);
@@ -82,6 +83,7 @@ class users extends baseModel {
         }
         return $user;
     }
+    
     
     // Content management magic.
     public function validate($username, $password, $email, $hideEmail, $group, $creating = true) {
@@ -123,7 +125,10 @@ reclaim your account instead.';
             'status' => self::ACCT_OPEN,
             'hideEmail' => $hideEmail,
             'group' => ($group == null ? self::DEFAULT_GROUP : $group),
-            'auths' => array('password')
+            'auths' => array('password'),
+            'notes' => array(),
+            'certs' => array(),
+            'bans' => array()
         );
         if (!$creating && !CheckAcl::can('changeUsername')) unset($entry['username']);
         if (!$creating && !CheckAcl::can('changeAcctStatus')) unset($entry['status']);
@@ -138,38 +143,6 @@ reclaim your account instead.';
         }
         
         return $entry;
-    }
-    
-    /**
-     * Authenticate a user.
-     * 
-     * @param string $username The username to use.
-     * @param string $password The password to use.
-     * 
-     * @return mixed User data on success, or error string.
-     */
-    public function authenticate($username, $password) {
-        $auths = array('Password', 'Certificate', 'CAP');
-        $applicable = array();
-        
-        foreach ($auths as $auth) {
-            $good = call_user_func(array($this, 'qualify' . $auth), 
-                $username, $password);
-            if ($good) $applicable[] = $auth;
-        }
-        
-        foreach ($applicable as $auth) {
-            $good = call_user_func(array($this, 'check' . $auth),
-                $username, $password);
-            if ($good != false) {
-                if ($good['status'] == self::ACCT_LOCKED) return 'User banned.';
-                
-                Session::setBatchVars($good);
-                return $good;
-            }
-        }
-        
-        return 'Invalid username/password';
     }
     
     /**
@@ -235,18 +208,6 @@ reclaim your account instead.';
         if (empty($auths)) return 'You need some method of authentication!';
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('auths' => $auths)));
-    }
-    
-    /**
-     * Hash a user's password.
-     * 
-     * @param string $password The password to use.
-     * @param string $username The username to use.
-     * 
-     * @return string The hashed password.
-     */
-    public function hash($password, $username) {
-        return crypt($password, $username);
     }
     
     /**
@@ -318,6 +279,69 @@ reclaim your account instead.';
             array('$set' => array('group' => (string) $group)));
     }
     
+    /**
+     * Special Ban a user.
+     */
+    public function banUser($userId, $bans) {
+        $user = $this->get($userId, false);
+        if (empty($user)) return 'Invalid user id.';
+        
+        $this->db->update(array('_id' => $this->_toMongoId($userId)),
+            array('$set' => array('bans' => $bans)));
+        self::ApcPurge($userId);
+        
+        // We need to permeate an active session!
+        $key = 'hts_Session_user_' . $user['username'];
+        if (apc_exists($key)) {
+            Session::setExternalVars(apc_fetch($key), array('bans' => $bans));
+        }
+        return $user;
+    }
+    
+    
+    /**
+     * Authenticate a user.
+     * 
+     * @param string $username The username to use.
+     * @param string $password The password to use.
+     * 
+     * @return mixed User data on success, or error string.
+     */
+    public function authenticate($username, $password) {
+        $auths = array('Password', 'Certificate', 'CAP');
+        $applicable = array();
+        
+        foreach ($auths as $auth) {
+            $good = call_user_func(array($this, 'qualify' . $auth), 
+                $username, $password);
+            if ($good) $applicable[] = $auth;
+        }
+        
+        foreach ($applicable as $auth) {
+            $good = call_user_func(array($this, 'check' . $auth),
+                $username, $password);
+            if ($good != false) {
+                if ($good['status'] == self::ACCT_LOCKED) return 'User banned.';
+                
+                Session::setBatchVars($good);
+                return $good;
+            }
+        }
+        
+        return 'Invalid username/password';
+    }
+    
+    /**
+     * Hash a user's password.
+     * 
+     * @param string $password The password to use.
+     * @param string $username The username to use.
+     * 
+     * @return string The hashed password.
+     */
+    public function hash($password, $username) {
+        return crypt($password, $username);
+    }
     
     // AUTHENTICATION MECHANISMS
     private function qualifyPassword($username, $password) {

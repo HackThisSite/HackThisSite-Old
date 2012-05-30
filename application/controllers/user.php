@@ -1,9 +1,37 @@
 <?php
+// I'm sorry this file is so freaking huge.  I've tried to counter that
+// with good organizaiton.  ~ Brendan Mc.
 class controller_user extends Controller {
     
-    public function view($arguments) {
-        if (empty($arguments[0])) 
-            return Error::set('Username is required.');
+    /*******************************************************************
+     * Basic User CRUD System
+     *     - Necessary things in every C.R.U.D. system.
+     ******************************************************************/
+    public function register($arguments) { // Create
+        print_r($_POST);
+        //die;
+        if (Session::isLoggedIn())
+            return Error::set('You can\'t register if you\'re logged in!');
+        
+        $this->view['valid'] = true;
+        
+        if (!empty($arguments) && $arguments[0] == 'save') {
+            if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']))
+                return Error::set('All forms are required.');
+            
+            $users = new users(ConnectionFactory::get('mongo'));
+            $hideEmail = (empty($_POST['hideEmail']) ? false : true);
+            $created = $users->create($_POST['username'], $_POST['password'], 
+                $_POST['email'], $hideEmail, null);
+            if (is_string($created)) return Error::set($created);
+            
+            $users->authenticate($_POST['username'], $_POST['password']);
+            header('Location: ' . Url::format('/'));
+        }
+    }
+    
+    public function view($arguments) { // Read
+        if (empty($arguments[0])) return Error::set('Username is required.');
 
         $username = $arguments[0];
         
@@ -12,24 +40,22 @@ class controller_user extends Controller {
         
         if (empty($userInfo)) return Error::set('User not found.');
         
-        $this->view['valid'] = true;
-        $this->view['username'] = $username;
-        $this->view['user'] = $userInfo;
-        
         $irc = new irc(ConnectionFactory::get('redis'));
-        $this->view['onIrc'] = $irc->isOnline($username);
-        $this->view['onSite'] = apc_exists('user_' . $username);
-        
         $articles = new articles(ConnectionFactory::get('mongo'));
         $lectures = new lectures(ConnectionFactory::get('mongo'));
         
+        $this->view['valid'] = true;
+        $this->view['username'] = $username;
+        $this->view['user'] = $userInfo;
+        $this->view['onIrc'] = $irc->isOnline($username);
+        $this->view['onSite'] = apc_exists(Cache::PREFIX . 'Session_user_' . $username);
         $this->view['articles'] = $articles->getForUser($this->view['user']['_id']);
         $this->view['lectures'] = $lectures->getForUser($username);
         
         Layout::set('title', $username . '\'s profile');
     }
     
-    public function settings($arguments) {
+    public function settings($arguments) { // Update
         if (!Session::isLoggedIn())
             return Error::set('You are not logged in!');
         
@@ -78,46 +104,14 @@ class controller_user extends Controller {
         
         Layout::set('title', 'Settings');
     }
+    // You don't Delete users!!
     
-    public function rmCert() {
-        if (!Session::isLoggedIn())
-            return Error::set('You are not logged in!');
-        if (empty($_POST['hash']))
-            return Error::set('No certificate hash was found.');
-        
-        $certs = new certs(ConnectionFactory::get('redis'));
-        $cert = $certs->get($_POST['hash'], false);
-        
-        if ($cert == null)
-            return Error::set('Invalid certificate hash.');
-        
-        if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
-            return Error::set('You are not allowed to remove this certificate.');
-        
-        $users = new users(ConnectionFactory::get('mongo'));
-        $users->removeCert(Session::getVar('_id'), $_POST['hash']);
-        $certs->removeCert($_POST['hash']);
-        
-        header('Location: ' . Url::format('/user/settings'));
-    }
     
-    public function viewCert() {
-        if (!Session::isLoggedIn())
-            return Error::set('You are not logged in!');
-        if (empty($_POST['hash']))
-            return Error::set('No certificate hash was found.');
-        
-        $certs = new certs(ConnectionFactory::get('redis'));
-        $cert = $certs->get($_POST['hash'], false);
-        
-        if ($cert == null)
-            return Error::set('Invalid certificate hash.');
-        if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
-            return Error::set('You are not allowed to view this certificate.');
-        
-        $this->view['cert'] = substr($cert, strpos($cert, ':') + 1);
-    }
     
+    /*******************************************************************
+     * Special Functionality
+     *     - Things the user system is special for!
+     ******************************************************************/
     public function login() {
         $username = (empty($_POST['username']) ? null : $_POST['username']);
         $password = (empty($_POST['password']) ? null : $_POST['password']);
@@ -138,51 +132,21 @@ class controller_user extends Controller {
         header('Location: ' . Url::format('/'));
     }
     
-    public function register($arguments) {
-        if (Session::isLoggedIn())
-            return Error::set('You can\'t register if you\'re logged in!');
-        
+    public function logs() {
+        if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
         $this->view['valid'] = true;
         
-        if (!empty($arguments) && $arguments[0] == 'save') {
-            if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']))
-                return Error::set('All forms are required.');
-            
-            $users = new users(ConnectionFactory::get('mongo'));
-            $hideEmail = (empty($_POST['hideEmail']) ? false : true);
-            $created = $users->create($_POST['username'], $_POST['password'], 
-                $_POST['email'], $hideEmail, null);
-            if (is_string($created)) return Error::set($created);
-            
-            $users->authenticate($_POST['username'], $_POST['password']);
-            header('Location: ' . Url::format('/'));
-        }
+        $logs = new logs(ConnectionFactory::get('redis'), ConnectionFactory::get('mongo'));
+        $this->view['logins'] = $logs->getLogins(Session::getVar('_id'));
+        $this->view['activity'] = $logs->getActivity(Session::getVar('_id'));
     }
     
-    public function addkey($arguments) {
-        if (!Session::isLoggedIn()) return Error::set('Please login to add keys.');
-        if (empty($_POST['csr'])) return Error::set('No CSR found.');
-        
-        $certs = new certs(ConnectionFactory::get('redis'));
-        $output = $certs->create($_POST['csr']);
-        
-        if (!$output) return Error::set('Invalid CSR.');
-        
-        $users = new users(ConnectionFactory::get('mongo'));
-        
-        $check = $certs->preAdd($output);
-        if (is_string($check))return Error::set($check);
-        
-        $check = $users->preAdd(Session::getVar('_id'), $certs->getKey($output));
-        if (is_string($check))return Error::set($check);
-        
-        $certs->add($output);
-        $users->addCert(Session::getVar('_id'), $certs->getKey($output));
-        
-        $this->view['valid'] = true;
-        $this->view['certificate'] = $output;
-    }
     
+    
+    /*******************************************************************
+     * Social Networking Integration
+     *     - Connecting user's profiles with other social networks.
+     ******************************************************************/
     public function link($arguments) {
         if (!Session::isLoggedIn()) return Error::set('Please login.');
         
@@ -212,22 +176,98 @@ class controller_user extends Controller {
         }
     }
     
-    public function notes() {
-        if (!CheckAcl::can('postNotes')) return Error::set('You are not allowed to post notes.');
-        if (empty($_POST['userId'])) return Error::set('No user id was found.');
-        if (empty($_POST['note'])) return Error::set('No note text was found.');
+    public function connections() {
+        if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
+        $user = new users(ConnectionFactory::get('mongo'));
+        $userInfo = $user->get(Session::getVar('_id'), false, true);
         
-        $users = new users(ConnectionFactory::get('mongo'));
-        $return = $users->addNote($_POST['userId'], $_POST['note']);
+        if (empty($userInfo['connections'])) 
+            return Error::set('You have no connections!');
         
-        if (is_string($return)) return Error::set($return);
-        
-        Error::set('Note posted.', true);
-        
-        if (!empty($_SERVER['HTTP_REFERER'])) header('Location: ' . Url::format($_SERVER['HTTP_REFERER']));
+        $this->view['valid'] = true;
     }
     
-    public function admin() {
+    
+    
+    /*******************************************************************
+     * Certificate CRUD System
+     *     - C.R.U.D System for handling certificates.
+     ******************************************************************/
+    public function certificate() { $this->subController(); }
+    
+    protected function certificate_add($arguments) { // Create
+        if (!Session::isLoggedIn()) return Error::set('Please login to add keys.');
+        if (empty($_POST['csr'])) return Error::set('No CSR found.');
+        
+        $certs = new certs(ConnectionFactory::get('redis'));
+        $output = $certs->create($_POST['csr']);
+        
+        if (!$output) return Error::set('Invalid CSR.');
+        
+        $users = new users(ConnectionFactory::get('mongo'));
+        
+        $check = $certs->preAdd($output);
+        if (is_string($check))return Error::set($check);
+        
+        $check = $users->preAdd(Session::getVar('_id'), $certs->getKey($output));
+        if (is_string($check))return Error::set($check);
+        
+        $certs->add($output);
+        $users->addCert(Session::getVar('_id'), $certs->getKey($output));
+        
+        $this->view['valid'] = true;
+        $this->view['certificate'] = $output;
+    }
+    
+    protected function certificate_view() { // Read
+        if (!Session::isLoggedIn())
+            return Error::set('You are not logged in!');
+        if (empty($_POST['hash']))
+            return Error::set('No certificate hash was found.');
+        
+        $certs = new certs(ConnectionFactory::get('redis'));
+        $cert = $certs->get($_POST['hash'], false);
+        
+        if ($cert == null)
+            return Error::set('Invalid certificate hash.');
+        if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
+            return Error::set('You are not allowed to view this certificate.');
+        
+        $this->view['cert'] = substr($cert, strpos($cert, ':') + 1);
+    }
+    // You don't update certificates?
+    
+    protected function certificate_remove() { // Delete
+        if (!Session::isLoggedIn())
+            return Error::set('You are not logged in!');
+        if (empty($_POST['hash']))
+            return Error::set('No certificate hash was found.');
+        
+        $certs = new certs(ConnectionFactory::get('redis'));
+        $cert = $certs->get($_POST['hash'], false);
+        
+        if ($cert == null)
+            return Error::set('Invalid certificate hash.');
+        
+        if (substr($cert, 0, strpos($cert, ':')) != Session::getVar('_id'))
+            return Error::set('You are not allowed to remove this certificate.');
+        
+        $users = new users(ConnectionFactory::get('mongo'));
+        $users->removeCert(Session::getVar('_id'), $_POST['hash']);
+        $certs->removeCert($_POST['hash']);
+        
+        header('Location: ' . Url::format('/user/settings'));
+    }
+    
+    
+    
+    /*******************************************************************
+     * User Administration
+     *     - That overpowered stuff.
+     ******************************************************************/
+    public function admin() { $this->subController(); }
+    
+    public function admin_index() {
         if (!CheckAcl::can('adminUsers')) return Error::set('You are not allowed to admin users.');
         if (empty($_POST['userId'])) return Error::set('No user id was found.');
         
@@ -250,34 +290,45 @@ class controller_user extends Controller {
         header('Location: ' . Url::format('/user/view/' . $userInfo['username']));
     }
     
-    public function forceLogout() {
+    public function admin_ban() {
+        if (!CheckAcl::can('banUsers')) return Error::set('You are not allowed to ban users.');
+        if (empty($_POST['userId'])) return Error::set('No user id found.');
+        
+        $bans = array(
+            'errorBan' => (!empty($_POST['errorban']) ? true : false),
+            'slowBan' => (!empty($_POST['slowban']) ? true : false)
+            );
+        
+        $users = new users(ConnectionFactory::get('mongo'));
+        $return = $users->banUser($_POST['userId'], $bans);
+        
+        if (is_string($return)) return Error::set($return);
+        header('Location: ' . Url::format('/user/view/' . $return['username']));
+    }
+    
+    public function admin_kick() {
         if (!CheckAcl::can('forceLogout')) return Error::set('You are not allowed to force logout a user.');
         if (empty($_POST['username'])) return Error::set('No username was found.');
-        if (!apc_exists('user_' . $_POST['username'])) return Error::set('This user is already logged out.');
+        if (!apc_exists(Cache::PREFIX . 'Session_user_' . $_POST['username'])) return Error::set('This user is already logged out.');
         
-        Session::forceLogout($_POST['username'], apc_fetch('user_' . $_POST['username']));
+        Session::forceLogout($_POST['username'], apc_fetch(Cache::PREFIX . 'Session_user_' . $_POST['username']));
         
         header('Location: ' . Url::format('/user/view/' . $_POST['username']));
     }
     
-    public function logs() {
-        if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
-        $this->view['valid'] = true;
+    public function admin_note() {
+        if (!CheckAcl::can('postNotes')) return Error::set('You are not allowed to post notes.');
+        if (empty($_POST['userId'])) return Error::set('No user id was found.');
+        if (empty($_POST['note'])) return Error::set('No note text was found.');
         
-        $logs = new logs(ConnectionFactory::get('redis'), ConnectionFactory::get('mongo'));
-        $this->view['logins'] = $logs->getLogins(Session::getVar('_id'));
-        $this->view['activity'] = $logs->getActivity(Session::getVar('_id'));
-    }
-    
-    public function connections() {
-        if (!Session::isLoggedIn()) return Error::set('You are not logged in!');
-        $user = new users(ConnectionFactory::get('mongo'));
-        $userInfo = $user->get(Session::getVar('_id'), false, true);
+        $users = new users(ConnectionFactory::get('mongo'));
+        $return = $users->addNote($_POST['userId'], $_POST['note']);
         
-        if (empty($userInfo['connections'])) 
-            return Error::set('You have no connections!');
+        if (is_string($return)) return Error::set($return);
         
-        $this->view['valid'] = true;
+        Error::set('Note posted.', true);
+        
+        if (!empty($_SERVER['HTTP_REFERER'])) header('Location: ' . Url::format($_SERVER['HTTP_REFERER']));
     }
     
 }

@@ -42,11 +42,12 @@ class Cache {
         apc_store(self::PREFIX . $key, $value, $ttl);
         
         if ($purgeOn == null) return;
-        self::AddPurge($key, $purgeOn);
+        self::AddPurge(self::PREFIX . $key, $purgeOn);
     }
     
     public static function ApcPurge($id) {
         $keyName = self::PREFIX . 'purgeOn_' . get_called_class() . '_' . $id;
+        
         $keys = apc_fetch($keyName);
         if (empty($keys)) return null;
         

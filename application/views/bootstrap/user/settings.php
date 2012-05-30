@@ -60,7 +60,7 @@ if (!empty($valid) && $valid):
 </form>
 
 <legend>Add a Certificate</legend>
-<form class="well forum-vertical" action="<?php echo Url::format('user/addkey'); ?>" method="post">
+<form class="well forum-vertical" action="<?php echo Url::format('user/certificate/add'); ?>" method="post">
 	<textarea style="width: 100%" rows="12" name="csr" placeholder="The contents of your CSR"></textarea><br />
 	<input type="submit" value="Submit" class="btn btn-primary" />
 </form>
@@ -72,29 +72,32 @@ if (!empty($valid) && $valid):
 ?>
 <table class="table table-striped">
 	<thead>
+        <td><i class="icon-question-sign" title="In Use?"></i></td>
 		<td>#</td>
 		<th>Hash</th>
 		<th>Organization</th>
 		<th>Valid From</th>
 		<th>Valid To</th>
+        <td style="width: 1%;"></td>
+        <td style="width: 1%;"></td>
 	</thead>
 	<tbody>
-<?php
-foreach ($user['certs'] as $cert): ?>
-	<tr<?php if ($secure && $clientSSLKey == $cert['certKey']): ?> style="background-color: LightGreen" title="In-Use"<?php endif; ?>>
+<?php foreach ($user['certs'] as $cert): ?>
+	<tr>
+        <td><?php if ($secure && $clientSSLKey == $cert['certKey']): ?><i class="icon-ok-sign" title="In Use!"></i><?php endif; ?></td>
 		<td><?php echo $cert['serialNumber']; ?></td>
 		<td><?php echo $cert['hash']; ?></td>
 		<td><?php echo $cert['subject']['organizationName']; ?></td>
 		<td><?php echo Date::dayFormat($cert['validFrom_time_t']); ?></td>
 		<td><?php echo Date::dayFormat($cert['validTo_time_t']); ?></td>
-		<td style="width: 1%">
-			<form action="<?php echo Url::format('/user/viewCert'); ?>" method="post" style="padding: 0;margin: 0">
+		<td>
+			<form action="<?php echo Url::format('/user/certificate/view'); ?>" method="post" style="display: inline">
 				<input type="hidden" name="hash" value="<?php echo $cert['certKey']; ?>" />
-				<input type="submit" value="View" class="btn btn-info" />
+				<input type="submit" value="View" class="btn btn-info"/>
 			</form>
-		</td>
-		<td style="width: 1%">
-			<form action="<?php echo Url::format('/user/rmCert'); ?>" method="post">
+        </td>
+        <td>
+			<form action="<?php echo Url::format('/user/certificate/remove'); ?>" method="post" style="display: inline">
 				<input type="hidden" name="hash" value="<?php echo $cert['certKey']; ?>" />
 				<input type="submit" value="Delete" class="btn btn-danger" />
 			</form>

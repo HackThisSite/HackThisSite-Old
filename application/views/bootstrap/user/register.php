@@ -3,13 +3,13 @@
 
 <form class="well form-vertical" action="<?php echo Url::format('/user/register/save'); ?>" method="post">
 <label>Username</label>
-<input type="text" name="username" /><br />
+<input type="text" name="username" required /><br />
 
 <label>Password</label>
-<input type="text" name="password" /><br />
+<input type="text" name="password" required /><br />
 
 <label>Email</label>
-<input type="text" name="email" /><br />
+<input type="text" name="email" required /><br />
 
 <label class="checkbox">
 	<input type="checkbox" name="hideEmail" value="true" /> Hide Your Email?

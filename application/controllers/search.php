@@ -21,6 +21,8 @@ class controller_search extends Controller {
         
         
         $i = 1;
+        
+        if (empty($results['hits']['hits'])) return;
         foreach ($results['hits']['hits'] as $result) {
             $entry = $result['_source'];
             

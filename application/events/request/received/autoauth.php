@@ -14,6 +14,7 @@ class events_request_received_autoauth {
 		$users = new users(ConnectionFactory::get('mongo'));
 		$user = $users->get($userId, false);
 		
+        if (empty($user)) return;
 		if (!in_array('autoauth', $user['auths'])) return self::done();
 		if ($user['status'] == users::ACCT_LOCKED) return self::done();
 		Session::setBatchVars($user);

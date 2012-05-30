@@ -1,9 +1,5 @@
 <?php
 class controller_news extends Content {
-
-    //public static $cache = array(
-    //    'view' => array('type' => 'v', 'key' => 'news/view_{REQ}_{SI}', 'ttl' => 5)
-    //    );
         
     var $name = 'news';
     var $model = 'news';
@@ -32,6 +28,7 @@ class controller_news extends Content {
         $mlt = Search::mlt($this->view['news'][0]['_id'], 'news', 'title,body,tags');
         $this->view['mlt'] = array();
 
+        if (empty($mlt['hits']['hits'])) return;
         foreach ($mlt['hits']['hits'] as $post) {
             $fetched = $newsModel->get($post['_id'], false, true);
             

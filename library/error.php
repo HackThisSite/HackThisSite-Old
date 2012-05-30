@@ -20,7 +20,6 @@ class Error {
      */
     public static function set($error, $notice = false) {
         if ($notice) {
-            Log::error($error);
             array_push(self::$notices, $error);
         } else {
             Log::error($error);

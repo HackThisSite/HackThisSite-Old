@@ -374,6 +374,7 @@ reclaim your account instead.';
         if ($userId == null) return false;
         
         $user = $this->get($userId, false);
+        if (empty($user['auths'])) return false;
         if (!in_array('certificate', $user['auths'])) return false;
         
         return $user;

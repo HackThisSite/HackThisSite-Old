@@ -4,7 +4,7 @@ HTS v5 server
 stock ubuntu server 11.10 install 
 host HTSv5
 
-Notes:  This does not setup search, client certificate authentication, SSL, and possibly more.
+Notes:  This does not client certificate authentication, SSL, and possibly more.
 
 installing:
 apt-get install make php5 git nginx php-apc php5-fpm php-pear libpcre-dev
@@ -12,7 +12,7 @@ apt-get install mongodb redis-server redis-doc
 
 Download the latest version of ElasticSearch from here:
 http://www.elasticsearch.org/download/
-And install it.
+And install it.  (I strongly recommend against using a package manager.)
 
 git clone git://github.com/nicolasff/phpredis.git
 cd phpredis

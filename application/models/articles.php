@@ -253,7 +253,6 @@ class articles extends baseModel {
             'body' => $bodyFD->getOpcodes(),
             'tags' => $tagsFD->getOpcodes(),
             'published' => $old['published'],
-            'flaggable' => $old['flaggable'],
             'commentable' => $old['commentable']
             );
         return $revision;

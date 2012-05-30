@@ -42,11 +42,13 @@ class controller_article extends Content {
         } else return;
         
         $mlt = Search::mlt($this->view['article'][0]['_id'], 'article', 'title,body,tags');
+        
         $this->view['mlt'] = array();
-
+        
+        if (empty($mlt['hits']['hits'])) return;
         foreach ($mlt['hits']['hits'] as $article) {
             $fetched = $articlesModel->get($article['_id'], false, true);
-
+            
             if (empty($fetched)) continue;
             array_push($this->view['mlt'], $fetched);
         }

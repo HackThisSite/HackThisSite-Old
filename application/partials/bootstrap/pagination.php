@@ -13,7 +13,7 @@ $pages = ceil($total / $perPage);
 <div class="pagination">
     <ul>
 <?php for($i = 1;$i <= $pages;++$i): ?>
-        <li<?php if ($page == $i): ?> class="active"<?php endif; ?>><a href="<?php echo Url::format($url . $i); ?>"><?php echo $i; ?></a></li>
+        <li<?php if ($page == $i): ?> class="active"<?php endif; ?>><a href="<?php echo Url::format($url . $i) . (!empty($where) ? '#' . $where : ''); ?>"><?php echo $i; ?></a></li>
 <?php endfor; ?>
     </ul>
 </div></center>

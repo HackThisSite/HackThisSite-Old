@@ -27,6 +27,17 @@ class controller_article extends Content {
     }
     
     public function view($arguments) {
+        if (!empty($arguments[3])) {
+            $page = (int) array_pop($arguments);
+            if ($page < 1) {
+                $this->view['commentPage'] = 1;
+            } else {
+                $this->view['commentPage'] = $page;
+            }
+        } else {
+            $this->view['commentPage'] = 1;
+        }
+        
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $articlesModel = new articles(ConnectionFactory::get('mongo'));
@@ -37,12 +48,11 @@ class controller_article extends Content {
         $this->view['article'] = $article;
         $this->view['multiple'] = (count($article) > 1);
         
-        if (!$this->view['multiple']) {
-            Layout::set('title', $this->view['article'][0]['title']);
-        } else return;
+        if ($this->view['multiple']) return;
         
+        $this->view['commentPageLoc'] = 'article/view/' . $id . '/';
+        Layout::set('title', $this->view['article'][0]['title']);
         $mlt = Search::mlt($this->view['article'][0]['_id'], 'article', 'title,body,tags');
-        
         $this->view['mlt'] = array();
         
         if (empty($mlt['hits']['hits'])) return;

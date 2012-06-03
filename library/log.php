@@ -7,6 +7,7 @@
 class Log {
     
     public static $start;
+    public static $uri;
     public static $request;
     public static $arguments;
     

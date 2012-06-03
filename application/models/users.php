@@ -86,7 +86,7 @@ class users extends baseModel {
     
     
     // Content management magic.
-    public function validate($username, $password, $email, $hideEmail, $group, $creating = true) {
+    public function validate($username, $password, $email, $hideEmail, $group, $lockToIp, $creating = true) {
         if (strpos($username, '\'') || strpos($username, '"')) return 'Invalid username.';
         $passEmpty = false;
         if (empty($password) && $creating) return 'Invalid password';
@@ -124,21 +124,20 @@ reclaim your account instead.';
             'email' => $email,
             'status' => self::ACCT_OPEN,
             'hideEmail' => $hideEmail,
-            'group' => ($group == null ? self::DEFAULT_GROUP : $group),
+            'lockToIP' => (bool) $lockToIp,
             'auths' => array('password'),
             'notes' => array(),
             'certs' => array(),
             'bans' => array()
         );
+        
+        if ($creating) $entry['group'] = ($group == null ? self::DEFAULT_GROUP : $group);
         if (!$creating && !CheckAcl::can('changeUsername')) unset($entry['username']);
         if (!$creating && !CheckAcl::can('changeAcctStatus')) unset($entry['status']);
         if (!$creating && !CheckAcl::can('editAcl')) unset($entry['group']);
         if (!$creating && $passEmpty) unset($entry['password']);
         
-        if (!$creating && isset($entry['username'])) Session::setVar('username', $entry['username']);
-        if (!$creating && isset($entry['group'])) Session::setVar('group', $entry['group']);
         if (!$creating) {
-            Session::setVar('email', $entry['email']);
             unset($entry['auth']);
         }
         
@@ -322,6 +321,11 @@ reclaim your account instead.';
                 $username, $password);
             if ($good != false) {
                 if ($good['status'] == self::ACCT_LOCKED) return 'User banned.';
+                
+                $key = Cache::PREFIX . 'Session_user_' . $good['username'];
+                if (apc_exists($key)) {
+                    Session::forceLogout($good['username'], apc_fetch($key));
+                }
                 
                 Session::setBatchVars($good);
                 return $good;

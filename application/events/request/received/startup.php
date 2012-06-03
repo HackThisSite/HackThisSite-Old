@@ -33,10 +33,16 @@ mod_setenvif: Not detected (required for Page Cache (enhanced mode) and Browser 
             apc_delete($key);
         }
         
-        // hard code the layout for now, pull
-        // later we'll pull the default layout from the config and then check
-        // it against user preference.
-        Layout::selectLayout(Config::get(self::CONFIG_LAYOUT));
+        $ip = Session::getVar('ip');
+        if (Session::isLoggedIn() && Session::getVar('lockToIP') && $ip != null && $ip != $_SERVER['REMOTE_ADDR']) {
+            Session::destroy();
+            header('Location: ' . Url::format('/'));
+            die; 
+        }
+        Session::setVar('ip', $_SERVER['REMOTE_ADDR']);
+        
+        $twitter = new twitter(ConnectionFactory::get('redis'));
+        Layout::set('tweets', $twitter->getOfficialTweets());
         
         self::slowBan();
         self::errorBan();

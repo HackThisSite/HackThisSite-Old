@@ -8,21 +8,26 @@ class controller_user extends Controller {
      *     - Necessary things in every C.R.U.D. system.
      ******************************************************************/
     public function register($arguments) { // Create
-        print_r($_POST);
-        //die;
         if (Session::isLoggedIn())
             return Error::set('You can\'t register if you\'re logged in!');
         
         $this->view['valid'] = true;
+        $this->view['publicKey'] = Config::get('recaptcha:publicKey');
         
         if (!empty($arguments) && $arguments[0] == 'save') {
+            if (empty($_POST['recaptcha_challenge_field']) || empty($_POST['recaptcha_response_field']))
+                return Error::set('We could not find the captcha validation fields!');
+            
+            $recaptcha = Recaptcha::check($_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']);
+            
+            if (is_string($recaptcha)) return Error::set(Recaptcha::$errors[$recaptcha]);
             if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']))
                 return Error::set('All forms are required.');
             
             $users = new users(ConnectionFactory::get('mongo'));
             $hideEmail = (empty($_POST['hideEmail']) ? false : true);
             $created = $users->create($_POST['username'], $_POST['password'], 
-                $_POST['email'], $hideEmail, null);
+                $_POST['email'], $hideEmail, null, true);
             if (is_string($created)) return Error::set($created);
             
             $users->authenticate($_POST['username'], $_POST['password']);
@@ -32,7 +37,18 @@ class controller_user extends Controller {
     
     public function view($arguments) { // Read
         if (empty($arguments[0])) return Error::set('Username is required.');
-
+        if (!empty($arguments[1])) {
+            $page = (int) array_pop($arguments);
+            if ($page < 1) {
+                $this->view['commentPage'] = 1;
+            } else {
+                $this->view['commentPage'] = $page;
+            }
+        } else {
+            $this->view['commentPage'] = 1;
+        }
+        $this->view['commentPageLoc'] = 'user/view/' . $arguments[0] . '/';
+        
         $username = $arguments[0];
         
         $users = new users(ConnectionFactory::get('mongo'));
@@ -80,12 +96,14 @@ class controller_user extends Controller {
             $password = (!empty($_POST['password']) ? $_POST['password'] : null);
             $email = (!empty($_POST['email']) ? $_POST['email'] : null);
             $hideEmail = (!empty($_POST['hideEmail']) ? true : false);
+            $lockToIp = (!empty($_POST['lockToIp']) ? true : false);
             
             $error = $user->edit(Session::getVar('_id'), $username, 
-                $password, $email, $hideEmail, null);
+                $password, $email, $hideEmail, null, $lockToIp);
             if (is_string($error)) return Error::set($error);
             
             $this->view['user'] = $user->get(Session::getVar('username'));
+            Session::setBatchVars($this->view['user']);
             Error::set('User profile saved.', true);
         }
         
@@ -113,14 +131,44 @@ class controller_user extends Controller {
      *     - Things the user system is special for!
      ******************************************************************/
     public function login() {
+        $this->view['captcha'] = false;
+        
+        $key = 'invalidLogin_' . $_SERVER['REMOTE_ADDR'];
+        if (apc_exists($key)) {
+            $value = apc_fetch($key);
+            if ($value > 3) {
+                $this->view['publicKey'] = Config::get('recaptcha:publicKey');
+                $this->view['captcha'] = true;
+                sleep(1);
+            }
+        }
+        
+        if (!isset($_POST['username']) || !isset($_POST['password'])) return;
+        
         $username = (empty($_POST['username']) ? null : $_POST['username']);
         $password = (empty($_POST['password']) ? null : $_POST['password']);
+        
+        if ($this->view['captcha'] && $value != 4) {
+            if (empty($_POST['recaptcha_challenge_field']) || empty($_POST['recaptcha_response_field']))
+                return Error::set('We could not find the captcha validation fields!');
+            
+            $recaptcha = Recaptcha::check($_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']);
+            
+            if (is_string($recaptcha)) return Error::set(Recaptcha::$errors[$recaptcha]);
+        }
         
         $users = new users(ConnectionFactory::get('mongo'));
         $good = $users->authenticate($username, $password);
         
-        if (!isset($_POST['username']) || !isset($_POST['password'])) return;
-        if (is_string($good)) return Error::set($good);
+        if (is_string($good)) {
+            if (!apc_exists($key)) {
+                apc_store($key, 0, 300);
+            } else {
+                apc_inc($key, 1);
+            }
+            
+            return Error::set($good);
+        }
         
         Log::login($good['_id']);
         

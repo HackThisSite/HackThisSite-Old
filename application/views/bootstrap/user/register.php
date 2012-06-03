@@ -15,6 +15,18 @@
 	<input type="checkbox" name="hideEmail" value="true" /> Hide Your Email?
 </label>
 
+<div class="control-group">
+<script type="text/javascript"src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $publicKey; ?>"></script>
+<noscript>
+    <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php echo $publicKey; ?>"
+    height="300" width="500" frameborder="0"></iframe><br>
+    <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+    </textarea>
+    <input type="hidden" name="recaptcha_response_field"
+    value="manual_challenge">
+</noscript>
+</div>
+
 <input type="submit" value="Register" class="btn btn-primary" />
 <input type="reset" value="Reset" class="btn btn-danger" /><br />
 </form>

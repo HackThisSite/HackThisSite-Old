@@ -155,6 +155,8 @@ class lazyLoader
         $file = "{$this->root}drivers/{$newName}.php";
 
 		$this->cache[$name] = $file;
+        
+        if (!file_exists($file)) die('Invalid driver.');
         require $file;
     }
 

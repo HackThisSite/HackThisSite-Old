@@ -76,6 +76,7 @@ class logs extends mongoBase {
                 'ipAddress' => $_SERVER['REMOTE_ADDR'], 
                 'sid' => session_id()
                 ),
+            'uri' => $this->clean(Log::$uri),
             'request' => $this->clean(Log::$request),
             'arguments' => $arguments,
             'input' => array(

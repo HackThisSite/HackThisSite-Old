@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class View
 {
+    public $finalCut = false;
+    
     private $viewPath = '';
     private $data = array();
     private $parsed;
@@ -45,8 +47,15 @@ class View
     const DRIVER_PREFIX      = 'driver_';
     const DRIVER_TRADITIONAL = 'traditional';
 
+    const CONFIG_LAYOUT = 'display:layout';
+    
     public function __construct($viewPath, $data = array(), $driver = self::DRIVER_TRADITIONAL)
     {
+        // hard code the layout for now, pull
+        // later we'll pull the default layout from the config and then check
+        // it against user preference.
+        Layout::selectLayout(Config::get(self::CONFIG_LAYOUT));
+        
         $this->viewPath = dirname(dirname(__FILE__)) . self::VIEW_PATH . 
             Layout::getLayout() . '/' . $viewPath . self::VIEW_EXT;
         
@@ -79,7 +88,7 @@ class View
 
         $driver = $this->driver;
 
-        return $this->parsed = $driver::render($this->viewPath, $this->data);
+        return $this->parsed = $driver::render($this->viewPath, $this->data, $this->finalCut);
 
     }
 

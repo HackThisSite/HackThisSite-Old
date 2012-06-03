@@ -50,8 +50,10 @@ class comments extends baseModel {
      */
     protected function getForId($id, $idlib = false, $justOne = true, $page = 1) {
         $query = $this->baseQuery;$query['contentId'] = $this->clean($id);
-        $comments = $this->db->find($query)
-            ->skip(($page - 1) * self::PAGE_LIMIT)
+        $comments = $this->db->find($query);
+        $total = $comments->count();
+        
+        $comments->skip(($page - 1) * self::PAGE_LIMIT)
             ->sort(array('date' => 1))
             ->limit(self::PAGE_LIMIT);
         
@@ -64,7 +66,7 @@ class comments extends baseModel {
             $this->resolveUTF8($comments[$key]);
         }
         
-        return ($justOne ? reset($comments) : $comments);
+        return ($justOne ? reset($comments) : array('total' => $total, 'comments' => $comments));
     }
     
     /**

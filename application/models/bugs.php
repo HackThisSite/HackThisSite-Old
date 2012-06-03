@@ -177,6 +177,7 @@ class bugs extends baseModel {
      * @param array $diff The diff to apply.
      */
     public function alter($id, $diff) {
+        $diff = array_merge($diff, array('lastUpdate' => time()));
         $this->db->update(array('_id' => $this->_toMongoId($id)), array(
             '$set' => $diff));
         

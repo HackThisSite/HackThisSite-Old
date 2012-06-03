@@ -1,21 +1,19 @@
 <?php
 if (!empty($article)) {
 	if ($multiple) {
-		$first = true;
 		foreach ($article as $post) {
-			if (!$first) {
-				echo '<br/ ><hr /><br />';
-			}
-			
-			echo Partial::render('articleFull', $post);
-			$first = false;
+			echo Partial::render('articleQuickView', $post);
 		}
 	} else {
         $article[0]['mlt'] = $mlt;
 		echo Partial::render('articleFull', $article[0]);
 		
 		if ($article[0]['commentable']) {
-			echo Partial::render('comment', array('id' => $article[0]['_id'], 'page' => 1));
+			echo Partial::render('comment', array(
+                'id' => $article[0]['_id'], 
+                'page' => $commentPage, 
+                'pageLoc' => $commentPageLoc
+            ));
 		}
 	}
 }

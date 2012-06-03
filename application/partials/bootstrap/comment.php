@@ -1,16 +1,28 @@
+<a name="comments"></a>
+<legend>Comments</legend>
 <?php
 // Comments
 // * $id - Content Id
 // * $page - Comments page
+// * $pageLoc - Where to send new pages to.
 
 $commLib = new comments(ConnectionFactory::get('mongo'));
-$comments = $commLib->getForId($id, false, false, $page);
+$commentData = $commLib->getForId($id, false, false, $page);
+extract($commentData);
 
+$paginationData = array(
+    'total' => $total,
+    'perPage' => comments::PAGE_LIMIT,
+    'page' => $page,
+    'url' => $pageLoc,
+    'where' => 'comments'
+);
+$pagination = Partial::render('pagination', $paginationData);
+
+if ($total != 0) echo $pagination;
 if (empty($comments))
 	echo '<div class="alert">No comments!</div>';
-if (!empty($comments))
-	echo '<legend>Comments</legend>';
-	
+
 foreach ($comments as $comment) {
 ?>
 <table class="table table-bordered">
@@ -60,6 +72,7 @@ if ($delete): ?>
 </table>
 <?php
 }
+if ($total != 0) echo $pagination;
 
 if (CheckAcl::can('postComment')):
 ?>

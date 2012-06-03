@@ -15,7 +15,8 @@ class events_request_received_dispatch
     {
         // crop out the get request of the uri
         list($uri) = explode("?", $_SERVER['REQUEST_URI']);
-
+        Log::$uri = $uri;
+        
         // filter out all blank segments of the uri
         $request = array_values(array_filter(explode('/', $uri), function($n)
         {
@@ -43,10 +44,7 @@ class events_request_received_dispatch
             $controller = "Controller";
         
 		$class = new $controller($request);
-        
-        // pass the request to the controller and return the result
-        Layout::set("content", $class);
-        
+        echo $class;
     }
     
 }

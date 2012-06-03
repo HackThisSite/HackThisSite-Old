@@ -19,8 +19,14 @@
 		<!--[if lt IE 9]>
 		  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
+        <link href="<?php echo Url::format('themes/jquery.js', true); ?>" rel="stylesheet">
+    <script type="text/javascript">
+        function HitBlank() { $('#blank-element').load('/nil/nil.blank'); }
+        window.setInterval("HitBlank()", 300000);
+    </script>
 	</head>
 	<body>
+        <span id="blank-element" style="display: none"></span>
 		<!-- Start header -->
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">

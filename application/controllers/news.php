@@ -11,6 +11,17 @@ class controller_news extends Content {
     var $diffdFields = array('title', 'department', 'body', '$tags');
 
     public function view($arguments) {
+        if (!empty($arguments[3])) {
+            $page = (int) array_pop($arguments);
+            if ($page < 1) {
+                $this->view['commentPage'] = 1;
+            } else {
+                $this->view['commentPage'] = $page;
+            }
+        } else {
+            $this->view['commentPage'] = 1;
+        }
+        
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $newsModel = new news(ConnectionFactory::get('mongo'));
@@ -19,12 +30,12 @@ class controller_news extends Content {
         if (empty($news)) return Error::set('Invalid id.');
         
         $this->view['news'] = $news;
-        $this->view['multiple'] = (count($this->view['news']) > 1);
+        $this->view['multiple'] = (count($news) > 1);
         
-        if (empty($this->view['news'])) Error::set('Invalid id.');
-        if (!$this->view['multiple']) Layout::set('title', $this->view['news'][0]['title']);
-        if ($this->view['multiple'] == true) return;
+        if ($this->view['multiple']) return;
 
+        $this->view['commentPageLoc'] = 'news/view/' . $id . '/';
+        Layout::set('title', $this->view['news'][0]['title']);
         $mlt = Search::mlt($this->view['news'][0]['_id'], 'news', 'title,body,tags');
         $this->view['mlt'] = array();
 

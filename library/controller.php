@@ -87,6 +87,7 @@ class Controller
             $this->view,
             $this->driver
         );
+        $this->parsedViewResult->finalCut = true;
     }
 
     // A wrapper to call controller methods

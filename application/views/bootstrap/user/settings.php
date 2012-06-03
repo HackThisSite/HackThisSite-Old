@@ -35,6 +35,14 @@ if (!empty($valid) && $valid):
 			<input type="checkbox" name="hideEmail" value="true"<?php echo ($user['hideEmail'] ? ' checked="checked"' : ''); ?> />
 		</div>
 	</div>
+    
+    <div class="control-group">
+        <label class="control-label">Lock sessions?</label>
+        
+        <div class="controls">
+            <input type="checkbox" name="lockToIp" value="true"<?php echo ($user['lockToIP'] ? ' checked="checked"' : ''); ?> />
+        </div>
+    </div>
 </fieldset>
 <fieldset>    
 	<legend>Change Password</legend>

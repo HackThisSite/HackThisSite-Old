@@ -4,13 +4,22 @@ class controller_reclaim extends Controller {
     public function index() {
         if (Session::isLoggedIn()) return Error::set('You\'re logged in!');
         $this->view['valid'] = true;
+        $this->view['publicKey'] = Config::get('recaptcha:publicKey');
     }
     
     public function check() {
         $this->setView('reclaim/index');
-        $this->view['valid'] = true;
         
         if (Session::isLoggedIn()) return Error::set('You\'re logged in!');
+        $this->view['valid'] = true;
+        $this->view['publicKey'] = Config::get('recaptcha:publicKey');
+        
+        if (empty($_POST['recaptcha_challenge_field']) || empty($_POST['recaptcha_response_field']))
+            return Error::set('We could not find the captcha validation fields!');
+        
+        $recaptcha = Recaptcha::check($_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']);
+        
+        if (is_string($recaptcha)) return Error::set(Recaptcha::$errors[$recaptcha]);
         if (empty($_POST['username']) || empty($_POST['password'])) 
             return Error::set('All forms are required.');
         

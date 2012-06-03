@@ -85,7 +85,7 @@ class reclaims extends mongoBase {
         
         $users = new users(ConnectionFactory::get('mongo'));
         $id = $users->create($username, $password, $data['email'], 
-            $data['hideEmail'], $this->groups[$data['mgroup']]);
+            $data['hideEmail'], $this->groups[$data['mgroup']], true);
         
         $newRef = MongoDBRef::create('users', $id);
         $oldRef = MongoDBRef::create('unimportedUsers', $data['_id']);

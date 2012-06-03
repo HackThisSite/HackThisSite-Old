@@ -41,6 +41,19 @@ class controller_bugs extends Content {
     }
     
     public function view($arguments) {
+        if (empty($arguments[0])) return Error::set('No bug ID found.');
+        if (!empty($arguments[1])) {
+            $page = (int) array_pop($arguments);
+            if ($page < 1) {
+                $this->view['commentPage'] = 1;
+            } else {
+                $this->view['commentPage'] = $page;
+            }
+        } else {
+            $this->view['commentPage'] = 1;
+        }
+        $this->view['commentPageLoc'] = 'bugs/view/' . $arguments[0] . '/';
+        
         $bugs = new bugs(ConnectionFactory::get('mongo'));
         $this->view['bug'] = $bugs->get($arguments[0], true, true);
         

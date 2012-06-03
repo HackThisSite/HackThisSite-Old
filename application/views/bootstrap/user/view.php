@@ -139,7 +139,11 @@ foreach ($lectures as $lecture): ?>
 
 <hr />
 <?php
-echo Partial::render('comment', array('id' => $user['_id'], 'page' => 1));
+echo Partial::render('comment', array(
+    'id' => $user['_id'], 
+    'page' => $commentPage,
+    'pageLoc' => $commentPageLoc
+));
 ?>
 <?php
 endif;

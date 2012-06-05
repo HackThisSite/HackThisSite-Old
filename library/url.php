@@ -18,6 +18,7 @@ class Url extends Cache {
      */
     protected static function format($url, $static = false) {
         if (!self::$populated) self::populate();
+        if (empty($url)) $url = '/';
         if (substr($url, 0, 4) == 'http')
             return $url;
         

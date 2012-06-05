@@ -134,7 +134,7 @@ class articles extends baseModel {
      * 
      * @return int The articles score, 1-10.
      */
-    protected function getScore($articleId) {
+    public function getScore($articleId) {
         $likes = $this->mongo->articleVotes->count(array(
             'contentId' => (string) $articleId, 'liked' => true));
         $dislikes = $this->mongo->articleVotes->count(array(
@@ -170,6 +170,7 @@ class articles extends baseModel {
         );
         
         $this->mongo->articleVotes->insert($entry);
+        $this->clearCache($articleId, false);
         return true;
     }
     
@@ -239,6 +240,7 @@ class articles extends baseModel {
         if (!$creating) unset($entry['user'], $entry['date'], 
             $entry['commentable'], $entry['published']);
         
+        self::ApcPurge('getNewPosts', null);
         return $entry;
     }
     
@@ -265,6 +267,7 @@ class articles extends baseModel {
      */
     public function approve($id) {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array('$set' => array('published' => true)));
+        self::ApcPurge('getNewPosts', null);
         return true;
     }
     

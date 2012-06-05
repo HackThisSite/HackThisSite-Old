@@ -42,13 +42,11 @@ class comments extends baseModel {
      * Get comments for a content id.
      * 
      * @param string $id The content id to use.
-     * @param bool $idlib If the Id library should be used.
-     * @param bool $justOne If only one entry should be returned.
      * @param int $page The page to get comments for.
      * 
      * @return mixed The comment/comments as an array, or an error string.
      */
-    protected function getForId($id, $idlib = false, $justOne = true, $page = 1) {
+    protected function getForId($id, $page = 1) {
         $query = $this->baseQuery;$query['contentId'] = $this->clean($id);
         $comments = $this->db->find($query);
         $total = $comments->count();
@@ -66,7 +64,7 @@ class comments extends baseModel {
             $this->resolveUTF8($comments[$key]);
         }
         
-        return ($justOne ? reset($comments) : array('total' => $total, 'comments' => $comments));
+        return array('total' => $total, 'comments' => $comments);
     }
     
     /**
@@ -76,7 +74,7 @@ class comments extends baseModel {
      * 
      * @return int The number of comments.
      */
-    protected function getCount($contentId) {
+    public function getCount($contentId) {
         return (int) $this->db->count(array('contentId' => (string) $contentId));
     }
     
@@ -107,9 +105,9 @@ class comments extends baseModel {
             'user' => $ref,
             'ghosted' => false,
             );
-        if (!$creating) unset($entry['reporter'], $entry['status'], 
-            $entry['created'], $entry['commentable'], $entry['user']);
+        if (!$creating) unset($entry['contentId'], $entry['date'], $entry['user'], $entry['ghosted']);
 
+        self::ApcPurge('getForId', $contentId);
         return $entry;
     }
     

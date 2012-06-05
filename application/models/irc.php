@@ -24,7 +24,7 @@ class irc extends mongoBase {
      * 
      * @return array The nicks pending.
      */
-    public function getPending($username) {
+    protected function getPending($username) {
         return $this->redis->sMembers('linkReqs_' . $username);
     }
     
@@ -48,6 +48,9 @@ class irc extends mongoBase {
      */
     public function delNick($username, $nick) {
         $this->redis->sRem('linkReqs_' . $username, $nick);
+        
+        // correlation to getPending
+        self::ApcPurge('getPending', $username);
     }
     
     /**
@@ -57,7 +60,7 @@ class irc extends mongoBase {
      * 
      * @return array An array of nicks.
      */
-    public function getNicks($username) {
+    protected function getNicks($username) {
         return $this->redis->sMembers('userNicks_' . $username);
     }
     
@@ -69,6 +72,9 @@ class irc extends mongoBase {
      */
     public function delAcceptedNick($username, $nick) {
         $this->redis->sRem('userNicks_' . $username, $nick);
+        
+        // correlation to getNicks
+        self::ApcPurge('getNicks', $username);
     }
     
     /**
@@ -78,7 +84,7 @@ class irc extends mongoBase {
      * 
      * @return array An array of usernames/nicks and the number of unknown.
      */
-    public function getOnline($resolve = true) {
+    protected function getOnline($resolve = true) {
         $online = $this->redis->sMembers('usersOnline');
         if (!$resolve) return $online;
         
@@ -104,7 +110,7 @@ class irc extends mongoBase {
      * 
      * @return array The nicks the user is online as.
      */
-    public function isOnline($username) {
+    protected function isOnline($username) {
         return $this->redis->sInter('usersOnline', 'userNicks_' . $username);
     }
     

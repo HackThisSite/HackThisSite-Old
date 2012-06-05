@@ -64,7 +64,7 @@ class controller_user extends Controller {
         $this->view['username'] = $username;
         $this->view['user'] = $userInfo;
         $this->view['onIrc'] = $irc->isOnline($username);
-        $this->view['onSite'] = apc_exists(Cache::PREFIX . 'Session_user_' . $username);
+        $this->view['onSite'] = apc_exists(Cache::PREFIX . 'user_' . $username);
         $this->view['articles'] = $articles->getForUser($this->view['user']['_id']);
         $this->view['lectures'] = $lectures->getForUser($username);
         
@@ -193,7 +193,7 @@ class controller_user extends Controller {
     
     /*******************************************************************
      * Social Networking Integration
-     *     - Connecting user's profiles with other social networks.
+     *     - Connecting user's profiles with other social networks/IRC.
      ******************************************************************/
     public function link($arguments) {
         if (!Session::isLoggedIn()) return Error::set('Please login.');
@@ -357,9 +357,9 @@ class controller_user extends Controller {
     public function admin_kick() {
         if (!CheckAcl::can('forceLogout')) return Error::set('You are not allowed to force logout a user.');
         if (empty($_POST['username'])) return Error::set('No username was found.');
-        if (!apc_exists(Cache::PREFIX . 'Session_user_' . $_POST['username'])) return Error::set('This user is already logged out.');
+        if (!apc_exists(Cache::PREFIX . 'user_' . $_POST['username'])) return Error::set('This user is already logged out.');
         
-        Session::forceLogout($_POST['username'], apc_fetch(Cache::PREFIX . 'Session_user_' . $_POST['username']));
+        Session::forceLogout($_POST['username'], apc_fetch(Cache::PREFIX . 'user_' . $_POST['username']));
         
         header('Location: ' . Url::format('/user/view/' . $_POST['username']));
     }

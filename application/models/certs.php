@@ -107,7 +107,7 @@ class certs extends mongoBase {
      * 
      * @return string The certificate key.
      */
-    protected static function getKey($cert) {
+    public static function getKey($cert) {
         return self::PREFIX . hash(self::HASH, trim($cert));
     }
     

@@ -63,7 +63,7 @@ class baseModel extends mongoBase {
         if ($this->hasRevisions) $this->mongo->revisions->insert($revision);
         
         if ($this->hasSearch) $this->searchIndex($id, $args, false);
-        self::ApcPurge($id);
+        $this->clearCache($id);
         return true;
     }
     
@@ -78,7 +78,7 @@ class baseModel extends mongoBase {
             return self::ERROR_NONEXISTANT;
         
         if ($this->hasSearch) Search::delete($id);
-        self::ApcPurge($id);
+        $this->clearCache($id);
         return $this->db->update(array('_id' => $this->_toMongoId($id)), 
             array('$set' => array('ghosted' => true)));
     }
@@ -124,6 +124,14 @@ class baseModel extends mongoBase {
                 $entry[$key] = utf8_decode($entry[$key]);
             }
         }
+    }
+    
+    public function clearCache($id, $idlib = false) {
+        $entry = $this->get($id, $idlib, true);
+        if (empty($entry)) die('Unknown error #1');
+        
+        self::ApcPurge('get', $entry['_id']);
+        self::ApcPurge('get', Id::create($this->type, $entry));
     }
     
 }

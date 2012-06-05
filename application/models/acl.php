@@ -35,13 +35,8 @@ class acl extends mongoBase {
      * 
      * @return bool True if the user is allowed.
      */
-    public function can($group, $name, $cache = true) {
-        $key = 'acl_' . $group . '_' . $name;
-        if ($cache && apc_exists($key)) return apc_fetch($key);
-        
+    protected function can($group, $name) {
         $result = $this->redis->sIsMember('acl_' . $group, $name);
-        
-        if ($cache) apc_add($key, $result, 60);
         return $result;
     }
     

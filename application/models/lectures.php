@@ -93,7 +93,8 @@ class lectures extends baseModel {
             'duration' => $duration, 
             'ghosted' => false
             );
-        
+        self::ApcPurge('getNew', null);
+        self::ApcPurge('getForUser', $lecturer);
         return $entry;
     }
     

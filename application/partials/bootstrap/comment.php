@@ -7,7 +7,7 @@
 // * $pageLoc - Where to send new pages to.
 
 $commLib = new comments(ConnectionFactory::get('mongo'));
-$commentData = $commLib->getForId($id, false, false, $page);
+$commentData = $commLib->getForId($id, $page);
 extract($commentData);
 
 $paginationData = array(
@@ -33,7 +33,7 @@ foreach ($comments as $comment) {
 			</a><br />
 			
 			<a class="thumbnail" class="display: block">
-				<img src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim((empty($comment['user']['email']) ? 'guest@hts.org' : $comment['user']['email'])))); ?>" />
+				<img src="https://secure.gravatar.com/avatar/<?php echo md5(strtolower(trim((empty($comment['user']['email']) ? 'guest@hts.org' : $comment['user']['email'])))); ?>?d=identicon&r=pg" />
 			</a>
 			
 			<small title="<?php echo Date::minuteFormat($comment['date']); ?>">

@@ -74,8 +74,8 @@ class Session extends Cache {
         $_SESSION = array_merge($_SESSION, self::$data);
         
         if (self::isLoggedIn()) {
-            $key = 'Session_user_' . self::$data['username'];
-            self::ApcAdd($key, session_id(), 300, $key);
+            $key = Cache::PREFIX . 'user_' . self::$data['username'];
+            apc_store($key, session_id(), 300);
         }
     }
     
@@ -83,7 +83,7 @@ class Session extends Cache {
      * Destroy the current session (logout).
      */
     public static function destroy() {
-        if (self::isLoggedIn()) self::ApcPurge('user_' . self::$data['username']);
+        if (self::isLoggedIn()) apc_delete(Cache::PREFIX . 'user_' . self::$data['username']);
         self::$data = array();
         
         if (ini_get("session.use_cookies")) {
@@ -130,7 +130,7 @@ class Session extends Cache {
             }
         }
         
-        self::ApcPurge('user_' . $username);
+        apc_delete(Cache::PREFIX . 'user_' . $username);
     }
     
     public static function getId() {

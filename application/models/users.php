@@ -127,6 +127,7 @@ reclaim your account instead.';
             'lockToIP' => (bool) $lockToIp,
             'auths' => array('password'),
             'notes' => array(),
+            'connections' => array(),
             'certs' => array(),
             'bans' => array()
         );
@@ -167,7 +168,7 @@ reclaim your account instead.';
      * @param string $certKey The key of the user's certificate.
      */
     public function addCert($userId, $certKey) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)), 
             array('$push' => array('certs' => $certKey)));
         return true;
@@ -180,7 +181,7 @@ reclaim your account instead.';
      * @param string $certKey The key of the user's certificate.
      */
     public function removeCert($userId, $certKey) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$pull' => array('certs' => $certKey)));
         return true;
@@ -196,7 +197,7 @@ reclaim your account instead.';
      * @param bool $autoauth True to enable AutoAuth.
      */
     public function changeAuth($userId, $password, $certificate, $certAndPass, $autoauth) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         
         $auths = array();
         if ($password) array_push($auths, 'password');
@@ -217,7 +218,7 @@ reclaim your account instead.';
      * @return string The user's new password.
      */
     public function resetPassword($userId) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $password = hash('crc32', rand());
 
         $userInfo = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
@@ -236,7 +237,7 @@ reclaim your account instead.';
      * @return mixed Null on success, or an error string.
      */
     public function addNote($userId, $note) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $user = $this->db->findOne(array('_id' => $this->_toMongoId($userId)));
         
         if (!$user) return 'Invalid user id.';
@@ -261,7 +262,7 @@ reclaim your account instead.';
      * @param int $status The user's new status.
      */
     public function setStatus($userId, $status) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('status' => (int) $status)));
     }
@@ -273,7 +274,7 @@ reclaim your account instead.';
      * @param string $group The user's new group.
      */
     public function setGroup($userId, $group) {
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('group' => (string) $group)));
     }
@@ -287,7 +288,7 @@ reclaim your account instead.';
         
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('bans' => $bans)));
-        self::ApcPurge($userId);
+        $this->clearCache($userId);
         
         // We need to permeate an active session!
         $key = 'hts_Session_user_' . $user['username'];

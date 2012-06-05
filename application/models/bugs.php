@@ -166,7 +166,7 @@ class bugs extends baseModel {
             );
         if (!$creating) unset($entry['reporter'], $entry['status'], 
             $entry['created'], $entry['commentable'], $entry['flagged']);
-        
+        self::ApcPurge('getNew', null);
         return $entry;
     }
     
@@ -181,6 +181,8 @@ class bugs extends baseModel {
         $this->db->update(array('_id' => $this->_toMongoId($id)), array(
             '$set' => $diff));
         
+        self::ApcPurge('getNew', null);
+        $this->clearCache($id);
         return true;
     }
 

@@ -125,7 +125,7 @@ class news extends baseModel {
             'ghosted' => false
             );
         if (!$creating) unset($entry['user'], $entry['date'], $entry['flaggable']);
-            
+        self::ApcPurge('getNewPosts', null);
         return $entry;
     }
 

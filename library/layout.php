@@ -2,9 +2,10 @@
 
 class Layout
 {
-    const FOLDER_LAYOUTS   = "/application/layouts/";
-    const LAYOUT_EXTENSION = ".php";
-
+    const FOLDER_LAYOUTS   = '/application/layouts/';
+    const LAYOUT_EXTENSION = '.php';
+    const CONFIG_LAYOUT = 'display:layout';
+    
     private static $layout  = "";
     public static $data = array();
     private static $template = true;
@@ -39,7 +40,7 @@ class Layout
 
     public static function getLayout()
     {
-        return self::$layout;
+        return (self::$layout == "" ? Config::get(self::CONFIG_LAYOUT) : self::$layout);
     }
 
     /**

@@ -21,20 +21,20 @@ Prerequisites
 
 ##### php.ini: #####
 ```
-    extension=apc.so
-    extension=bbcode.so
-    extension=mongo.so
-    extension=redis.so
-    apc.slam_defense=0
-    session.save_handler=redis
-    session.save_path = "tcp://localhost:6379?weight=1&timeout=0.5"
+extension=apc.so
+extension=bbcode.so
+extension=mongo.so
+extension=redis.so
+apc.slam_defense=0
+session.save_handler=redis
+session.save_path = "tcp://localhost:6379?weight=1&timeout=0.5"
 ```
 
 #### Nginx ####
 
 ##### /etc/nginx/sites-available/htsv5: #####
 ```
-    server {
+server {
 
 	listen  80; ## listen for ipv4
 	server_name  localhost;
@@ -78,12 +78,12 @@ Prerequisites
  
 	        fastcgi_pass 127.0.0.1:9000;
 	}
-    }
+}
 ```
 
 ```
-    $ rm /etc/nginx/sites-enabled/default
-    $ ln -s /etc/nginx/sites-available/HTSv5 /etc/nginx/sites-enabled/
+$ rm /etc/nginx/sites-enabled/default
+$ ln -s /etc/nginx/sites-available/HTSv5 /etc/nginx/sites-enabled/
 ```
 
 Installing the Code
@@ -92,24 +92,24 @@ Generate an OpenSSH public/private keypair: `$ ssh-keygen -t rsa`
 
 ##### ~/.ssh/config: ######
 ```
-    Host git.hackthissite.org
-         HostName git.hackthissite.org
-         User git
-         IdentityFile /home/<username>/.ssh/<privkey>\
+Host git.hackthissite.org
+    HostName git.hackthissite.org
+    User git
+    IdentityFile /home/<username>/.ssh/<privkey>\
 ```
 
 ```
-    $ cd /var/www
-    $ git clone git@git.hackthissite.org:htsdev.git
-    $ cd /var/www/html/application/configs/servers
-    $ mkdir *host.example.org*
-    $ touch *host.example.org*/override.php
+$ cd /var/www
+$ git clone git@git.hackthissite.org:htsdev.git
+$ cd /var/www/html/application/configs/servers
+$ mkdir *host.example.org*
+$ touch *host.example.org*/override.php
 ```
 
 ##### *host.example.org*/override.php: #####
 ```
-    return array("system:environment" => "dev",
-        "other:baseUrl" => "http://192.168.101.65/",
-        "other:staticUrl" => "http://192.168.101.65/static/");
+return array("system:environment" => "dev",
+    "other:baseUrl" => "http://192.168.101.65/",
+    "other:staticUrl" => "http://192.168.101.65/static/");
 ```
 Note: Do not forget the trailing slash.

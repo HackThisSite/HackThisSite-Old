@@ -13,17 +13,8 @@ class users extends baseModel {
     
     var $hasSearch = false;
     var $hasRevisions = false;
-    
-    /**
-     * Creates a new instance.
-     * 
-     * @param resource $mongo A MongoDB connection.
-     */
-    public function __construct($mongo) {
-        $db       = Config::get(self::KEY_DB);
-        $this->mongo = $mongo->$db;
-        $this->db = $mongo->$db->users;
-    }
+    var $collection = 'users';
+    var $type = 'user';
     
     /**
      * Get a user by id.

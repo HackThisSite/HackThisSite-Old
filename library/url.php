@@ -30,7 +30,7 @@ class Url extends Cache {
     
     private static function populate() {
         self::$populated = true;
-        self::$base = Config::get('other:baseUrl');
-        self::$static = Config::get('other:staticUrl');
+        self::$base = str_replace('%P', $_SERVER['SERVER_PORT'], Config::get('other:baseUrl'));
+        self::$static = str_replace('%P', $_SERVER['SERVER_PORT'], Config::get('other:staticUrl'));
     }
 }

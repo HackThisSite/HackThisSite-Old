@@ -298,6 +298,17 @@ reclaim your account instead.';
         return $user;
     }
     
+    /**
+     * Add a connection to a user
+     */
+    public function addConnection($userId, $connection, $value) {
+        $this->db->update(array('_id' => $this->_toMongoId($userId)),
+            array(
+                '$set' => array('connections.' . $connection => $this->clean($value))
+            ));
+        self::ApcPurge('get', $userId);
+    }
+    
     
     /**
      * Authenticate a user.

@@ -7,8 +7,7 @@ host HTSv5
 Notes:  This does not client certificate authentication, SSL, and possibly more.
 
 installing:
-apt-get install make php5 git nginx php-apc php5-fpm php-pear libpcre-dev
-apt-get install mongodb redis-server redis-doc
+apt-get install make php5 git-core nginx php-apc php5-fpm php-pear libpcre-dev mongodb redis-server redis-doc
 
 Download the latest version of ElasticSearch from here:
 http://www.elasticsearch.org/download/

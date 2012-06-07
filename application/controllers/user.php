@@ -229,10 +229,19 @@ class controller_user extends Controller {
         $user = new users(ConnectionFactory::get('mongo'));
         $userInfo = $user->get(Session::getVar('_id'), false, true);
         
-        if (empty($userInfo['connections'])) 
-            return Error::set('You have no connections!');
+        $updated = false;
+        if (isset($_POST['github'])) {
+            $user->addConnection($userInfo['_id'], 'github', $_POST['github']);
+            $updated = true;
+        }
+        
+        if ($updated) {
+            Error::set('Connections updated', true);
+            $userInfo = $user->get(Session::getVar('_id'), false, true);
+        }
         
         $this->view['valid'] = true;
+        $this->view = $userInfo['connections'];
     }
     
     

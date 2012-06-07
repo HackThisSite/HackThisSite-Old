@@ -1,6 +1,6 @@
 <center><form action="<?php echo Url::format('/user/login'); ?>" method="post">
     Username: <input type="text" name="username" /><br />
-    Password: <input type="text" name="password" /><br />
+    Password: <input type="password" name="password" /><br />
 <?php if ($captcha): ?>
     <div class="control-group">
     <script type="text/javascript"src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $publicKey; ?>"></script>

@@ -5,7 +5,7 @@
 into the new format.</p>
 <center><form action="<?php echo Url::format('/reclaim/check'); ?>" method="post">
     Username: <input type="text" name="username" /><br />
-    Password: <input type="text" name="password" /><br />
+    Password: <input type="password" name="password" /><br />
     
 <div class="control-group">
 <script type="text/javascript"src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $publicKey; ?>"></script>

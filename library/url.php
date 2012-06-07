@@ -4,7 +4,7 @@
  * 
  * @package Library
  */
-class Url extends Cache {
+class Url {
     
     static $populated = false;
     static $base;
@@ -16,7 +16,7 @@ class Url extends Cache {
      * @param string $url A partial/complete url.
      * @param bool $static True if the static server should be used.
      */
-    protected static function format($url, $static = false) {
+    public static function format($url, $static = false) {
         if (!self::$populated) self::populate();
         if (empty($url)) $url = '/';
         if (substr($url, 0, 4) == 'http')

@@ -118,7 +118,7 @@ reclaim your account instead.';
             'lockToIP' => (bool) $lockToIp,
             'auths' => array('password'),
             'notes' => array(),
-            'connections' => array(),
+            'connections' => array('nil' => 'nil'),
             'certs' => array(),
             'bans' => array()
         );

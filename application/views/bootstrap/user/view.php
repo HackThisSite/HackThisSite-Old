@@ -77,6 +77,34 @@ foreach ($lectures as $lecture): ?>
 	</div>
 </div>
 
+<?php if (!empty($github)): ?>
+<div class="row">
+    <div class="span5">
+        <legend>GitHub</legend>
+<?php if (is_string($github)): ?>
+<div class="alert alert-error"><?php echo $github; ?></div>
+<?php else: foreach ($github as $repo): ?>
+<table class="table table-bordered">
+    <tr>
+        <th style="width: 99%">
+            <i class="icon-book"></i>&nbsp;
+            <a href="<?php echo Url::format($repo['url']); ?>" target="_blank">
+                <?php echo $repo['name']; ?>
+            </a>
+        </th>
+        <td style="border: none"><?php echo $repo['language']; ?></td>
+    </tr>
+<?php if (!empty($repo['description'])): ?>
+    <tr>
+        <td colspan="2"><span><?php echo $repo['description']; ?></span></td>
+    </tr>
+<?php endif; ?>
+</table>
+<?php endforeach;endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php if (CheckAcl::can('adminUsers')): ?>
 <legend>Admin Panel</legend>
 

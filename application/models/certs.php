@@ -72,7 +72,9 @@ class certs extends mongoBase {
      * @return string The certificate.
      */
     public function get($certKey, $cut = true) {
-        $cert = file_get_contents(Config::get('certs:location') . $certKey . Config::get('certs:extension'));
+        $where = Config::get('certs:location') . $certKey . Config::get('certs:extension');
+        if (!file_exists($where)) return null;
+        $cert = file_get_contents($where);
         return ($cut ? substr($cert, strpos($cert, ':') + 1) : $cert);
     }
     

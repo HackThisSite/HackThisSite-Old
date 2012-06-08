@@ -59,6 +59,7 @@ class controller_user extends Controller {
         $irc = new irc(ConnectionFactory::get('redis'));
         $articles = new articles(ConnectionFactory::get('mongo'));
         $lectures = new lectures(ConnectionFactory::get('mongo'));
+        $github = new github(ConnectionFactory::get('redis'));
         
         $this->view['valid'] = true;
         $this->view['username'] = $username;
@@ -67,6 +68,7 @@ class controller_user extends Controller {
         $this->view['onSite'] = apc_exists(Cache::PREFIX . 'user_' . $username);
         $this->view['articles'] = $articles->getForUser($this->view['user']['_id']);
         $this->view['lectures'] = $lectures->getForUser($username);
+        $this->view['github'] = $github->get($userInfo['_id']);
         
         Layout::set('title', $username . '\'s profile');
     }

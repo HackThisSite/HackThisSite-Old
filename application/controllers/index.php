@@ -7,6 +7,7 @@ class controller_index extends Controller {
         $notices = new notices(ConnectionFactory::get('redis'));
         $irc = new irc(ConnectionFactory::get('redis'));
         $quotes = new quotes(ConnectionFactory::get('mongo'));
+        $forums = new forums(ConnectionFactory::get('redis'));
         
         // Set all site-wide notices.
         foreach ($notices->getAll() as $notice) {
@@ -19,6 +20,7 @@ class controller_index extends Controller {
         $this->view['newArticles'] = $articles->getNewPosts('new', 1, 5);
         $this->view['ircOnline'] = $irc->getOnline();
         $this->view['randomQuote'] = $quotes->getRandom();
+        $this->view['fPosts'] = $forums->getNew();
         
         // Get online users.
         $apc = new APCIterator('user', '/' . Cache::PREFIX . 'user_.*/');

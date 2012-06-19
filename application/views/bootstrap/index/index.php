@@ -40,8 +40,12 @@ foreach ($newArticles['articles'] as $entry) {
 ?>
     </div></div>
     <div class="span6"><div class="well">
-        <h4>Latest Forum Posts</h4>
-        <em>Not implemented yet.</em>
+        <h4>Active Forum Posts</h4>
+<?php 
+foreach ($fPosts as $post) {
+    echo '<a href="' . Url::format($post['url']) . '">' . $post['topic'] . '</a><br />'; 
+}
+?>
     </div></div>
 </div>
 <?php

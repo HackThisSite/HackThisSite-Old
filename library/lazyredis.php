@@ -7,8 +7,8 @@
 class LazyRedis {
     
     private $conn;
-    private $ip;
-    private $port;
+    private $isArray;
+    private $host;
     private $connected = false;
     
     /**
@@ -17,16 +17,23 @@ class LazyRedis {
      * @param string $ip I.P. address to connect to.
      * @param int $port Port of the Redis server.
      */
-    public function __construct($ip = '127.0.0.1', $port = 6379) {
-        $this->ip = $ip;
-        $this->port = $port;
+    public function __construct($isArray = false, $host = '127.0.0.1') {
+        $this->isArray = $isArray;
+        $this->host = $host;
     }
     
     private function connect() {
         $this->connected = true;
-        $this->conn = new Redis();
         
-        $this->conn->pconnect($this->ip, $this->port);
+        if ($this->isArray) {
+            $this->conn = new RedisArray($this->host['hosts'], array('previous' => $this->host['previous']));
+        } else {
+            $this->conn = new Redis();
+            
+            list($ip, $port) = explode(':', $this->host);
+            $this->conn->pconnect($ip, $port);
+        }
+        
         
         $file = Config::get('redis:passwordFile');
         if (!empty($file)) {

@@ -16,18 +16,23 @@ class logs extends mongoBase {
     }
     
     public function __destruct() {
-        $multi = $this->redis->multi();
+        if (Config::get('redis:array')) {
+            $host = $this->redis->_target('{log}');
+            $multi = $this->redis->multi($host);
+        } else {
+            $multi = $this->redis->multi();
+        }
         
         foreach ($this->error as $errorLog) {
-            $multi->publish('log_error', $errorLog);
+            $multi->publish('{log}log_error', $errorLog);
         }
         
         foreach ($this->activity as $activityLog) {
-            $multi->publish('log_activity', $activityLog);
+            $multi->publish('{log}log_activity', $activityLog);
         }
         
         foreach ($this->general as $generalLog) {
-            $multi->publish('log_general', $generalLog);
+            $multi->publish('{log}log_general', $generalLog);
         }
         
         $multi->exec();

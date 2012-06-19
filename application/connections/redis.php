@@ -19,10 +19,11 @@ class ConnectionRedis {
             );
         $info = array_merge($info, $data);
         
+        $isArray = Config::get('redis:array');
         if (empty($info['port'])) { // Allows connection to the local socket
-            self::$connections[$key] = new LazyRedis($info['host']);
+            self::$connections[$key] = new LazyRedis($isArray, $info['host']);
         } else {
-			self::$connections[$key] = new LazyRedis($info['host'], $info['port']);
+			self::$connections[$key] = new LazyRedis($isArray, $info['host'], $info['port']);
         }
         
         return self::$connections[$key];

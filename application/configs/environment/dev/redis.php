@@ -1,6 +1,6 @@
 <?php
 return array(
-    "redis:server" => "127.0.0.1",
-    "redis:passwordFile" => null,
-    "redis:client" => null
+    'redis:array' => true,
+    'redis:server' => array('hosts' => array('127.0.0.1', '127.0.0.1:1234'), 'previous' => array('127.0.0.1')),
+    'redis:passwordFile' => null,
 );

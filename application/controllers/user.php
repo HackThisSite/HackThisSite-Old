@@ -258,7 +258,7 @@ class controller_user extends Controller {
         if (!Session::isLoggedIn()) return Error::set('Please login to add keys.');
         if (empty($_POST['csr'])) return Error::set('No CSR found.');
         
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         $output = $certs->create($_POST['csr']);
         
         if (!$output) return Error::set('Invalid CSR.');
@@ -284,7 +284,7 @@ class controller_user extends Controller {
         if (empty($_POST['hash']))
             return Error::set('No certificate hash was found.');
         
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         $cert = $certs->get($_POST['hash'], false);
         
         if ($cert == null)
@@ -302,7 +302,7 @@ class controller_user extends Controller {
         if (empty($_POST['hash']))
             return Error::set('No certificate hash was found.');
         
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         $cert = $certs->get($_POST['hash'], false);
         
         if ($cert == null)

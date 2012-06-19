@@ -8,15 +8,19 @@ class certs extends mongoBase {
     
     const HASH      = 'md5';
     const PREFIX    = 'cert_';
+    const KEY_DB    = 'mongo:db';
+    
+    private $grid;
     private $redis;
     
     /**
      * Creates a new instance.
      * 
-     * @param resource $connection A Redis connection.
+     * @param resource $connection A MongoDB connection.
      */
-    public function __construct($connection) {
-        $this->redis = $connection;
+    public function __construct($connection, $redis) {
+        $this->grid = $connection->{Config::get(self::KEY_DB)}->getGridFS();
+        $this->redis = $redis;
     }
     
     /**
@@ -27,9 +31,9 @@ class certs extends mongoBase {
      * @return mixed True on success, or an error string.
      */
     public function preAdd($cert) {
-        $exists = file_exists(Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension'));
+        $certificate = $this->grid->findOne(array('key' => $this->getKey($cert)));
         
-        if ($exists) return 'Duplicate certificate';
+        if (!empty($certificate)) return 'Duplicate certificate';
         return true;
     }
     
@@ -41,10 +45,8 @@ class certs extends mongoBase {
     public function add($cert) {
         $this->redis->incr('cert_serial');
         
-        $fh = fopen(Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension'), 'c');
-        fwrite($fh, Session::getVar('_id') . ':' . trim($cert));
-        fclose($fh);
-        
+        $this->grid->storeBytes(Session::getVar('_id') . ':' . trim($cert),
+            array('key' => $this->getKey($cert)));
         return true;
     }
     
@@ -72,9 +74,9 @@ class certs extends mongoBase {
      * @return string The certificate.
      */
     public function get($certKey, $cut = true) {
-        $where = Config::get('certs:location') . $certKey . Config::get('certs:extension');
-        if (!file_exists($where)) return null;
-        $cert = file_get_contents($where);
+        $cert = $this->grid->findOne(array('key' => $certKey));
+        if ($cert == null) return null;
+        $cert = $cert->getBytes();
         return ($cut ? substr($cert, strpos($cert, ':') + 1) : $cert);
     }
     
@@ -84,7 +86,7 @@ class certs extends mongoBase {
      * @param string $certKey The certificate key to search by.
      */
     public function removeCert($certKey) {
-        unlink(Config::get('certs:location') . $certKey . Config::get('certs:extension'));
+        $this->grid->remove(array('key' => $certKey));
     }
     
     /**
@@ -95,9 +97,9 @@ class certs extends mongoBase {
      * @return string The user id that corresponds to this certificate.
      */
     protected function check($cert) {
-        $file = Config::get('certs:location') . $this->getKey($cert) . Config::get('certs:extension');
-        if (!file_exists($file)) return null;
-        $info = file_get_contents($file);
+        $cert = $this->grid->findOne(array('key' => $this->getKey($cert)));
+        if ($cert == null) return null;
+        $info = $cert->getBytes();
 
         return substr($info, 0, strpos($info, ':'));
     }

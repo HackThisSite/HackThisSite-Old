@@ -6,7 +6,7 @@ class events_request_received_autoauth {
 		if (empty($_SERVER['SSL_CLIENT_RAW_CERT'])) return self::done();
 		if (Session::isLoggedIn()) return self::done();
 		
-		$certs = new certs(ConnectionFactory::get('redis'));
+		$certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
 		$userId = $certs->check($_SERVER['SSL_CLIENT_RAW_CERT']);
 		
 		if ($userId == NULL) return self::done();

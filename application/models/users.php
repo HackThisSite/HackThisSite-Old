@@ -64,7 +64,7 @@ class users extends baseModel {
     
     private function resolveCerts($user) {
         if (!empty($user['certs'])) {
-            $certs = new certs(ConnectionFactory::get('redis'));
+            $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
             
             foreach ($user['certs'] as $key => $certKey) {
                 $user['certs'][$key] = openssl_x509_parse($certs->get($certKey), false);
@@ -375,7 +375,7 @@ reclaim your account instead.';
     }
     
     private function checkCertificate() {
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         $userId = $certs->check($_SERVER['SSL_CLIENT_RAW_CERT']);
         
         if ($userId == null) return false;
@@ -405,7 +405,7 @@ reclaim your account instead.';
             return false;
         
         // Check certificate authentication
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         $userId = $certs->check($_SERVER['SSL_CLIENT_RAW_CERT']);
         
         if ($userId == null) return false;

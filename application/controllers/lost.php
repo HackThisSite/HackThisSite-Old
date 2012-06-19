@@ -82,7 +82,7 @@ class controller_lost extends Controller {
     private function checkCerts($user) {
         if (empty($user['certs'])) return false;
         
-        $certs = new certs(ConnectionFactory::get('redis'));
+        $certs = new certs(ConnectionFactory::get('mongo'), ConnectionFactory::get('redis'));
         
         foreach ($user['certs'] as $cert) {
             if (time() > $cert['validFrom_time_t'] && time() < $cert['validTo_time_t'])

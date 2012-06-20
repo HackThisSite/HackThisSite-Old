@@ -11,4 +11,6 @@
     <label class="checkbox"><input type="checkbox" name="shortNews" value="yes" />  Short News</label>
     <input type="submit" class="btn btn-primary" value="Post News" />
 </form>
+<?php else: ?>
+<a href="<?php echo Url::format('/news/view/' . Id::create($info, 'news')); ?>">Read</a>
 <?php endif; ?>

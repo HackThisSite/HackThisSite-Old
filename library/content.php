@@ -61,6 +61,8 @@ class Content extends Controller {
                 return Error::set($info);
             
             $this->view['valid'] = false;
+            $this->view['info'] = $info;
+            
             Error::set(ucwords($this->name) . ' posted!', true);
             Log::activity('Created:  ' . $this->name, 
                 '/' . substr(get_called_class(), 11) . '/view/' . Id::create($info, $this->name));
@@ -100,7 +102,9 @@ class Content extends Controller {
                 return Error::set($return);
             
             $this->view['post'] = $model->get($arguments[0], false, true);
-            Error::set('Entry edited!', true);
+            Error::set('Entry edited!', true, 
+                array('View' => Url::format('/' . $this->name . '/view/' . Id::create($this->view['post'], $this->name)))
+            );
             Log::activity('Edited:  ' . $this->name,
                 '/' . substr(get_called_class(), 11) . '/view/' . Id::create($this->view['post'], $this->name));
         }

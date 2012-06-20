@@ -18,12 +18,18 @@ class Error {
      * @return bool Returns false so that controllers can return this 
      * function to show they died prematurely.
      */
-    public static function set($error, $notice = false) {
+    public static function set($error, $notice = false, $supplementary = array()) {
+        $extra = '';
+        foreach ($supplementary as $name => $link) {
+            $extra .= '<a href="' . $link . '">' . $name . '</a>, ';
+        }
+        if ($extra != '') { $extra = '&nbsp;&nbsp;' . substr($extra, 0, -2); }
+        
         if ($notice) {
-            array_push(self::$notices, $error);
+            array_push(self::$notices, $error . $extra);
         } else {
             Log::error($error);
-            array_push(self::$errors, $error);
+            array_push(self::$errors, $error . $extra);
         }
         
         return false;

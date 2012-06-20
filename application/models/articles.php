@@ -161,7 +161,7 @@ class articles extends baseModel {
         
         $data = $this->mongo->articleVotes
             ->count(array('contentId' => $articleId, 'userId' => (string) Session::getVar('_id')));
-        if ($data != 0) return 'You\'re already voted on this!';
+        if ($data != 0) return 'You\'ve already voted on this!';
         
         $entry = array(
             'contentId' => $articleId,

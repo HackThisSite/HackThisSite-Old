@@ -17,4 +17,7 @@
     <span class="help-inline">(Comma seperated list of tags)</span><br />
     <input type="submit" value="Post Article" class="btn btn-primary" />
 </form>
+<?php else: ?>
+<p>You're article has been submitted for approval by a moderator.  It really 
+shouldn't take more than a few days.  If it does, then contact a moderator.</p>
 <?php endif; ?>

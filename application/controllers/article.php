@@ -102,9 +102,10 @@ class controller_article extends Content {
         
         $articles = new articles(ConnectionFactory::get('mongo'));
         $result = $articles->castVote($arguments[0], $arguments[1]);
+        $post = $articles->get($arguments[0], false, true);
         
-        if (is_string($result)) return Error::set($result);
-        Error::set('Vote cast!', true);
+        if (is_string($result)) return Error::set($result, false, array('Back' => Url::format('/article/view/' . Id::create($post, 'news'))));
+        Error::set('Vote cast!', true, array('Back' => Url::format('/article/view/' . Id::create($post, 'news'))));
     }
     
 }

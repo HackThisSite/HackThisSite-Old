@@ -3,9 +3,14 @@
     Password: <input type="password" name="password" /><br />
 <?php if ($captcha): ?>
     <div class="control-group">
-    <script type="text/javascript"src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $publicKey; ?>"></script>
+    <script type="text/javascript">
+        var RecaptchaOptions = {
+            theme : 'white'
+        };
+    </script>
+    <script type="text/javascript"src="https://www.google.com/recaptcha/api/challenge?&k=<?php echo $publicKey; ?>"></script>
     <noscript>
-        <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php echo $publicKey; ?>"
+        <iframe src="https://www.google.com/recaptcha/api/noscript?&k=<?php echo $publicKey; ?>"
         height="300" width="500" frameborder="0"></iframe><br>
         <textarea name="recaptcha_challenge_field" rows="3" cols="40">
         </textarea>

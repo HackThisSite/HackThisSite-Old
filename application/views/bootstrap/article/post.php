@@ -12,10 +12,11 @@
     <label>Description:</label>
     <textarea rows="5" style="width: 100%" name="description"></textarea><br />
     <label>Text:  </label>
-    <textarea rows="20" style="width: 100%" name="text"></textarea><br />
+    <textarea rows="20" style="width: 100%" name="body"></textarea><br />
     <label>Tags:  </label> <input type="text" name="tags" />
     <span class="help-inline">(Comma seperated list of tags)</span><br />
-    <input type="submit" value="Post Article" class="btn btn-primary" />
+    <input type="submit" class="btn btn-info" name="preview" value="Preview" />
+    <input type="submit" class="btn btn-primary" name="post" value="Post Article" />
 </form>
 <?php else: ?>
 <p>You're article has been submitted for approval by a moderator.  It really 

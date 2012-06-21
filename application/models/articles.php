@@ -217,6 +217,7 @@ class articles extends baseModel {
         $title = substr($this->clean($title), 0, 100);
         $description = substr($this->clean($description), 0, 500);
         $body = substr($this->clean($text), 0, 7000);
+        if (is_array($tags)) $tags = implode(',', $tags);
         $tags = array_map($func, explode(',', $this->clean($tags)));
         
         if (empty($title)) return 'Invalid title.';
@@ -247,11 +248,13 @@ class articles extends baseModel {
     // Content management magic.
     public function generateRevision($update, $old) {
         $titleFD = new FineDiff($update['title'], $old['title']);
+        $descriptionFD = new FineDiff($update['description'], $old['description']);
         $bodyFD = new FineDiff($update['body'], $old['body']);
         $tagsFD = new FineDiff(serialize($update['tags']), serialize($old['tags']));
         
         $revision = array(
             'title' => $titleFD->getOpcodes(),
+            'description' => $descriptionFD->getOpcodes(),
             'body' => $bodyFD->getOpcodes(),
             'tags' => $tagsFD->getOpcodes(),
             'published' => $old['published'],

@@ -7,7 +7,6 @@ if (isset($revisions)) {
 <?php
     foreach ($revisions as $revision) {
         $revision['revision'] = true;
-        $revision['currentId'] = $current['_id'];
         echo Partial::render('newsFull', $revision);
     }
 }

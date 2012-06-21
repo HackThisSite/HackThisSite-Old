@@ -101,13 +101,14 @@ class news extends baseModel {
     }
 
     // Content management magic.
-    public function validate($title, $department, $text, $tags, $shortNews, $commentable, $creating = true) {
+    public function validate($title, $department, $text, $tags, $shortNews, $commentable, $creating = true, $preview = false) {
         $ref = MongoDBRef::create('users', Session::getVar('_id'));
         $func = function($value) { return trim($value); };
         
         $title = substr($this->clean($title), 0, 100);
         $department = substr(str_replace(' ', '-', strtolower($this->clean($department))), 0, 80);
         $body = substr($this->clean($text), 0, 5000);
+        if (is_array($tags)) $tags = implode(',', $tags);
         $tags = array_map($func, explode(',', $this->clean($tags)));
         
         if (empty($title)) return 'Invalid title.';
@@ -125,7 +126,7 @@ class news extends baseModel {
             'ghosted' => false
             );
         if (!$creating) unset($entry['user'], $entry['date'], $entry['flaggable']);
-        self::ApcPurge('getNewPosts', null);
+        if (!$preview) { self::ApcPurge('getNewPosts', null); }
         return $entry;
     }
 

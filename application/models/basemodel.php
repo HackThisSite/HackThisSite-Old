@@ -128,7 +128,7 @@ class baseModel extends mongoBase {
     
     public function clearCache($id, $idlib = false) {
         $entry = $this->get($id, $idlib, true);
-        if (empty($entry)) die('Unknown error #1');
+        if (empty($entry)) return;
         
         self::ApcPurge('get', $entry['_id']);
         self::ApcPurge('get', Id::create($this->type, $entry));

@@ -47,6 +47,11 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
 }
 set_error_handler("errorHandler");
 
+// Basic data cleaning
+function clean($string) {
+    return htmlentities(trim((string) $string), ENT_QUOTES, '', false);
+}
+
 // add our library path to the include path
 set_include_path(
     get_include_path() .

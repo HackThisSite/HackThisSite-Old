@@ -1,12 +1,11 @@
 <?php
 class Content extends Controller {
     
-    private function validatePost($arguments) {
+    private function normalize() {
         $return = array();
-        $skippable = false;
-        $argPos = 0;
         
         foreach ($this->createForms as $field) {
+            $skippable = false;
             $medium = $_POST;
             $keyfield = $field;
             
@@ -15,20 +14,13 @@ class Content extends Controller {
                 $skippable = true;
             } else if ($field[0] == '@') {
                 $keyfield = $field = substr($field, 1);
-                $medium = $arguments;
-                $keyfield = $argPos;
-                $argPos++;
             }
             
-            if (empty($medium[$keyfield]) && (isset($medium[$keyfield]) && $medium[$keyfield] != 0) && !$skippable) {
-                $return = false;
-                break;
-            } else if (empty($medium[$keyfield]) && !isset($medium[$keyfield]) && $skippable) {
+            if (empty($medium[$keyfield])) {
                 $medium[$keyfield] = false;
             }
             
             $return[$field] = $medium[$keyfield];
-            $skippable = false;
         }
 
         return $return;
@@ -43,71 +35,106 @@ class Content extends Controller {
         return $name;
     }
     
-    public function post($arguments) {
-        if (!CheckAcl::can('post' . $this->permission))
-            return Error::set('You are not allowed to post ' . $this->pluralize($this->name) . '!');
-
+    private function handle($method) {
         $this->view['valid'] = true;
-        Layout::set('title', 'Post ' . ucwords($this->name));
+        $this->view['method'] = $method;
         
-        if (!empty($arguments[0]) && $arguments[0] == 'save') {
-            if (($forms = $this->validatePost($arguments)) == false)
-                return Error::set('All forms need to be filled out.');
+        if (empty($_POST['post']) && empty($_POST['preview'])) {
+            return false;
+        }
+        
+        // Error checks.
+        $errors = false;
+        if (!empty($_POST['post']) || !empty($_POST['preview'])) {
+            $forms = $this->normalize();
+            array_push($forms, true, true);
             
             $model = new $this->model(ConnectionFactory::get($this->db));
-            $info = call_user_func_array(array($model, 'create'), $forms);
-
-            if (is_string($info))
-                return Error::set($info);
+            $info = call_user_func_array(array($model, 'validate'), $forms);
             
+            if (is_string($info)) {
+                Error::set($info);
+                $errors = true;
+            } else {
+                $info['preview'] = true;
+                $model->resolveUTF8($info);
+                $model->resolveUser($info['user']);
+            }
+        }
+        
+        // Display form with old data.
+        if ($errors || (!$errors && !empty($_POST['preview']))) {
+            $this->view['post'] = $forms;
+            $this->setView($this->name . '/edit');
+        }
+        
+        if (!$errors && !empty($_POST['preview'])) {
+            $this->view['preview'] = true;
+            $this->view['info'] = $info;
+        } else if (!$errors && !empty($_POST['post'])) {
             $this->view['valid'] = false;
             $this->view['info'] = $info;
-            
-            Error::set(ucwords($this->name) . ' posted!', true);
-            Log::activity('Created:  ' . $this->name, 
-                '/' . substr(get_called_class(), 11) . '/view/' . Id::create($info, $this->name));
+            return array(&$model, $info, array_slice($forms, 0, -2));
         }
+        
+        return false;
+    }
+    
+    public function post($arguments) {
+        Layout::set('title', 'Post ' . ucwords($this->name));
+        if (!CheckAcl::can('post' . $this->permission))
+            return Error::set('You are not allowed to post ' . $this->pluralize($this->name) . '!');
+        
+        $return = $this->handle('post');
+        if ($return == false) return;
+        
+        list($model, $info, $forms) = $return;
+        call_user_func_array(array($model, 'create'), $forms);
+        
+        if ($this->name != 'article') {
+            Error::set(ucwords($this->name) . ' posted!', true,
+                array('View' => Url::format('/' . $this->name . '/view/' . Id::create($info, $this->name)))
+            );
+        } else {
+            Error::set(ucwords($this->name) . ' posted!', true);
+        }
+        Log::activity('Created:  ' . $this->name, 
+            '/' . substr(get_called_class(), 11) . '/view/' . Id::create($info, $this->name));
     }
     
     public function edit($arguments) {
-        $model = new $this->model(ConnectionFactory::get($this->db));
-        
-        if (empty($arguments[0]))
-            return Error::set('No ' . $this->name . ' id was found!');
-        if (!method_exists($model, 'authChange') && !CheckAcl::can('edit' . $this->permission))
-            return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
-        
-        $entry = $model->get($arguments[0], false, true);
-        
-        if (empty($entry))
-            return Error::set('Invalid id.');
-        if (is_string($entry))
-            return Error::set($entry);      
-        if (method_exists($model, 'authChange') && !$model->authChange('edit', $entry))
-            return Error::set('You are not allowed to edit this ' . $this->name . '!');
-        
-        $this->view['valid'] = true;
-        $this->view['post'] = $entry;
         Layout::set('title', 'Edit ' . ucwords($this->name));
         
-        if (!empty($arguments[1]) && $arguments[1] == 'save') {
-            if (($forms = $this->validatePost($arguments)) == false)
-                return Error::set('All forms need to be filled out.');
+        // START CHECKS
+        if (empty($arguments[0]))
+            return Error::set('No ' . $this->name . ' id was found!');
+        
+        $model = new $this->model(ConnectionFactory::get($this->db));
+        $entry = $this->view['post'] = $model->get($arguments[0], false, true);
+        $this->view['_id'] = $entry['_id'];
+        
+        if (empty($entry)) return Error::set('Invalid id.');
+        if (is_string($entry)) return Error::set($entry); 
+        if (!method_exists($model, 'authChange') && !CheckAcl::can('edit' . $this->permission))
+            return Error::set('You are not allowed to edit ' . $this->pluralize($this->name) . '!');
+        if (method_exists($model, 'authChange') && !$model->authChange('edit', $entry))
+            return Error::set('You are not allowed to edit this ' . $this->name . '!');
+        // END CHECKS
 
-            $this->view['forms'] = $forms;
-            array_unshift($forms, $arguments[0]);
-            $return = call_user_func_array(array($model, 'edit'), $forms);
-            
-            if (is_string($return))
-                return Error::set($return);
-            
-            $this->view['post'] = $model->get($arguments[0], false, true);
-            Error::set('Entry edited!', true, 
-                array('View' => Url::format('/' . $this->name . '/view/' . Id::create($this->view['post'], $this->name)))
-            );
-            Log::activity('Edited:  ' . $this->name,
-                '/' . substr(get_called_class(), 11) . '/view/' . Id::create($this->view['post'], $this->name));
-        }
+        
+        $return = $this->handle('edit');
+        if ($return == false) return;
+        
+        
+        // START AFTERWARDS
+        list($model, $info, $forms) = $return;
+        array_unshift($forms, $this->view['_id']);
+        call_user_func_array(array($model, 'edit'), $forms);
+        Error::set('Entry edited!', true, 
+            array('View' => Url::format('/' . $this->name . '/view/' . Id::create($entry, $this->name)))
+        );
+        Log::activity('Edited:  ' . $this->name,
+            '/' . substr(get_called_class(), 11) . '/view/' . Id::create($entry, $this->name));
     }
     
     public function delete($arguments) {

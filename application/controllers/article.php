@@ -5,7 +5,7 @@ class controller_article extends Content {
     var $model = 'articles';
     var $db = 'mongo';
     var $permission = 'Article';
-    var $createForms = array('title', 'category', 'description', 'text', '?tags');
+    var $createForms = array('title', 'category', 'description', 'body', '?tags');
     var $location = 'article';
     var $hasRevisions = true;
     var $diffdFields = array('title', 'category' ,'description', 'body', '$tags');

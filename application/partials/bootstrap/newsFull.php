@@ -7,12 +7,12 @@
 		Replaced on <?php echo Date::dayFormat($_id->getTimestamp()); ?>
 		<?php endif; ?>
 		<?php if (!empty($department)): ?> from the <?php echo $department; ?> dept<?php endif; ?>
-		<?php if (empty($revision)): ?>
+		<?php if (empty($revision) && empty($preview)): ?>
 		<?php if (CheckAcl::can('editNews')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/edit/' . $_id); ?>">Edit</a><?php endif; ?>
 		<?php if (CheckAcl::can('deleteNews')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/delete/' . $_id); ?>">Delete</a><?php endif; ?>
 		<?php if (CheckAcl::can('viewNewsRevisions')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/revisions/' . $_id); ?>">Revisions</a><?php endif; ?>
-		<?php else: ?>
-		<?php if (CheckAcl::can('revertNews')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/revisions/' . $currentId . '/revert/' . $_id); ?>">Revert</a><?php endif; ?>
+		<?php elseif (empty($preview)): ?>
+		<?php if (CheckAcl::can('revertNews')): ?>&nbsp;-&nbsp;<a href="<?php echo Url::format('/news/revisions/' . $contentId . '/revert/' . $_id); ?>">Revert</a><?php endif; ?>
 		<?php endif; ?>
 	</small>
 	

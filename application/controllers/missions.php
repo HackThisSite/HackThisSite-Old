@@ -69,6 +69,7 @@ class controller_missions extends Controller {
         }
     }
     
+    /*
     public function basic($arguments) {
         $this->baseMission('basic', $arguments);
         
@@ -77,5 +78,10 @@ class controller_missions extends Controller {
         ($arguments[0] == '4' && $arguments[1] == 'level4.php') || 
         ($arguments[0] == '5' && $arguments[1] == 'level5.php'))
             Layout::cut();
+    }
+    */
+    
+    public function legacy($arguments) {
+        Error::set('Not yet added!', true);
     }
 }

@@ -1,9 +1,9 @@
 <?php
 return array(
-    "display:layout" => "bootstrap",
-    "display:leftnav" => array(
-        "Challenges" => array(
-            "Basic"       => "missions/basic", /*
+    'display:layout' => 'bootstrap',
+    'display:leftnav' => array(
+        'Challenges' => array(
+            "Legacy"       => "missions/legacy", /*
             "Realistic"   => "#",
             "Application" => "#",
             "Programming" => "#",

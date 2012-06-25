@@ -333,17 +333,20 @@ class controller_user extends Controller {
         $user = new users(ConnectionFactory::get('mongo'));
         $userInfo = $user->get($_POST['userId'], false, true);
         
+        $return = null;
         if (empty($_POST['status']) && $userInfo['status'] == $user::ACCT_LOCKED) {
-            $user->setStatus($_POST['userId'], $user::ACCT_OPEN);
+            $return = $user->setStatus($_POST['userId'], $user::ACCT_OPEN);
         } else if (!empty($_POST['status']) && $_POST['status'] == 'locked' && $userInfo['status'] == $user::ACCT_OPEN) {
-            $user->setStatus($_POST['userId'], $user::ACCT_LOCKED);
+            $return = $user->setStatus($_POST['userId'], $user::ACCT_LOCKED);
         }
+        if (is_string($return)) return Error::set($return);
         
         if (empty($_POST['group']) || !in_array($_POST['group'], acl::$acls))
             return Error::set('Invalid group.');
         
         if ($_POST['group'] != $userInfo['group']) {
-            $user->setGroup($_POST['userId'], $_POST['group']);
+            $return = $user->setGroup($_POST['userId'], $_POST['group']);
+            if (is_string($return)) return Error::set($return);
         }
         
         header('Location: ' . Url::format('/user/view/' . $userInfo['username']));

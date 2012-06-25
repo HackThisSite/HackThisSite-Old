@@ -253,9 +253,18 @@ reclaim your account instead.';
      * @param int $status The user's new status.
      */
     public function setStatus($userId, $status) {
+        $user = $this->get($userId, false);
+        if (empty($user)) return 'Invalid user id.';
+        
         $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('status' => (int) $status)));
+        
+        // We need to permeate an active session!
+        $key = 'hts_user_' . $user['username'];
+        if (apc_exists($key)) {
+            Session::setExternalVars(apc_fetch($key), array('status' => (int) $status));
+        }
     }
     
     /**
@@ -265,9 +274,18 @@ reclaim your account instead.';
      * @param string $group The user's new group.
      */
     public function setGroup($userId, $group) {
+        $user = $this->get($userId, false);
+        if (empty($user)) return 'Invalid user id.';
+        
         $this->clearCache($userId);
         $this->db->update(array('_id' => $this->_toMongoId($userId)),
             array('$set' => array('group' => (string) $group)));
+            
+        // We need to permeate an active session!
+        $key = 'hts_user_' . $user['username'];
+        if (apc_exists($key)) {
+            Session::setExternalVars(apc_fetch($key), array('group' => (string) $group));
+        }
     }
     
     /**
@@ -282,7 +300,7 @@ reclaim your account instead.';
         $this->clearCache($userId);
         
         // We need to permeate an active session!
-        $key = 'hts_Session_user_' . $user['username'];
+        $key = 'hts_user_' . $user['username'];
         if (apc_exists($key)) {
             Session::setExternalVars(apc_fetch($key), array('bans' => $bans));
         }

@@ -89,15 +89,16 @@ class Content extends Controller {
         if ($return == false) return;
         
         list($model, $info, $forms) = $return;
-        call_user_func_array(array($model, 'create'), $forms);
+        $info = $this->view['info'] = call_user_func_array(array($model, 'create'), $forms);
         
         if ($this->name != 'article') {
             Error::set(ucwords($this->name) . ' posted!', true,
-                array('View' => Url::format('/' . $this->name . '/view/' . Id::create($info, $this->name)))
+                array('View' => Url::format('/' . $this->location . '/view/' . Id::create($info, $this->name)))
             );
         } else {
             Error::set(ucwords($this->name) . ' posted!', true);
         }
+        
         Log::activity('Created:  ' . $this->name, 
             '/' . substr(get_called_class(), 11) . '/view/' . Id::create($info, $this->name));
     }

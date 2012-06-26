@@ -25,8 +25,9 @@ class Id extends Cache {
                 break;
                 
             case 'bug':
-                $time = $data['_id']->getTimestamp();
-                $number = $data['_id']->getInc();
+                $id = $data['_id'];
+                $time = $id->getTimestamp();
+                $number = $id->getInc();
                 
                 $id = base_convert($time, 10, 36) . '-' . base_convert($number, 10, 36);
                 

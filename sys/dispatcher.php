@@ -38,7 +38,9 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
         ' on line ' . $errline;
     Log::error($error);
     
-    if (Config::get('system:environment') == 'dev') {
+    if (isset($GLOBALS['api'])) {
+        echo json_encode(array('errors' => array($errstr)));
+    } else if (Config::get('system:environment') == 'dev') {
         echo $error;
     } else {
         echo 'Sorry, an error has occured.';

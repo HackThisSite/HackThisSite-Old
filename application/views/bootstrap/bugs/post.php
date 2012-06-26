@@ -47,9 +47,7 @@
 		</div>
 	</div>
     
-    <input type="submit" value="Post Bug" class="btn btn-primary" />
+    <input type="submit" name="post" value="Post Bug" class="btn btn-primary" />
 </fieldset>
 </form>
-<?php else: ?>
-<a href="<?php echo Url::format('/bugs/view/' . Id::create($info, 'bug')); ?>">Read</a>
 <?php endif; ?>

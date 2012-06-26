@@ -34,7 +34,7 @@ class Log {
         if (!self::$opened) self::initiate();
         
         $logHeader = (!Session::isLoggedIn() ? 'Guest' : 'User ' . Session::getVar('username')) . 
-            ' (' . microtime(true) . '):  ';
+            ' ' . $_SERVER['REMOTE_ADDR'] . ' (' . microtime(true) . '):  ';
         return self::$logModel->error($logHeader . $message);
     }
     

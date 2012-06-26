@@ -52,6 +52,8 @@ class bugs extends baseModel {
      * @return array The new bugs.
      */
     protected function getNew($filter = 'open', $page = 1) {
+        if (!isset(self::$filters[$filter])) $filter = 'open';
+        if (intval($page) < 1) $page = 1;
         $pageLimit = 15;
         
         $query = array(

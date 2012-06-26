@@ -1,6 +1,7 @@
 <?php
 class controller_platform extends Controller {
     
+    /***** START SSO *****/
     public function sso() {
         Layout::cut();
         
@@ -86,6 +87,30 @@ class controller_platform extends Controller {
             default:
                 return hash($secure, $string).$secure;
         }
+    }
+    /***** END SSO *****/
+    
+    /***** START API *****/
+    public function api($arguments) {
+        Layout::cut();
+        $GLOBALS['api'] = true;
+        $this->view['data'] = array();
+        
+        if (empty($_SERVER['SSL_CLIENT_RAW_CERT']) || !in_array(md5($_SERVER['SSL_CLIENT_RAW_CERT']), Config::get('api:clients')))
+            return Error::set('You are not allowed to use the API.');
+        if (count($arguments) != 2) 
+            return Error::set('Too many or too few arguments.');
+        if (!in_array($arguments[0] . '/' . $arguments[1], Config::get('api:whitelist')))
+            return Error::set('Invalid reference.');
+        
+        $class = new $arguments[0](ConnectionFactory::get('mongo'));
+        
+        $params = (empty($_POST['params']) ? array() : json_decode(base64_decode($_POST['params']), true));
+        $this->view['data'] = call_user_func_array(array($class, $arguments[1]),
+            $params);
+        
+        Log::error('API call made ' . $arguments[0] . '::' . $arguments[1] .
+            ' with parameters ' . json_encode($params));
     }
     
 }

@@ -28,11 +28,13 @@ class controller_bugs extends Content {
         $filter = 'open';
         $page = 1;
         
-        if (!empty($arguments[0]) && isset(bugs::$filters[$arguments[0]])) $filter = $arguments[0];
-        if (!empty($arguments[0]) && !isset(bugs::$filters[$arguments[0]])) Error::set('Invalid filter.');
-        if (!empty($arguments[1]) && intval($arguments[1]) >= 1) $page = intval($arguments[1]);
+        if (!empty($arguments[0])) $filter = $arguments[0];
+        if (!empty($arguments[1])) $page = $arguments[1];
 
-        $this->view = $bugs->getNew($filter, $page);
+        $bug = $bugs->getNew($filter, $page);
+        if (is_string($bug)) return Error::set($bug);
+        
+        $this->view = $bug;
         $this->view['page'] = $page;
         $this->view['filter'] = $filter;
         

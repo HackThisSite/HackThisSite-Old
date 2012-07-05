@@ -15,7 +15,7 @@ class controller_bugs extends Content {
         * ghosted       bool  
     */
     
-    var $name = 'bug';
+    var $name = 'bugs';
     var $model = 'bugs';
     var $db = 'mongo';
     var $permission = 'Bugs';
@@ -59,8 +59,8 @@ class controller_bugs extends Content {
         $bugs = new bugs(ConnectionFactory::get('mongo'));
         $this->view['bug'] = $bugs->get($arguments[0], true, true);
         
-        if (empty($this->view['bug']))
-            return Error::set('Invalid id.');
+        if (is_string($this->view['bug']))
+            return Error::set($this->view['bug']);
         if (!bugs::canView($this->view['bug']))
             return Error::set('You are not allowed to view this bug.');
                 
@@ -112,7 +112,7 @@ class controller_bugs extends Content {
         $this->view['valid'] = true;
         Error::set('Status changed.', true);
         
-        apc_delete('bugs_' . Id::create(current($bug), 'bug'));
+        apc_delete('bugs_' . Id::create(current($bug), 'bugs'));
     }
     
 }

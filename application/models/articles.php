@@ -82,49 +82,43 @@ class articles extends baseModel {
      * 
      * @return mixed The article/articles as an array, or an error string.
      */
-    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
+        $query = array('published' => true, 'ghosted' => false);
         if ($idlib) {
-            $idLib = new Id;
-
-            $query = array('ghosted' => false, 'published' => true);
-            $keys = $idLib->dissectKeys($id, 'news');
-
+            $keys = Id::dissectKeys($id, 'article');
             $query['date'] = array('$gte' => $keys['date'], '$lte' => $keys['date'] + $keys['ambiguity']);
         } else {
-            $query = array('_id' => $this->_toMongoId($id), 'published' => true, 'ghosted' => false);
+            $query['_id'] = $this->_toMongoId($id);
         }
-
-        $results = $this->db->find($query);
         
-        if (empty($results)) return 'Invalid id.';
+        $results = $this->db->find($query)->sort(array('date' => -1));
+        $total = $results->count();
+        $valid = array();
         
-        if (!$idlib) {
-            $toReturn = iterator_to_array($results);
-            
-            foreach ($toReturn as $key => $entry) {
-                $this->resolveUser($toReturn[$key]['user']);
-                if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
+        if ($limit != null) $results->limit($limit);
+        if ($idlib) {
+            foreach ($results as $result) {
+                if (!Id::validateHash($id, array('ambiguity' => $keys['ambiguity'],
+                    'reportedDate' => $keys['date'], 'date' => $result['date'],
+                    'title' => $result['title']), 'news'))
+                    continue;
+                array_push($valid, $result);
             }
-            
-            return ($justOne ? reset($toReturn) : $toReturn);
+        } else { $valid = iterator_to_array($results); }
+        if ($justOne) $valid = array(reset($valid));
+        
+        if (empty($valid)) return array('Invalid id.', 0);
+        
+        $comments = new comments(ConnectionFactory::get('mongo'));
+        foreach ($valid as $key => $entry) {
+            $this->resolveUser($valid[$key]['user']);
+            if ($fixUTF8) $this->resolveUTF8($valid[$key]);
+            $valid[$key]['rating'] = $this->getScore($entry['_id']);
+            $valid[$key]['comments'] = $comments->getCount($entry['_id']);
         }
-            
-        $toReturn = array();
-
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array('ambiguity' => $keys['ambiguity'],
-                'reportedDate' => $keys['date'], 'date' => $result['date'],
-                'title' => $result['title']), 'news'))
-                continue;
-            
-            $result['rating'] = $this->getScore($result['_id']);
-            $this->resolveUser($result['user']);
-            if ($fixUTF8) $this->resolveUTF8($result);
-            if ($justOne) return $result;
-            array_push($toReturn, $result);
-        }
-
-        return $toReturn;
+        
+        if ($justOne) return reset($valid);
+        return array($valid, $total);
     }
     
     /**

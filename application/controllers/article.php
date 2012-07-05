@@ -41,9 +41,9 @@ class controller_article extends Content {
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $articlesModel = new articles(ConnectionFactory::get('mongo'));
-        $article = $articlesModel->get($id);
+        list($article, $total) = $articlesModel->get($id);
         
-        if (empty($article)) return Error::set('Invalid id.');
+        if (is_string($article)) return Error::set($article);
         
         $this->view['article'] = $article;
         $this->view['multiple'] = (count($article) > 1);

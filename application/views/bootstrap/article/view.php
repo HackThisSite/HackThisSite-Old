@@ -1,6 +1,13 @@
 <?php
 if (!empty($article)) {
 	if ($multiple) {
+        $data = array(
+            'total' => $total,
+            'perPage' => articles::PER_PAGE,
+            'page' => $page,
+            'url' => $url
+        );
+        echo Partial::render('pagination', $data);
 		foreach ($article as $post) {
 			echo Partial::render('articleQuickView', $post);
 		}

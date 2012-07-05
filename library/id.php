@@ -16,6 +16,7 @@ class Id extends Cache {
      */
     protected static function create($data, $type) {
         switch ($type) {
+            case 'article':
             case 'news':
                 $string = trim(strtolower($data['title']));
                 $string = preg_replace('{(-)\1+}', '-', preg_replace('/[^\w\d_ -]/si', '-', $string));
@@ -24,7 +25,7 @@ class Id extends Cache {
                 return date('Y/m/dHi_', $data['date']) . $string;
                 break;
                 
-            case 'bug':
+            case 'bugs':
                 $id = $data['_id'];
                 $time = $id->getTimestamp();
                 $number = $id->getInc();
@@ -36,10 +37,6 @@ class Id extends Cache {
             
             case 'user':
                 return $data['username'];
-                break;
-            
-            case 'article':
-                return Id::create($data, 'news');
                 break;
         }
         
@@ -60,6 +57,7 @@ class Id extends Cache {
      */
     protected static function dissectKeys($hash, $type) {
         switch ($type) {
+            case 'article':
             case 'news':
                 $sections = explode('/', $hash);
                 $toReturn = array();
@@ -97,7 +95,7 @@ class Id extends Cache {
                 return $toReturn;
                 break;
                 
-            case 'bug':
+            case 'bugs':
                 $toReturn = array();
                 $data = explode('-', $hash);
                 $toReturn['time'] = base_convert($data[0], 36, 10);
@@ -107,10 +105,6 @@ class Id extends Cache {
             
             case 'user':
                 return array('username' => $hash);
-                break;
-            
-            case 'article':
-                return Id::dissetKeys($hash, 'news');
                 break;
                 
         }
@@ -131,6 +125,7 @@ class Id extends Cache {
      */
     protected static function validateHash($hash, $data, $type) {
         switch ($type) {
+            case 'article':
             case 'news':
                 $realHash = self::create($data, $type);
                 return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
@@ -146,10 +141,6 @@ class Id extends Cache {
                 
             case 'user':
                 return ($hash == $data['username']);
-                break;
-            
-            case 'article':
-                return Id::validateHash($hash, $data, 'news');
                 break;
         }
         

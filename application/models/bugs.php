@@ -43,6 +43,8 @@ class bugs extends baseModel {
     var $collection = 'bugs';
     var $type = 'bug';
     
+    const PER_PAGE = 10;
+    
     /**
      * Gets new bugs.
      * 
@@ -95,48 +97,39 @@ class bugs extends baseModel {
      * 
      * @return mixed The bug/bugs as an array, or an error string.
      */
-    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true) {
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
+        $query = array('ghosted' => false);
         if ($idlib) {
-            $idLib = new Id;
-
-            $query = array('ghosted' => false);
-            $keys = $idLib->dissectKeys($id, 'bug');
-            
+            $keys = Id::dissectKeys($id, 'bugs');
             $query['created'] = (int) $keys['time'];
         } else {
-            $query = array('_id' => $this->_toMongoId($id));
+            $query['_id'] = $this->_toMongoId($id);
         }
         
         $results = $this->db->find($query);
+        $total = $results->count();
+        $valid = array();
         
-        if (empty($results)) return 'Invalid id.';
-        
-        if (!$idlib) {
-            $toReturn = iterator_to_array($results);
-            
-            foreach ($toReturn as $key => $entry) {
-                $this->resolveUser($toReturn[$key]['reporter']);
-                if ($fixUTF8) $this->resolveUTF8($toReturn[$key]);
-            }
-            
-            return ($justOne ? reset($toReturn) : $toReturn);
-        }
-
-        $toReturn = array();
-        
-        foreach ($results as $result) {
-            if (!$idLib->validateHash($id, array(
+        if ($limit != null) $results->limit($limit);
+        if ($idlib) {
+            foreach ($results as $result) {
+            if (!Id::validateHash($id, array(
                 '_id' => $result['_id'], 
                 'created' => $result['created']), 'bugs')) continue;
-
-            $this->resolveUser($result['reporter']);
-            if ($fixUTF8) $this->resolveUTF8($result);
-            
-            if ($justOne) return $result;
-            array_push($toReturn, $result);
+                array_push($valid, $result);
+            }
+        } else { $valid = iterator_to_array($results); }
+        if ($justOne) $valid = array(reset($valid));
+        
+        if (empty($valid) || $total == 0) return array('Invalid id.', 0);
+        
+        foreach ($valid as $key => $entry) {
+            $this->resolveUser($valid[$key]['reporter']);
+            if ($fixUTF8) $this->resolveUTF8($valid[$key]);
         }
-
-        return $toReturn;
+        
+        if ($justOne) return reset($valid);
+        return array($valid, $total);
     }
     
     // Content management magic.

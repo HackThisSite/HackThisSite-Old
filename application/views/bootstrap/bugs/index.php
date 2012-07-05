@@ -48,7 +48,7 @@ echo implode($array);
         <td><?php echo Date::dayFormat($bug['lastUpdate']); ?></td>
         <td><?php echo ucwords(bugs::$status[$bug['status']]); ?></td>
         <td>
-            <a href="<?php echo Url::format('/bugs/view/' . Id::create($bug, 'bug')); ?>">
+            <a href="<?php echo Url::format('/bugs/view/' . Id::create($bug, 'bugs')); ?>">
                 <?php echo $bug['title']; ?>
             </a>
         </td>

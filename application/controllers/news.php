@@ -9,7 +9,7 @@ class controller_news extends Content {
     var $location = '';
     var $hasRevisions = true;
     var $diffdFields = array('title', 'department', 'body', '$tags');
-
+    
     public function view($arguments) {
         if (!empty($arguments[3])) {
             $page = (int) array_pop($arguments);
@@ -25,9 +25,9 @@ class controller_news extends Content {
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $newsModel = new news(ConnectionFactory::get('mongo'));
-        $news = $newsModel->get($id);
+        list($news, $total) = $newsModel->get($id);
         
-        if (empty($news)) return Error::set('Invalid id.');
+        if (is_string($news)) return Error::set($news);
         
         $this->view['news'] = $news;
         $this->view['multiple'] = (count($news) > 1);

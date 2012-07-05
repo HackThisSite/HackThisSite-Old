@@ -93,7 +93,7 @@ class Content extends Controller {
         
         if ($this->name != 'article') {
             Error::set(ucwords($this->name) . ' posted!', true,
-                array('View' => Url::format('/' . $this->location . '/view/' . Id::create($info, $this->name)))
+                array('View' => Url::format('/' . $this->name . '/view/' . Id::create($info, $this->name)))
             );
         } else {
             Error::set(ucwords($this->name) . ' posted!', true);

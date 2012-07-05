@@ -128,7 +128,11 @@ class Id extends Cache {
             case 'article':
             case 'news':
                 $realHash = self::create($data, $type);
-                return ($realHash == $hash || ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']));
+                
+                $prec = count(array_filter(explode('/', $hash)));
+                $one = $realHash == $hash;
+                $two = ($data['date'] >= $data['reportedDate'] && $data['date'] <= $data['reportedDate'] + $data['ambiguity']);
+                return ($prec == 3 && $one || $prec < 3 && $two);
                 break;
                 
             case 'bugs':

@@ -22,15 +22,27 @@ class controller_news extends Content {
             $this->view['commentPage'] = 1;
         }
         
+        if (!empty($_GET['p'])) {
+            $page = (int) $_GET['p'];
+            if ($page < 1) {
+                $this->view['page'] = 1;
+            } else {
+                $this->view['page'] = $page;
+            }
+        } else {
+            $this->view['page'] = 1;
+        }
+        
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $newsModel = new news(ConnectionFactory::get('mongo'));
-        list($news, $total) = $newsModel->get($id);
+        list($news, $this->view['total']) = $newsModel->get($id, true, false, true, $this->view['page']);
         
         if (is_string($news)) return Error::set($news);
         
         $this->view['news'] = $news;
         $this->view['multiple'] = (count($news) > 1);
+        $this->view['url'] = Url::format('/news/view/' . $id . '?p=');
         
         if ($this->view['multiple']) return;
 

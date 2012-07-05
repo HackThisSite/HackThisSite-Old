@@ -38,15 +38,27 @@ class controller_article extends Content {
             $this->view['commentPage'] = 1;
         }
         
+        if (!empty($_GET['p'])) {
+            $page = (int) $_GET['p'];
+            if ($page < 1) {
+                $this->view['page'] = 1;
+            } else {
+                $this->view['page'] = $page;
+            }
+        } else {
+            $this->view['page'] = 1;
+        }
+        
         @$id = implode('/', $arguments);
         if (empty($id)) return Error::set('Invalid id.');
         $articlesModel = new articles(ConnectionFactory::get('mongo'));
-        list($article, $total) = $articlesModel->get($id);
+        list($article, $this->view['total']) = $articlesModel->get($id, true, false, true, $this->view['page']);
         
         if (is_string($article)) return Error::set($article);
         
         $this->view['article'] = $article;
         $this->view['multiple'] = (count($article) > 1);
+        $this->view['url'] = Url::format('/article/view/' . $id . '?p=');
         
         if ($this->view['multiple']) return;
         

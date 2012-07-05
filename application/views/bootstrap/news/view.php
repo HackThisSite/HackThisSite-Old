@@ -1,6 +1,13 @@
 <?php
 if (!empty($news)) {
 	if ($multiple) {
+        $data = array(
+            'total' => $total,
+            'perPage' => news::PER_PAGE,
+            'page' => $page,
+            'url' => $url
+        );
+        echo Partial::render('pagination', $data);
 		foreach ($news as $post) {
 			echo Partial::render('newsShort', $post);
 		}

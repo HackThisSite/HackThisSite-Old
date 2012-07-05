@@ -97,7 +97,7 @@ class bugs extends baseModel {
      * 
      * @return mixed The bug/bugs as an array, or an error string.
      */
-    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $limit = self::PER_PAGE) {
+    protected function get($id, $idlib = true, $justOne = false, $fixUTF8 = true, $page = 1, $limit = self::PER_PAGE) {
         $query = array('ghosted' => false);
         if ($idlib) {
             $keys = Id::dissectKeys($id, 'bugs');
@@ -106,7 +106,7 @@ class bugs extends baseModel {
             $query['_id'] = $this->_toMongoId($id);
         }
         
-        $results = $this->db->find($query);
+        $results = $this->db->find($query)->skip(($page - 1) * self::PER_PAGE);
         $total = $results->count();
         $valid = array();
         

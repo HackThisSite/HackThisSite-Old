@@ -84,10 +84,58 @@ class news extends baseModel {
             $this->resolveUser($valid[$key]['user']);
             if ($fixUTF8) $this->resolveUTF8($valid[$key]);
             $valid[$key]['comments'] = $comments->getCount($entry['_id']);
+            $valid[$key]['rating'] = $this->getScore($entry['_id']);
         }
         
         if ($justOne) return reset($valid);
         return array($valid, $total);
+    }
+
+    /**
+     * Get a new post's rating.
+     * 
+     * @param string $id The news post's id.
+     * 
+     * @return int The new post's score, 1-10.
+     */
+    public function getScore($id) {
+        $likes = $this->mongo->newsVotes->count(array(
+            'contentId' => (string) $id, 'liked' => true));
+        $dislikes = $this->mongo->newsVotes->count(array(
+            'contentId' => (string) $id, 'liked' => false));
+
+        return array('likes' => $likes, 'dislikes' => $dislikes);
+    }
+    
+    /**
+     * Casts a vote on a news post.
+     * 
+     * @param string $id The news post's id.
+     * @param int $vote The vote, 1-10.
+     * 
+     * @return mixed Null if successful, or an error string.
+     */
+    public function castVote($id, $vote) {
+        $id = (string) $id;
+        $vote = (string) $vote;
+        
+        if ($vote != 'like' && $vote != 'dislike') return 'Invalid vote.';
+        $data = $this->get($id, false, true);
+        if (empty($data)) return 'Invalid news id.';
+        
+        $data = $this->mongo->newsVotes
+            ->count(array('contentId' => $id, 'userId' => (string) Session::getVar('_id')));
+        if ($data != 0) return 'You\'ve already voted on this!';
+        
+        $entry = array(
+            'contentId' => $id,
+            'userId' => (string) Session::getVar('_id'),
+            'liked' => ($vote == 'like')
+        );
+        
+        $this->mongo->newsVotes->insert($entry);
+        $this->clearCache($id, false);
+        return true;
     }
 
     // Content management magic.

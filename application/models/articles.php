@@ -126,7 +126,7 @@ class articles extends baseModel {
      * 
      * @param string $articleId The article's id.
      * 
-     * @return int The articles score, 1-10.
+     * @return int The article's score, 1-10.
      */
     public function getScore($articleId) {
         $likes = $this->mongo->articleVotes->count(array(

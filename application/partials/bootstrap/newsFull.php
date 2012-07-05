@@ -17,7 +17,16 @@
 	</small>
 	
 	<p><?php echo BBCode::parse($body); ?></p>
-    
+
+<?php if (empty($revision) && empty($preview)):
+$data = array(
+    '_id' => $_id,
+    'rating' => $rating,
+    'type' => 'News',
+    'where' => 'news'
+);
+echo Partial::render('like', $data);
+endif; ?>
 <?php if (!empty($mlt)): ?>
     <p><h4>More Like This:</h4>
 <?php

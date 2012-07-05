@@ -48,4 +48,18 @@ class controller_news extends Content {
         }
     }
     
+    public function vote($arguments) {
+        if (!CheckAcl::can('voteOnNews')) 
+            return Error::set('You can not vote on news posts.');
+        if (empty($arguments[0]) || empty($arguments[1]))
+            return Error::set('Vote or news id not found.');
+        
+        $news = new news(ConnectionFactory::get('mongo'));
+        $result = $news->castVote($arguments[0], $arguments[1]);
+        $post = $news->get($arguments[0], false, true);
+        
+        if (is_string($result)) return Error::set($result, false, array('Back' => Url::format('/news/view/' . Id::create($post, 'news'))));
+        Error::set('Vote cast!', true, array('Back' => Url::format('/news/view/' . Id::create($post, 'news'))));
+    }
+    
 }

@@ -3,6 +3,6 @@
 
 <form class="form-inline well" action="<?php echo Url::format('/notice/post/save'); ?>" method="post">
     <strong>New Notice:  </strong> <input type="text" name="text" />&nbsp;
-    <input type="submit" value="Post Notice" class="btn btn-primary" />
+    <input type="submit" name="post" value="Post Notice" class="btn btn-primary" />
 </form>
 <?php endif; ?>

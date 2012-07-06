@@ -87,6 +87,7 @@ class lazyLoader
         spl_autoload_register(array($this, 'event'));
         spl_autoload_register(array($this, 'controller'));
         spl_autoload_register(array($this, 'driver'));
+        spl_autoload_register(array($this, 'mission'));
         
         $this->cache = apc_fetch('lazyLoader_cache');
     }
@@ -164,6 +165,15 @@ class lazyLoader
 		$this->cache[$name] = $file;
         
         if (!file_exists($file)) die('Invalid driver.');
+        require $file;
+    }
+    
+    public function mission($name) {
+        if (substr($name, -8) != 'Missions') return false;
+        
+        $file = Config::get('missions:location') . strtolower(substr($name, 0, -8)) . '.php';
+        if (!file_exists($file)) return false;
+        
         require $file;
     }
 

@@ -3,7 +3,9 @@ return array(
     'display:layout' => 'bootstrap',
     'display:leftnav' => array(
         'Challenges' => array(
-            "Legacy"       => "missions/legacy", /*
+            'Basic'        => 'missions/basic',
+            'Cryptography' => 'missions/cryptography',
+            'Legacy'       => 'missions/legacy', /*
             "Realistic"   => "#",
             "Application" => "#",
             "Programming" => "#",

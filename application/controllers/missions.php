@@ -10,7 +10,7 @@ class controller_missions extends Controller {
         $this->view['missions'] = $missions->getTypes();
     }
     
-    
+    /*
     private function baseMission($type, $arguments) {
         $this->setView('missions/index');
         if (!Session::isLoggedIn())
@@ -68,7 +68,7 @@ class controller_missions extends Controller {
             $this->setView('missions/base');
         }
     }
-    
+    */
     /*
     public function basic($arguments) {
         $this->baseMission('basic', $arguments);
@@ -80,6 +80,34 @@ class controller_missions extends Controller {
             Layout::cut();
     }
     */
+    
+    public function basic($arguments) {
+        $missions = new missions(ConnectionFactory::get('mongo'));
+
+        if (!empty($arguments[0])) { // A specific mission has been requested.
+            $mission = $missions->get('basic', intval($arguments[0]));
+            if (empty($mission)) return Error::set('Mission does not exist.');
+            
+            $this->view['valid'] = true;
+            $this->view['num'] = $arguments[0];
+            $this->view['basic'] = new BasicMissions;
+            $this->view['name'] = $mission['name'];
+            
+            if (isset($_POST['password'])) {
+                $good = call_user_func(array($this->view['basic'], 
+                    'validateMission' . $this->view['num']), $_POST['password']);
+                if ($good) {
+                    Error::set('Correct!', true);
+                } else {
+                    Error::set('Invalid password!');
+                }
+            }
+        } else { // Just show a listing of possible missions.
+            $this->view['valid'] = true;
+            $this->view['missions'] = $missions->getMissionsByType('basic');
+            $this->setView('missions/base');
+        }
+    }
     
     public function legacy($arguments) {
         Error::set('Not yet added!', true);

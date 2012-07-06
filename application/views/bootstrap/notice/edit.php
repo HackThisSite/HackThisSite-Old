@@ -4,6 +4,6 @@ extract($post); ?>
 
 <form class="form-horizontal" action="<?php echo Url::format('/notice/edit/' . ++$id . '/save'); ?>" method="post">
     <b>Text:  </b> <input type="text" name="text" value="<?php echo $notice; ?>" />&nbsp;
-    <input type="submit" value="Edit Notice" class="btn btn-primary" />
+    <input type="submit" name="post" value="Edit Notice" class="btn btn-primary" />
 </form>
 <?php endif; ?>

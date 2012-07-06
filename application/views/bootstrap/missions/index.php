@@ -1,12 +1,12 @@
 <?php if (!empty($valid) && $valid): ?>
 <center>
 <?php foreach ($missions as $mission): ?>
-    <table border="1" style="width: 50%">
-        <tr><td>
-            <center><b><u><a href="<?php echo Url::format('missions/' . strtolower($mission['name'])); ?>"><?php echo $mission['name']; ?> Missions</a></u></b><br />
-            <p><?php echo $mission['description']; ?></p></center>
-        </td></tr>
-    </table><br /><br />
+<div class="well">
+    <center>
+        <h3><a href="<?php echo Url::format('missions/' . strtolower($mission['name'])); ?>"><?php echo ucwords($mission['name']); ?> Missions</a></h3>
+        <p><?php echo $mission['description']; ?></p>
+    </center>
+</div>
 
 <?php endforeach; ?>
 </center>

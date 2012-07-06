@@ -27,9 +27,7 @@ class users extends baseModel {
      */
     protected function get($id, $idlib = true, $justOne = true) {
         if ($idlib) {
-            $idLib = new Id;
-            $keys = $idLib->dissectKeys($id, 'user');
-
+            $keys = Id::dissectKeys($id, 'user');
             $query = array('username' => $this->clean($keys['username']));
         } else {
             $query = array('_id' => $this->_toMongoId($id));

@@ -4,6 +4,25 @@
  * 
  * @package Model
  */
+/*
+missionTypes:
+    array(
+        'name' => 'basic',
+        'description' => 'To get you started off...',
+        'sort' => 1
+    );
+
+mission:
+    array(
+        'type' => 'basic',
+        'name' => 'HTML Sauce',
+        'sort' => 1,
+        
+    );
+
+
+
+*/
 class missions extends mongoBase {
     
     var $db;

@@ -92,15 +92,14 @@ class controller_missions extends Controller {
             $this->view['num'] = $arguments[0];
             $this->view['basic'] = new BasicMissions;
             $this->view['name'] = $mission['name'];
+            $this->view['next'] = ($arguments[0] != 6);
             
-            if (isset($_POST['password'])) {
-                $good = call_user_func(array($this->view['basic'], 
-                    'validateMission' . $this->view['num']), $_POST['password']);
-                if ($good) {
-                    Error::set('Correct!', true);
-                } else {
-                    Error::set('Invalid password!');
-                }
+            $good = call_user_func(array($this->view['basic'], 'validateMission' . $this->view['num']));
+            if ($good !== null) { // BALANCED.  TERNARY.
+                if (!$good) return Error::set('Wrong!');
+                
+                $this->view['valid'] = false;
+                $this->view['good'] = true;
             }
         } else { // Just show a listing of possible missions.
             $this->view['valid'] = true;

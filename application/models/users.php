@@ -82,7 +82,7 @@ class users extends baseModel {
         if (empty($password)) $passEmpty = true;
         
         // Cleaning
-        $username = $this->clean($username);
+        $username = substr($this->clean($username), 0, 80);
         $password = $this->hash($password, $username);
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
         $hideEmail = (bool) $hideEmail;

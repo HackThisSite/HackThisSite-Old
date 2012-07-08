@@ -17,7 +17,7 @@ Prerequisites
 - [ElasticSearch](http://www.elasticsearch.org/download/)
 - [phpredis](http://www.github.com/nicolasff/phpredis)
 - [MsgPack for PHP](http://code.google.com/p/php-msgpack/)
-- [BrowsCap](http://browsers.garykeith.com/downloads.asp)
+- [BrowskCap](http://browsers.garykeith.com/downloads.asp)
 - PECL extensions (apc, bbcode, mongo)
 
 #### PHP ####
@@ -29,11 +29,8 @@ extension=bbcode.so
 extension=mongo.so
 extension=redis.so
 apc.slam_defense=0
-browscap=/var/www/php_browscap.ini;
-session.name=HTSSID;
 session.save_handler=redis
 session.save_path = "tcp://localhost:6379?weight=1&timeout=0.5"
-session.serialize_handler=msgpack;
 ```
 
 #### Nginx ####

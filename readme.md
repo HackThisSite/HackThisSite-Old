@@ -130,5 +130,10 @@ Just Run It
 
 Further Information
 ====================
-Refer to [HackThisSite Wiki](https://github.com/HackThisSite/HackThisSite/wiki)
-or HackThisSite/docs for more documentation.
+Refer to [HackThisSite Wiki](https://github.com/HackThisSite/HackThisSite/wiki) or
+```
+$ cd HackThisSite/HackThisSite
+$ git submodule init # Init the .gitmodules config
+$ git submodule update # fetch all data from the wiki repo
+$ cd docs
+```

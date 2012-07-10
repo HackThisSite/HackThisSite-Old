@@ -130,4 +130,5 @@ Just Run It
 
 Further Information
 ====================
-Check HackThisSite/docs for more stuff.
+Refer to [HackThisSite Wiki](https://github.com/HackThisSite/HackThisSite/wiki)
+or HackThisSite/docs for more documentation.

@@ -1,5 +1,10 @@
-HackThisSite v5 Installation Guide
-==================================
+[HackThisSite](http://redmine.hackthissite.org/projects/htsdev)
+==============
+
+Getting Started
+----------------
+Clone the repo, ```git clone https://github.com/HackThisSite/HackThisSite.git```.
+Fetch submodules (docs), ```git submodule update --init```.
 
 Prerequisites
 -------------
@@ -127,13 +132,3 @@ Just Run It
 3. mongodb
 4. redis
 5. elasticsearch
-
-Further Information
-====================
-Refer to [HackThisSite Wiki](https://github.com/HackThisSite/HackThisSite/wiki) or
-```
-$ cd HackThisSite/HackThisSite
-$ git submodule init # Init the .gitmodules config
-$ git submodule update # fetch all data from the wiki repo
-$ cd docs
-```

@@ -4,10 +4,10 @@ SSL Client Authentication
 Setting Up the CA
 -----------------
 Create the CA certificate pair for signing client certs:
-'''
+```
 	$ openssl genrsa -out ca.key 4096
 	$ openssl req -new -x509 -days 365 -key ca.key -out ca.crt
-'''
+```
 
 The location of the certificate and key files will be in the 
 ssl:certificate and ssl:key configuration directives.  These two files 
@@ -19,27 +19,27 @@ Setting Up SSL on Nginx
 -----------------------
 In order to allow SSL connections on Nginx, you need a server 
 certificate and key.  You can generate them by running:
-'''
+```
 	$ openssl genrsa -out server.key 1024
 	$ openssl req -new -x509 -days 365 -key server.key -out server.crt
-'''
+```
 
 Put server.key and server.crt in the same place you put the CA's key 
 pair in the section above.  Then copy your server block that you use 
 for normal site vists and change the listen directive to accept 
 connections on port 443.  Also, add the following lines in the server 
 block (anywhere is fine as long as it is not in a location block!):
-'''
+```
 	ssl on;
 	ssl_certificate /var/www/server.crt;
 	ssl_certificate_key /var/www/server.key;
-'''
+```
 
 Then, where you have your list of fastcgi_params, add the directives:
-'''
+```
 	fastcgi_param SSL_CLIENT_CERT $ssl_client_cert;
 	fastcgi_param SSL_CLIENT_RAW_CERT $ssl_client_raw_cert;
-'''
+```
 
 Just make sure that they are in the appropriate location block and above 
 the fastcgi_pass line.  You can verify that SSL works by saving your 
@@ -51,10 +51,10 @@ Setting Up Nginx
 ----------------
 Once you have SSL enabled on Nginx , add the following lines below your 
 SSL directives:
-'''
+```
 	ssl_verify_client optional; # Ask for a client certificate
 	ssl_client_certificate /var/www/ca.crt; # Location of the CA's certificate
-'''
+```
 
 Make sure to restart Nginx if it's currently running.  Also, if you want 
 to keep your keys safe from other users on your box, you can chown them 
@@ -80,7 +80,7 @@ https://github.com/nategood/sleep-tight/blob/master/scripts/create-certs.sh
 
 Example Configuration
 ---------------------
-'''
+```
 server {
 
 	listen  443;
@@ -136,4 +136,4 @@ server {
 	        fastcgi_pass 127.0.0.1:9000;
 	}
 }
-'''
+```

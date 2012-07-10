@@ -1,8 +1,6 @@
 [HackThisSite](http://redmine.hackthissite.org/projects/htsdev)
 ==============
 
-Getting Started
-----------------
 ```
 git clone https://github.com/HackThisSite/HackThisSite.git
 git submodule update --init

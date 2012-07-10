@@ -3,8 +3,8 @@
 
 Getting Started
 ----------------
-Clone the repo, ```git clone https://github.com/HackThisSite/HackThisSite.git```.
-Fetch submodules (docs), ```git submodule update --init```.
+Clone the repo: ```git clone https://github.com/HackThisSite/HackThisSite.git```.
+Fetch submodules (docs): ```git submodule update --init```.
 
 Prerequisites
 -------------

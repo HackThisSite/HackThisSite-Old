@@ -119,3 +119,11 @@ return array("system:environment" => "dev",
     "other:staticUrl" => "http://192.168.101.65/static/");
 ```
 Note: Do not forget the trailing slash.
+
+Just Run It
+===========
+1. nginx
+2. php-fpm
+3. mongodb
+4. redis
+5. elasticsearch

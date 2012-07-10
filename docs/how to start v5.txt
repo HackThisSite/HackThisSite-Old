@@ -1,7 +1,0 @@
-(Sorry this is so short, it's just a quick doc for dev reference.)
-
-1.  Start nginx
-2.  Start php-fpm
-3.  Start mongod
-4.  Start redis
-5.  Stat elasticsearch

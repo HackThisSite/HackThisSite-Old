@@ -127,3 +127,7 @@ Just Run It
 3. mongodb
 4. redis
 5. elasticsearch
+
+Further Information
+====================
+Check HackThisSite/docs for more stuff.

@@ -3,8 +3,7 @@
 
 ```
 $ git clone https://github.com/HackThisSite/HackThisSite.git
-$ git submodule update --init
-$ make # Currently builds twitter-bootstrap.
+$ make
 ```
 
 Prerequisites

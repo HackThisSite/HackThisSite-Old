@@ -1,9 +1,14 @@
-.PHONY: all clean
+BOOTSTRAPDIR = vendor/bootstrap
+DOCSDIR = docs
 
-all: twitter/bootstrap
+all: docs twitter/bootstrap
+
+docs:
+	git submodule update --init $(DOCSDIR)
 
 twitter/bootstrap:
-	@echo 'Building twitter-bootstrap.'
+	git submodule update --init $(BOOTSTRAPDIR)
 	cd vendor/bootstrap; $(MAKE) $(MAKEFLAGS) bootstrap
+	@ln -s ../../vendor/bootstrap/bootstrap static/themes/bootstrap
 
-clean:
+.PHONY: all

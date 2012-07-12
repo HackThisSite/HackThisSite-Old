@@ -1,16 +1,13 @@
-BOOTSTRAPDIR = vendor/bootstrap
-DOCSDIR = docs
-
-all: docs twitter/bootstrap
+all: docs vendor/bootstrap/bootstrap
 
 docs:
 	@echo Fetching/Updating $@.
-	@git submodule update --init $(DOCSDIR)
+	@git submodule update --init $@
 
-twitter/bootstrap:
+vendor/bootstrap/bootstrap:
 	@echo Fetching/Updating $@.
-	@git submodule update --init $(BOOTSTRAPDIR)
+	@git submodule update --init $@
 	@cd $(BOOTSTRAPDIR); $(MAKE) $(MAKEFLAGS) bootstrap
-	@ln -sf ../../$(BOOTSTRAPDIR)/bootstrap static/themes/bootstrap
+	@ln -sf ../../$@ static/themes/bootstrap
 
-.PHONY: all docs twitter/bootstrap
+.PHONY: all

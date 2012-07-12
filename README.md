@@ -6,7 +6,6 @@ Getting The Code
 ----------------
 ```
 git clone --recursive https://github.com/HackThisSite/HackThisSite.git
-make
 ```
 Installation
 ------------

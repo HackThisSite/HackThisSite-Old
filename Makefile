@@ -9,6 +9,6 @@ docs:
 twitter/bootstrap:
 	git submodule update --init $(BOOTSTRAPDIR)
 	cd vendor/bootstrap; $(MAKE) $(MAKEFLAGS) bootstrap
-	@ln -s ../../vendor/bootstrap/bootstrap static/themes/bootstrap
+	ln -sf ../../vendor/bootstrap/bootstrap static/themes/bootstrap
 
 .PHONY: all

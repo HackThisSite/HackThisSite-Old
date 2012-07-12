@@ -2,8 +2,8 @@
 ==============
 
 ```
-$ git clone https://github.com/HackThisSite/HackThisSite.git
-$ make
+git clone https://github.com/HackThisSite/HackThisSite.git
+make
 ```
 
 Prerequisites
@@ -24,6 +24,7 @@ Prerequisites
 - [MsgPack for PHP](http://code.google.com/p/php-msgpack/)
 - [BrowsCap](http://browsers.garykeith.com/downloads.asp)
 - PECL extensions (apc, bbcode, mongo)
+- npm (to build bootstrap) ```npm install recess uglify-js jshint -g```
 
 #### PHP ####
 

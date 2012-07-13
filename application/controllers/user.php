@@ -141,8 +141,9 @@ class controller_user extends Controller {
             if ($value > 3) {
                 $this->view['publicKey'] = Config::get('recaptcha:publicKey');
                 $this->view['captcha'] = true;
-                sleep(1);
             }
+            
+            if ($value > 15) return Error::set('No.  Bad boy.');
         }
         
         if (!isset($_POST['username']) || !isset($_POST['password'])) return;
@@ -164,7 +165,7 @@ class controller_user extends Controller {
         
         if (is_string($good)) {
             if (!apc_exists($key)) {
-                apc_store($key, 0, 300);
+                apc_store($key, 2, 300);
             } else {
                 apc_inc($key, 1);
             }

@@ -9,7 +9,7 @@ git clone --recursive https://github.com/HackThisSite/HackThisSite.git
 ```
 Installation
 ------------
-See the Wiki for the up-to-date [Installation Guide](https://github.com/HackThisSite/HackThisSite/wiki/Installation).
+See the Wiki for the up-to-date [Installation Guide](https://github.com/HackThisSite/HackThisSite/wiki/Install).
 
 Help Us Out By Contributing
 ---------------------------
